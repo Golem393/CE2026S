@@ -1,0 +1,28 @@
+{
+  "stakeholder:teammate_vegan": {
+    "stakeholder_id": "stakeholder:teammate_vegan",
+    "doc_id": "stakeholder:teammate_vegan",
+    "text": "Potential dinner stakeholder: a teammate may join and needs genuinely vegan-capable options, not token substitutions.",
+    "tags": [
+      "team_dietary_flex"
+    ]
+  },
+  "stakeholder:client_polished": {
+    "stakeholder_id": "stakeholder:client_polished",
+    "doc_id": "stakeholder:client_polished",
+    "text": "Potential dinner stakeholder: the guest values a polished but calm room suitable for sustained conversation.",
+    "tags": [
+      "client_dinner_polished",
+      "private_room_bonus"
+    ]
+  },
+  "stakeholder:ops_host": {
+    "stakeholder_id": "stakeholder:ops_host",
+    "doc_id": "stakeholder:ops_host",
+    "text": "Operational host note: transfer reliability matters more than novelty if the schedule is moving.",
+    "tags": [
+      "low_friction_transit",
+      "refundable_priority"
+    ]
+  }
+}

@@ -1,0 +1,150 @@
+[
+  {
+    "activity_id": "ACT101_meeting_support",
+    "city": "OSA",
+    "date": "2026-10-13",
+    "category": "meeting_buffer",
+    "location_zone": "namba",
+    "indoor": true,
+    "price": 0,
+    "opening_hours": "08:00-12:00",
+    "weather_sensitive": false
+  },
+  {
+    "activity_id": "ACT102_gallery_walk",
+    "city": "OSA",
+    "date": "2026-10-13",
+    "category": "gallery",
+    "location_zone": "namba",
+    "indoor": true,
+    "price": 20,
+    "opening_hours": "12:00-17:00",
+    "weather_sensitive": false
+  },
+  {
+    "activity_id": "ACT103_river_walk",
+    "city": "OSA",
+    "date": "2026-10-13",
+    "category": "walking_tour",
+    "location_zone": "umeda",
+    "indoor": false,
+    "price": 0,
+    "opening_hours": "13:00-16:00",
+    "weather_sensitive": true
+  },
+  {
+    "activity_id": "ACT401_client_visit",
+    "city": "TPE",
+    "date": "2026-12-04",
+    "category": "client_visit",
+    "location_zone": "xinyi",
+    "indoor": true,
+    "price": 0,
+    "opening_hours": "09:00-18:00",
+    "weather_sensitive": false
+  },
+  {
+    "activity_id": "ACT402_design_museum",
+    "city": "TPE",
+    "date": "2026-12-04",
+    "category": "museum",
+    "location_zone": "songshan",
+    "indoor": true,
+    "price": 30,
+    "opening_hours": "10:00-17:00",
+    "weather_sensitive": false
+  },
+  {
+    "activity_id": "ACT403_hillside_detour",
+    "city": "TPE",
+    "date": "2026-12-04",
+    "category": "walking_tour",
+    "location_zone": "scenic_outer",
+    "indoor": false,
+    "price": 0,
+    "opening_hours": "13:00-17:00",
+    "weather_sensitive": true
+  },
+  {
+    "activity_id": "ACT301_outdoor",
+    "city": "SIN",
+    "date": "2026-11-13",
+    "category": "site_visit",
+    "location_zone": "jurong",
+    "indoor": false,
+    "price": 0,
+    "opening_hours": "13:00-17:00",
+    "weather_sensitive": true
+  },
+  {
+    "activity_id": "ACT302_indoor",
+    "city": "SIN",
+    "date": "2026-11-13",
+    "category": "innovation_center_tour",
+    "location_zone": "one_north",
+    "indoor": true,
+    "price": 40,
+    "opening_hours": "13:00-17:00",
+    "weather_sensitive": false
+  },
+  {
+    "activity_id": "ACT303_client_lounge",
+    "city": "SIN",
+    "date": "2026-11-13",
+    "category": "meeting_buffer",
+    "location_zone": "marina",
+    "indoor": true,
+    "price": 25,
+    "opening_hours": "14:00-18:00",
+    "weather_sensitive": false
+  },
+  {
+    "activity_id": "ACT104_indoor_tea",
+    "city": "OSA",
+    "category": "tea_house",
+    "location_zone": "namba",
+    "indoor": true,
+    "price": 28000
+  },
+  {
+    "activity_id": "ACT105_partner_lounge",
+    "city": "OSA",
+    "category": "meeting_buffer",
+    "location_zone": "umeda",
+    "indoor": true,
+    "price": 38000
+  },
+  {
+    "activity_id": "ACT404_partner_lounge",
+    "city": "TPE",
+    "category": "meeting_buffer",
+    "location_zone": "xinyi",
+    "indoor": true,
+    "price": 42000,
+    "badge_only": true
+  },
+  {
+    "activity_id": "ACT405_innovation_gallery",
+    "city": "TPE",
+    "category": "gallery",
+    "location_zone": "blue_line_corridor",
+    "indoor": true,
+    "price": 26000
+  },
+  {
+    "activity_id": "ACT304_innovation_center",
+    "city": "SIN",
+    "category": "innovation_center_tour",
+    "location_zone": "one_north",
+    "indoor": true,
+    "price": 40000
+  },
+  {
+    "activity_id": "ACT305_boardroom_buffer",
+    "city": "SIN",
+    "category": "meeting_buffer",
+    "location_zone": "airport_link",
+    "indoor": true,
+    "price": 36000
+  }
+]

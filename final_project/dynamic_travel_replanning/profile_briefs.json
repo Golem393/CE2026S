@@ -1,0 +1,100 @@
+{
+  "traveler_consultant": {
+    "traveler_id": "traveler_consultant",
+    "doc_id": "profile:traveler_consultant",
+    "text": "Stable profile: avoid red-eyes, protect prep evenings before meetings, prefers quiet hotel rooms over flashy design, values local character when schedule risk is low, vegan-friendly group dinners help the team.",
+    "stable_prefs": [
+      "avoid_red_eye",
+      "protect_prep_evening",
+      "prefer_quiet_hotel",
+      "local_character_if_safe",
+      "vegan_team_meal"
+    ],
+    "avoid_zones": [
+      "nightlife_strip"
+    ],
+    "preferred_zones": [
+      "central",
+      "namba",
+      "xinyi",
+      "one_north"
+    ]
+  },
+  "traveler_exec": {
+    "traveler_id": "traveler_exec",
+    "doc_id": "profile:traveler_exec",
+    "text": "Stable profile: airport access usually matters, direct flights are worth a small premium, hotel noise is costly, client-facing dinners should feel polished, avoid chaotic late-night districts unless explicitly overridden.",
+    "stable_prefs": [
+      "prefer_airport_access",
+      "prefer_direct_flight",
+      "prefer_quiet_hotel",
+      "client_dinner_polished"
+    ],
+    "avoid_zones": [
+      "nightlife_strip"
+    ],
+    "preferred_zones": [
+      "airport_link",
+      "marina",
+      "central",
+      "xinyi"
+    ]
+  },
+  "traveler_research": {
+    "traveler_id": "traveler_research",
+    "doc_id": "profile:traveler_research",
+    "text": "Stable profile: low-friction transit and time to think matter, likes calm local places over touristy bustle, can accept simple meals, avoids unnecessary hotel changes once settled.",
+    "stable_prefs": [
+      "low_friction_transit",
+      "prefer_calm_local",
+      "avoid_rebooking_if_possible"
+    ],
+    "avoid_zones": [
+      "airport_far_edge"
+    ],
+    "preferred_zones": [
+      "one_north",
+      "xinyi",
+      "umeda"
+    ]
+  },
+  "traveler_sales": {
+    "traveler_id": "traveler_sales",
+    "doc_id": "profile:traveler_sales",
+    "text": "Stable profile: values polished but calm dinners, accepts bundles if they reduce friction, prefers refundable plans when partner schedules look volatile, and dislikes carrying too many conditional notes in active context.",
+    "stable_prefs": [
+      "client_dinner_polished",
+      "low_friction_transit",
+      "refundable_priority",
+      "relevant_only"
+    ],
+    "avoid_zones": [
+      "nightlife_strip"
+    ],
+    "preferred_zones": [
+      "namba",
+      "xinyi",
+      "one_north",
+      "marina"
+    ]
+  },
+  "traveler_ops": {
+    "traveler_id": "traveler_ops",
+    "doc_id": "profile:traveler_ops",
+    "text": "Stable profile: airport access, transfer resilience, and quiet sleep matter. Will accept a chain when it meaningfully lowers operational risk, but does not want stale exceptions to rewrite the normal profile.",
+    "stable_prefs": [
+      "prefer_airport_access",
+      "low_friction_transit",
+      "prefer_quiet_hotel",
+      "chain_exception_this_trip"
+    ],
+    "avoid_zones": [
+      "nightlife_strip"
+    ],
+    "preferred_zones": [
+      "airport_link",
+      "blue_line_corridor",
+      "one_north"
+    ]
+  }
+}

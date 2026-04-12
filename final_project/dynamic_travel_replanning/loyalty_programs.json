@@ -1,0 +1,64 @@
+{
+  "traveler_exec": {
+    "traveler_id": "traveler_exec",
+    "doc_id": "loyalty:traveler_exec",
+    "hotel_partner_ids": [
+      "HT202",
+      "HT206",
+      "HT807",
+      "HT907",
+      "HT908"
+    ],
+    "preferred_flight_ids": [
+      "FL105",
+      "FL705",
+      "FL806"
+    ],
+    "hotel_credit_krw": 18000,
+    "bonus_tags": [
+      "loyalty_bundle_value",
+      "prefer_airport_access"
+    ],
+    "text": "Executive loyalty profile: selected chain stays include breakfast or late checkout, slightly improving effective value when the operational fit is already good."
+  },
+  "traveler_sales": {
+    "traveler_id": "traveler_sales",
+    "doc_id": "loyalty:traveler_sales",
+    "hotel_partner_ids": [
+      "HT208",
+      "HT807",
+      "HT907"
+    ],
+    "preferred_flight_ids": [
+      "FL106",
+      "FL706",
+      "FL806"
+    ],
+    "hotel_credit_krw": 22000,
+    "bonus_tags": [
+      "loyalty_bundle_value",
+      "refundable_priority"
+    ],
+    "text": "Sales loyalty profile: premium but flexible chain bookings get extra value when schedule volatility is non-trivial."
+  },
+  "traveler_ops": {
+    "traveler_id": "traveler_ops",
+    "doc_id": "loyalty:traveler_ops",
+    "hotel_partner_ids": [
+      "HT208",
+      "HT807",
+      "HT908"
+    ],
+    "preferred_flight_ids": [
+      "FL106",
+      "FL706",
+      "FL806"
+    ],
+    "hotel_credit_krw": 20000,
+    "bonus_tags": [
+      "loyalty_bundle_value",
+      "low_friction_transit"
+    ],
+    "text": "Ops loyalty profile: airport-linked chain stays receive value from priority check-in and operational support when the trip gets messy."
+  }
+}

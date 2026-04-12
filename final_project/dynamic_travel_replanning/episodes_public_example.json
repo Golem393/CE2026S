@@ -1,0 +1,4234 @@
+[
+  {
+    "trip_id": "rtl7_public_easy_001",
+    "difficulty_tier": "easy",
+    "benchmark_family": "core_memory_replanning",
+    "family": "business_travel",
+    "city": "OSA",
+    "origin": "GMP",
+    "traveler_id": "traveler_consultant",
+    "nights": 2,
+    "budget_total": 610000,
+    "meeting_zone": "namba",
+    "weather": "clear",
+    "spoken_rule_density": "moderate",
+    "scenario_hooks": {
+      "stakeholders": [],
+      "badge_status": "inactive",
+      "schedule_volatility": "normal",
+      "bundle_watch": false,
+      "late_arrival_risk": false,
+      "event_sensitive": false
+    },
+    "scenario_state": {
+      "airport_priority": false,
+      "rainy": false,
+      "client_dinner": false,
+      "chain_exception": false,
+      "partner_bundle": false,
+      "event_disruption": false,
+      "badge_available": false,
+      "refund_risk": false,
+      "loyalty_focus": false,
+      "late_arrival_risk": false,
+      "teammate_vegan": false,
+      "stakeholder_ids": []
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "Please build a short trip plan that keeps me functional for work, not just technically on time."
+      },
+      {
+        "speaker": "user",
+        "text": "A teammate may join dinner, so dietary flexibility matters more than a flashy venue."
+      },
+      {
+        "speaker": "user",
+        "text": "My usual travel habits are in my profile. Please use them, but do not let one-off exceptions rewrite them."
+      },
+      {
+        "speaker": "user",
+        "text": "Please remember that a genuinely quiet room matters to me; do not treat it as cosmetic."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not send me through a red-eye just because the fare is lower."
+      },
+      {
+        "speaker": "user",
+        "text": "Please filter out places that feel loud after 10pm; nightlife spillover is a real problem for this trip."
+      },
+      {
+        "speaker": "user",
+        "text": "Bring back only the relevant old preferences, not the whole history; keep active context lean."
+      },
+      {
+        "speaker": "user",
+        "text": "If you reject a hotel for noise, keep that reason around and do not surface it again unless something material changes."
+      },
+      {
+        "speaker": "user",
+        "text": "If a dinner option is out for the wrong vibe, keep it out instead of rediscovering the same mistake later."
+      },
+      {
+        "speaker": "user",
+        "text": "The older budget assumption is no longer valid, so retire it rather than repeating it."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_budget",
+        "meeting_safe_arrival",
+        "quiet_hotel",
+        "zone_coherence"
+      ],
+      "soft_tags": [
+        "quiet",
+        "low_friction",
+        "local_character",
+        "vegan_friendly"
+      ],
+      "acceptable_flights": [
+        "FL101"
+      ],
+      "acceptable_hotels": [
+        "HT206"
+      ],
+      "good_restaurants": [
+        "RS3001"
+      ],
+      "good_activities": [
+        "ACT101_meeting_support"
+      ],
+      "required_docs": [
+        "city_ops:OSA",
+        "dependency:OSA_ht206_rs3001_private_room",
+        "event:OSA_namba_food_fair",
+        "event:OSA_umeda_private_room_night",
+        "heuristic:lean_context_policy",
+        "heuristic:rejected_option_memory",
+        "profile:traveler_consultant",
+        "promo:OSA_ht206_rs3001_private_room",
+        "venue:OSA_business_travel"
+      ],
+      "stale_docs_to_retire": [
+        "stale:budget_cap_archive"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:traveler_consultant_weekend_food_crawl",
+        "playbook:OSA_business_travel_afterwork_social",
+        "stale:OSA_shinsekai_shortcut"
+      ],
+      "should_retrieve": [
+        "avoid_red_eye",
+        "local_character_if_safe",
+        "low_friction_transit",
+        "prefer_quiet_hotel"
+      ],
+      "should_retire": [
+        "old_budget_cap"
+      ],
+      "should_remember_rejected": [
+        "rejected_hotel_for_noise",
+        "rejected_flight_for_red_eye",
+        "rejected_restaurant_for_vibe"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "quiet_matters"
+        ],
+        "forbidden": [
+          "red_eye",
+          "loud_after_10pm"
+        ],
+        "one_off_only": [],
+        "retire": [
+          "old_budget_cap"
+        ],
+        "do_not_reconsider": [
+          "noise_rejected_hotel",
+          "wrong_vibe_restaurant"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_zone": "namba",
+      "avoid_zone": "shinsekai",
+      "episodic_exceptions": []
+    }
+  },
+  {
+    "trip_id": "rtl7_public_easy_002",
+    "difficulty_tier": "easy",
+    "benchmark_family": "client_ready_dinner",
+    "family": "conference_trip",
+    "city": "TPE",
+    "origin": "SEL",
+    "traveler_id": "traveler_exec",
+    "nights": 2,
+    "budget_total": 590000,
+    "meeting_zone": "xinyi",
+    "weather": "clear",
+    "spoken_rule_density": "moderate",
+    "scenario_hooks": {
+      "stakeholders": [
+        "stakeholder:client_polished"
+      ],
+      "badge_status": "inactive",
+      "schedule_volatility": "normal",
+      "bundle_watch": false,
+      "late_arrival_risk": false,
+      "event_sensitive": false
+    },
+    "scenario_state": {
+      "airport_priority": false,
+      "rainy": false,
+      "client_dinner": true,
+      "chain_exception": false,
+      "partner_bundle": false,
+      "event_disruption": false,
+      "badge_available": false,
+      "refund_risk": false,
+      "loyalty_focus": false,
+      "late_arrival_risk": false,
+      "teammate_vegan": false,
+      "stakeholder_ids": [
+        "stakeholder:client_polished"
+      ]
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "I need to arrive ready for an early conference morning, not merely arrive somehow."
+      },
+      {
+        "speaker": "user",
+        "text": "A small networking dinner is welcome only if it does not damage the next day."
+      },
+      {
+        "speaker": "user",
+        "text": "My usual travel habits are in my profile. Please use them, but do not let one-off exceptions rewrite them."
+      },
+      {
+        "speaker": "user",
+        "text": "Please remember that a genuinely quiet room matters to me; do not treat it as cosmetic."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not send me through a red-eye just because the fare is lower."
+      },
+      {
+        "speaker": "user",
+        "text": "Please filter out places that feel loud after 10pm; nightlife spillover is a real problem for this trip."
+      },
+      {
+        "speaker": "user",
+        "text": "Bring back only the relevant old preferences, not the whole history; keep active context lean."
+      },
+      {
+        "speaker": "user",
+        "text": "If you reject a hotel for noise, keep that reason around and do not surface it again unless something material changes."
+      },
+      {
+        "speaker": "user",
+        "text": "If a dinner option is out for the wrong vibe, keep it out instead of rediscovering the same mistake later."
+      },
+      {
+        "speaker": "user",
+        "text": "Remember that client-facing or partner-facing dinners should feel polished enough for conversation, not merely convenient."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_budget",
+        "meeting_safe_arrival",
+        "quiet_hotel",
+        "zone_coherence"
+      ],
+      "soft_tags": [
+        "quiet",
+        "low_friction",
+        "local_character",
+        "client_ready"
+      ],
+      "acceptable_flights": [
+        "FL702"
+      ],
+      "acceptable_hotels": [
+        "HT806"
+      ],
+      "good_restaurants": [
+        "RS4001"
+      ],
+      "good_activities": [
+        "ACT401_client_visit"
+      ],
+      "required_docs": [
+        "city_ops:TPE",
+        "event:TPE_xinyi_expo_surge",
+        "heuristic:lean_context_policy",
+        "heuristic:rejected_option_memory",
+        "heuristic:stakeholder_balance",
+        "profile:traveler_exec",
+        "stakeholder:client_polished",
+        "venue:TPE_conference_trip"
+      ],
+      "stale_docs_to_retire": [
+        "stale:budget_cap_archive"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:traveler_exec_scenic_photo_walk",
+        "playbook:TPE_conference_afterparty",
+        "stale:TPE_scenic_outer_transfer_note"
+      ],
+      "should_retrieve": [
+        "avoid_red_eye",
+        "client_dinner_polished",
+        "local_character_if_safe",
+        "low_friction_transit",
+        "prefer_quiet_hotel"
+      ],
+      "should_retire": [
+        "old_budget_cap"
+      ],
+      "should_remember_rejected": [
+        "rejected_hotel_for_noise",
+        "rejected_flight_for_red_eye",
+        "rejected_restaurant_for_vibe"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "quiet_matters",
+          "client_ready_dinner"
+        ],
+        "forbidden": [
+          "red_eye",
+          "loud_after_10pm"
+        ],
+        "one_off_only": [],
+        "retire": [
+          "old_budget_cap"
+        ],
+        "do_not_reconsider": [
+          "noise_rejected_hotel",
+          "wrong_vibe_restaurant"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_zone": "xinyi",
+      "avoid_zone": "scenic_outer",
+      "episodic_exceptions": []
+    }
+  },
+  {
+    "trip_id": "rtl7_public_medium_003",
+    "difficulty_tier": "medium",
+    "benchmark_family": "loyalty_effective_value",
+    "family": "business_travel",
+    "city": "OSA",
+    "origin": "GMP",
+    "traveler_id": "traveler_ops",
+    "nights": 2,
+    "budget_total": 570000,
+    "meeting_zone": "namba",
+    "weather": "clear",
+    "spoken_rule_density": "dense",
+    "scenario_hooks": {
+      "stakeholders": [],
+      "badge_status": "inactive",
+      "schedule_volatility": "high",
+      "bundle_watch": true,
+      "late_arrival_risk": true,
+      "event_sensitive": false
+    },
+    "scenario_state": {
+      "airport_priority": true,
+      "rainy": false,
+      "client_dinner": false,
+      "chain_exception": false,
+      "partner_bundle": true,
+      "event_disruption": false,
+      "badge_available": false,
+      "refund_risk": true,
+      "loyalty_focus": true,
+      "late_arrival_risk": true,
+      "teammate_vegan": false,
+      "stakeholder_ids": []
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "Please build a short trip plan that keeps me functional for work, not just technically on time."
+      },
+      {
+        "speaker": "user",
+        "text": "A teammate may join dinner, so dietary flexibility matters more than a flashy venue."
+      },
+      {
+        "speaker": "user",
+        "text": "My usual travel habits are in my profile. Please use them, but do not let one-off exceptions rewrite them."
+      },
+      {
+        "speaker": "user",
+        "text": "Please remember that a genuinely quiet room matters to me; do not treat it as cosmetic."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not send me through a red-eye just because the fare is lower."
+      },
+      {
+        "speaker": "user",
+        "text": "Please filter out places that feel loud after 10pm; nightlife spillover is a real problem for this trip."
+      },
+      {
+        "speaker": "user",
+        "text": "Bring back only the relevant old preferences, not the whole history; keep active context lean."
+      },
+      {
+        "speaker": "user",
+        "text": "If you reject a hotel for noise, keep that reason around and do not surface it again unless something material changes."
+      },
+      {
+        "speaker": "user",
+        "text": "If a dinner option is out for the wrong vibe, keep it out instead of rediscovering the same mistake later."
+      },
+      {
+        "speaker": "user",
+        "text": "For this trip only, airport access matters more than local character."
+      },
+      {
+        "speaker": "user",
+        "text": "After the risk update, stop carrying the old local-character preference in active context unless it becomes relevant again."
+      },
+      {
+        "speaker": "user",
+        "text": "I heard some hotel+dinner or shuttle bundles may exist. Count them only if they improve the full plan, not just the sticker price."
+      },
+      {
+        "speaker": "user",
+        "text": "Timing may still move, so refundable bookings deserve real weight instead of being treated as a trivial nice-to-have."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not assume a nominal dinner bundle still works after a late arrival; some perks disappear after check-in cutoffs."
+      },
+      {
+        "speaker": "user",
+        "text": "Please consider whether a loyalty perk changes the effective value of a bundle, not just the list price."
+      },
+      {
+        "speaker": "user",
+        "text": "The older budget assumption is no longer valid, so retire it rather than repeating it."
+      },
+      {
+        "speaker": "user",
+        "text": "Keep the useful parts, drop stale assumptions, and adjust only what the new situation forces."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_budget",
+        "meeting_safe_arrival",
+        "quiet_hotel",
+        "zone_coherence",
+        "refund_safe",
+        "bundle_dependency_valid"
+      ],
+      "soft_tags": [
+        "quiet",
+        "low_friction",
+        "easy_airport_access",
+        "vegan_friendly"
+      ],
+      "acceptable_flights": [
+        "FL101"
+      ],
+      "acceptable_hotels": [
+        "HT206"
+      ],
+      "good_restaurants": [
+        "RS3001"
+      ],
+      "good_activities": [
+        "ACT101_meeting_support"
+      ],
+      "required_docs": [
+        "city_ops:OSA",
+        "constraint:late_arrival_voids_bundle",
+        "dependency:OSA_ht206_rs3001_private_room",
+        "event:OSA_namba_food_fair",
+        "event:OSA_umeda_private_room_night",
+        "heuristic:lean_context_policy",
+        "heuristic:partner_bundle_reasoning",
+        "heuristic:refundable_schedule_risk",
+        "heuristic:rejected_option_memory",
+        "loyalty:traveler_ops",
+        "profile:traveler_ops",
+        "promo:OSA_ht206_rs3001_private_room",
+        "venue:OSA_business_travel"
+      ],
+      "stale_docs_to_retire": [
+        "stale:budget_cap_archive",
+        "stale:bundle_discount_always_wins",
+        "stale:late_checkin_irrelevant",
+        "stale:local_character_default"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:traveler_consultant_weekend_food_crawl",
+        "playbook:OSA_business_travel_afterwork_social",
+        "stale:OSA_shinsekai_shortcut",
+        "stale:partner_social_default"
+      ],
+      "should_retrieve": [
+        "avoid_red_eye",
+        "bundle_discount_value",
+        "late_checkin_risk",
+        "low_friction_transit",
+        "loyalty_bundle_value",
+        "prefer_airport_access",
+        "prefer_quiet_hotel",
+        "private_room_bonus",
+        "refundable_priority"
+      ],
+      "should_retire": [
+        "late_checkin_irrelevant",
+        "local_character_if_safe",
+        "old_budget_cap",
+        "old_bundle_discount_absolute"
+      ],
+      "should_remember_rejected": [
+        "rejected_hotel_for_noise",
+        "rejected_flight_for_red_eye",
+        "rejected_restaurant_for_vibe"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "quiet_matters"
+        ],
+        "forbidden": [
+          "red_eye",
+          "loud_after_10pm"
+        ],
+        "one_off_only": [
+          "airport_access_more_important_now"
+        ],
+        "retire": [
+          "late_checkin_irrelevant",
+          "old_budget_cap",
+          "old_bundle_discount_absolute",
+          "old_local_character_priority"
+        ],
+        "do_not_reconsider": [
+          "noise_rejected_hotel",
+          "wrong_vibe_restaurant"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_zone": "namba",
+      "avoid_zone": "shinsekai",
+      "episodic_exceptions": [
+        "airport_access_more_important_now"
+      ]
+    }
+  },
+  {
+    "trip_id": "rtl7_public_medium_004",
+    "difficulty_tier": "medium",
+    "benchmark_family": "bundle_cutoff_reasoning",
+    "family": "business_travel",
+    "city": "OSA",
+    "origin": "GMP",
+    "traveler_id": "traveler_consultant",
+    "nights": 2,
+    "budget_total": 570000,
+    "meeting_zone": "namba",
+    "weather": "clear",
+    "spoken_rule_density": "dense",
+    "scenario_hooks": {
+      "stakeholders": [],
+      "badge_status": "inactive",
+      "schedule_volatility": "normal",
+      "bundle_watch": true,
+      "late_arrival_risk": true,
+      "event_sensitive": false
+    },
+    "scenario_state": {
+      "airport_priority": true,
+      "rainy": false,
+      "client_dinner": false,
+      "chain_exception": false,
+      "partner_bundle": true,
+      "event_disruption": false,
+      "badge_available": false,
+      "refund_risk": false,
+      "loyalty_focus": false,
+      "late_arrival_risk": true,
+      "teammate_vegan": false,
+      "stakeholder_ids": []
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "Please build a short trip plan that keeps me functional for work, not just technically on time."
+      },
+      {
+        "speaker": "user",
+        "text": "A teammate may join dinner, so dietary flexibility matters more than a flashy venue."
+      },
+      {
+        "speaker": "user",
+        "text": "My usual travel habits are in my profile. Please use them, but do not let one-off exceptions rewrite them."
+      },
+      {
+        "speaker": "user",
+        "text": "Please remember that a genuinely quiet room matters to me; do not treat it as cosmetic."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not send me through a red-eye just because the fare is lower."
+      },
+      {
+        "speaker": "user",
+        "text": "Please filter out places that feel loud after 10pm; nightlife spillover is a real problem for this trip."
+      },
+      {
+        "speaker": "user",
+        "text": "Bring back only the relevant old preferences, not the whole history; keep active context lean."
+      },
+      {
+        "speaker": "user",
+        "text": "If you reject a hotel for noise, keep that reason around and do not surface it again unless something material changes."
+      },
+      {
+        "speaker": "user",
+        "text": "If a dinner option is out for the wrong vibe, keep it out instead of rediscovering the same mistake later."
+      },
+      {
+        "speaker": "user",
+        "text": "For this trip only, airport access matters more than local character."
+      },
+      {
+        "speaker": "user",
+        "text": "After the risk update, stop carrying the old local-character preference in active context unless it becomes relevant again."
+      },
+      {
+        "speaker": "user",
+        "text": "I heard some hotel+dinner or shuttle bundles may exist. Count them only if they improve the full plan, not just the sticker price."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not assume a nominal dinner bundle still works after a late arrival; some perks disappear after check-in cutoffs."
+      },
+      {
+        "speaker": "user",
+        "text": "The older budget assumption is no longer valid, so retire it rather than repeating it."
+      },
+      {
+        "speaker": "user",
+        "text": "Keep the useful parts, drop stale assumptions, and adjust only what the new situation forces."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_budget",
+        "meeting_safe_arrival",
+        "quiet_hotel",
+        "zone_coherence",
+        "bundle_dependency_valid"
+      ],
+      "soft_tags": [
+        "quiet",
+        "low_friction",
+        "easy_airport_access",
+        "vegan_friendly"
+      ],
+      "acceptable_flights": [
+        "FL101"
+      ],
+      "acceptable_hotels": [
+        "HT206"
+      ],
+      "good_restaurants": [
+        "RS3001"
+      ],
+      "good_activities": [
+        "ACT101_meeting_support"
+      ],
+      "required_docs": [
+        "city_ops:OSA",
+        "constraint:late_arrival_voids_bundle",
+        "dependency:OSA_ht206_rs3001_private_room",
+        "event:OSA_namba_food_fair",
+        "event:OSA_umeda_private_room_night",
+        "heuristic:lean_context_policy",
+        "heuristic:partner_bundle_reasoning",
+        "heuristic:rejected_option_memory",
+        "profile:traveler_consultant",
+        "promo:OSA_ht206_rs3001_private_room",
+        "venue:OSA_business_travel"
+      ],
+      "stale_docs_to_retire": [
+        "stale:budget_cap_archive",
+        "stale:bundle_discount_always_wins",
+        "stale:late_checkin_irrelevant",
+        "stale:local_character_default"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:traveler_consultant_weekend_food_crawl",
+        "playbook:OSA_business_travel_afterwork_social",
+        "stale:OSA_shinsekai_shortcut",
+        "stale:partner_social_default"
+      ],
+      "should_retrieve": [
+        "avoid_red_eye",
+        "bundle_discount_value",
+        "late_checkin_risk",
+        "low_friction_transit",
+        "prefer_airport_access",
+        "prefer_quiet_hotel",
+        "private_room_bonus"
+      ],
+      "should_retire": [
+        "late_checkin_irrelevant",
+        "local_character_if_safe",
+        "old_budget_cap",
+        "old_bundle_discount_absolute"
+      ],
+      "should_remember_rejected": [
+        "rejected_hotel_for_noise",
+        "rejected_flight_for_red_eye",
+        "rejected_restaurant_for_vibe"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "quiet_matters"
+        ],
+        "forbidden": [
+          "red_eye",
+          "loud_after_10pm"
+        ],
+        "one_off_only": [
+          "airport_access_more_important_now"
+        ],
+        "retire": [
+          "late_checkin_irrelevant",
+          "old_budget_cap",
+          "old_bundle_discount_absolute",
+          "old_local_character_priority"
+        ],
+        "do_not_reconsider": [
+          "noise_rejected_hotel",
+          "wrong_vibe_restaurant"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_zone": "namba",
+      "avoid_zone": "shinsekai",
+      "episodic_exceptions": [
+        "airport_access_more_important_now"
+      ]
+    }
+  },
+  {
+    "trip_id": "rtl7_public_medium_005",
+    "difficulty_tier": "medium",
+    "benchmark_family": "weather_disruption",
+    "family": "business_travel",
+    "city": "SIN",
+    "origin": "PUS",
+    "traveler_id": "traveler_consultant",
+    "nights": 2,
+    "budget_total": 570000,
+    "meeting_zone": "one_north",
+    "weather": "rainy",
+    "spoken_rule_density": "dense",
+    "scenario_hooks": {
+      "stakeholders": [],
+      "badge_status": "inactive",
+      "schedule_volatility": "normal",
+      "bundle_watch": false,
+      "late_arrival_risk": false,
+      "event_sensitive": true
+    },
+    "scenario_state": {
+      "airport_priority": false,
+      "rainy": true,
+      "client_dinner": false,
+      "chain_exception": false,
+      "partner_bundle": false,
+      "event_disruption": true,
+      "badge_available": false,
+      "refund_risk": false,
+      "loyalty_focus": false,
+      "late_arrival_risk": false,
+      "teammate_vegan": false,
+      "stakeholder_ids": []
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "Please build a short trip plan that keeps me functional for work, not just technically on time."
+      },
+      {
+        "speaker": "user",
+        "text": "A teammate may join dinner, so dietary flexibility matters more than a flashy venue."
+      },
+      {
+        "speaker": "user",
+        "text": "My usual travel habits are in my profile. Please use them, but do not let one-off exceptions rewrite them."
+      },
+      {
+        "speaker": "user",
+        "text": "Please remember that a genuinely quiet room matters to me; do not treat it as cosmetic."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not send me through a red-eye just because the fare is lower."
+      },
+      {
+        "speaker": "user",
+        "text": "Please filter out places that feel loud after 10pm; nightlife spillover is a real problem for this trip."
+      },
+      {
+        "speaker": "user",
+        "text": "Bring back only the relevant old preferences, not the whole history; keep active context lean."
+      },
+      {
+        "speaker": "user",
+        "text": "If you reject a hotel for noise, keep that reason around and do not surface it again unless something material changes."
+      },
+      {
+        "speaker": "user",
+        "text": "If a dinner option is out for the wrong vibe, keep it out instead of rediscovering the same mistake later."
+      },
+      {
+        "speaker": "user",
+        "text": "Weather looks worse now, so brittle outdoor ideas should probably drop out."
+      },
+      {
+        "speaker": "user",
+        "text": "There is a city event tonight that may change transfer friction or noise in one zone, so do not rely on stale assumptions."
+      },
+      {
+        "speaker": "user",
+        "text": "The older budget assumption is no longer valid, so retire it rather than repeating it."
+      },
+      {
+        "speaker": "user",
+        "text": "Keep the useful parts, drop stale assumptions, and adjust only what the new situation forces."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_budget",
+        "meeting_safe_arrival",
+        "quiet_hotel",
+        "zone_coherence",
+        "weather_safe_activity"
+      ],
+      "soft_tags": [
+        "quiet",
+        "low_friction",
+        "local_character",
+        "vegan_friendly",
+        "weather_safe"
+      ],
+      "acceptable_flights": [
+        "FL801"
+      ],
+      "acceptable_hotels": [
+        "HT907"
+      ],
+      "good_restaurants": [
+        "RS2004"
+      ],
+      "good_activities": [
+        "ACT304_innovation_center"
+      ],
+      "required_docs": [
+        "city_ops:SIN",
+        "dependency:SIN_ht907_rs2004_shuttle",
+        "event:SIN_one_north_thunderstorm",
+        "heuristic:lean_context_policy",
+        "heuristic:rejected_option_memory",
+        "profile:traveler_consultant",
+        "venue:SIN_business_travel"
+      ],
+      "stale_docs_to_retire": [
+        "stale:budget_cap_archive",
+        "stale:dry_weather_ops_assumption",
+        "stale:partner_social_default"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:traveler_research_airport_lounge_habit",
+        "playbook:SIN_marina_client_evening",
+        "stale:SIN_clarke_quay_social_note"
+      ],
+      "should_retrieve": [
+        "avoid_red_eye",
+        "local_character_if_safe",
+        "low_friction_transit",
+        "prefer_quiet_hotel",
+        "shuttle_bundle",
+        "weather_safe_backup"
+      ],
+      "should_retire": [
+        "old_budget_cap",
+        "old_social_bundle_default",
+        "old_weather_assumption"
+      ],
+      "should_remember_rejected": [
+        "rejected_hotel_for_noise",
+        "rejected_flight_for_red_eye",
+        "rejected_restaurant_for_vibe"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "quiet_matters"
+        ],
+        "forbidden": [
+          "red_eye",
+          "loud_after_10pm"
+        ],
+        "one_off_only": [],
+        "retire": [
+          "old_budget_cap",
+          "old_social_bundle_default",
+          "old_weather_assumption"
+        ],
+        "do_not_reconsider": [
+          "noise_rejected_hotel",
+          "wrong_vibe_restaurant"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_zone": "one_north",
+      "avoid_zone": "clarke_quay",
+      "episodic_exceptions": []
+    }
+  },
+  {
+    "trip_id": "rtl7_public_medium_006",
+    "difficulty_tier": "medium",
+    "benchmark_family": "stakeholder_tradeoff",
+    "family": "partner_summit",
+    "city": "TPE",
+    "origin": "SEL",
+    "traveler_id": "traveler_sales",
+    "nights": 2,
+    "budget_total": 595000,
+    "meeting_zone": "xinyi",
+    "weather": "clear",
+    "spoken_rule_density": "dense",
+    "scenario_hooks": {
+      "stakeholders": [
+        "stakeholder:teammate_vegan",
+        "stakeholder:client_polished"
+      ],
+      "badge_status": "active",
+      "schedule_volatility": "normal",
+      "bundle_watch": true,
+      "late_arrival_risk": false,
+      "event_sensitive": true
+    },
+    "scenario_state": {
+      "airport_priority": false,
+      "rainy": false,
+      "client_dinner": true,
+      "chain_exception": false,
+      "partner_bundle": true,
+      "event_disruption": true,
+      "badge_available": true,
+      "refund_risk": false,
+      "loyalty_focus": false,
+      "late_arrival_risk": false,
+      "teammate_vegan": true,
+      "stakeholder_ids": [
+        "stakeholder:teammate_vegan",
+        "stakeholder:client_polished"
+      ]
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "This is a partner summit, so I care about a calm but polished evening room more than novelty."
+      },
+      {
+        "speaker": "user",
+        "text": "If a venue badge unlocks a genuinely better bundle, count it, but only if the full plan still stays lean and low-risk."
+      },
+      {
+        "speaker": "user",
+        "text": "My usual travel habits are in my profile. Please use them, but do not let one-off exceptions rewrite them."
+      },
+      {
+        "speaker": "user",
+        "text": "Please remember that a genuinely quiet room matters to me; do not treat it as cosmetic."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not send me through a red-eye just because the fare is lower."
+      },
+      {
+        "speaker": "user",
+        "text": "Please filter out places that feel loud after 10pm; nightlife spillover is a real problem for this trip."
+      },
+      {
+        "speaker": "user",
+        "text": "Bring back only the relevant old preferences, not the whole history; keep active context lean."
+      },
+      {
+        "speaker": "user",
+        "text": "If you reject a hotel for noise, keep that reason around and do not surface it again unless something material changes."
+      },
+      {
+        "speaker": "user",
+        "text": "If a dinner option is out for the wrong vibe, keep it out instead of rediscovering the same mistake later."
+      },
+      {
+        "speaker": "user",
+        "text": "Remember that client-facing or partner-facing dinners should feel polished enough for conversation, not merely convenient."
+      },
+      {
+        "speaker": "user",
+        "text": "This dinner should feel polished enough for a client or partner conversation, not just convenient."
+      },
+      {
+        "speaker": "user",
+        "text": "I heard some hotel+dinner or shuttle bundles may exist. Count them only if they improve the full plan, not just the sticker price."
+      },
+      {
+        "speaker": "user",
+        "text": "I will have the event badge this time, so if it unlocks a calmer or lower-friction option, that is relevant for this trip only."
+      },
+      {
+        "speaker": "user",
+        "text": "A teammate may join dinner and may need vegan-capable options, so group flexibility matters."
+      },
+      {
+        "speaker": "user",
+        "text": "There is a city event tonight that may change transfer friction or noise in one zone, so do not rely on stale assumptions."
+      },
+      {
+        "speaker": "user",
+        "text": "The older budget assumption is no longer valid, so retire it rather than repeating it."
+      },
+      {
+        "speaker": "user",
+        "text": "Keep the useful parts, drop stale assumptions, and adjust only what the new situation forces."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_budget",
+        "meeting_safe_arrival",
+        "quiet_hotel",
+        "zone_coherence",
+        "team_dietary_support",
+        "bundle_dependency_valid"
+      ],
+      "soft_tags": [
+        "quiet",
+        "low_friction",
+        "local_character",
+        "client_ready"
+      ],
+      "acceptable_flights": [
+        "FL702"
+      ],
+      "acceptable_hotels": [
+        "HT801"
+      ],
+      "good_restaurants": [
+        "RS4004"
+      ],
+      "good_activities": [
+        "ACT404_partner_lounge"
+      ],
+      "required_docs": [
+        "city_ops:TPE",
+        "constraint:badge_private_room_access",
+        "dependency:TPE_ht801_rs4004_badge_bundle",
+        "event:TPE_xinyi_expo_surge",
+        "heuristic:badge_unlock_logic",
+        "heuristic:lean_context_policy",
+        "heuristic:partner_bundle_reasoning",
+        "heuristic:rejected_option_memory",
+        "heuristic:stakeholder_balance",
+        "profile:traveler_sales",
+        "stakeholder:client_polished",
+        "stakeholder:teammate_vegan",
+        "venue:TPE_partner_summit"
+      ],
+      "stale_docs_to_retire": [
+        "stale:budget_cap_archive",
+        "stale:bundle_discount_always_wins",
+        "stale:partner_social_default"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:traveler_exec_scenic_photo_walk",
+        "playbook:TPE_conference_afterparty",
+        "stale:TPE_scenic_outer_transfer_note",
+        "stale:partner_social_default"
+      ],
+      "should_retrieve": [
+        "avoid_red_eye",
+        "bundle_discount_value",
+        "client_dinner_polished",
+        "conference_badge_access",
+        "local_character_if_safe",
+        "low_friction_transit",
+        "prefer_quiet_hotel",
+        "private_room_bonus",
+        "team_dietary_flex"
+      ],
+      "should_retire": [
+        "old_budget_cap",
+        "old_bundle_discount_absolute",
+        "old_social_bundle_default"
+      ],
+      "should_remember_rejected": [
+        "rejected_hotel_for_noise",
+        "rejected_flight_for_red_eye",
+        "rejected_restaurant_for_vibe"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "quiet_matters",
+          "client_ready_dinner"
+        ],
+        "forbidden": [
+          "red_eye",
+          "loud_after_10pm"
+        ],
+        "one_off_only": [],
+        "retire": [
+          "old_budget_cap",
+          "old_bundle_discount_absolute",
+          "old_social_bundle_default"
+        ],
+        "do_not_reconsider": [
+          "noise_rejected_hotel",
+          "wrong_vibe_restaurant"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_zone": "xinyi",
+      "avoid_zone": "scenic_outer",
+      "episodic_exceptions": []
+    }
+  },
+  {
+    "trip_id": "rtl7_public_medium_007",
+    "difficulty_tier": "medium",
+    "benchmark_family": "stakeholder_tradeoff",
+    "family": "partner_summit",
+    "city": "TPE",
+    "origin": "SEL",
+    "traveler_id": "traveler_exec",
+    "nights": 2,
+    "budget_total": 595000,
+    "meeting_zone": "xinyi",
+    "weather": "clear",
+    "spoken_rule_density": "dense",
+    "scenario_hooks": {
+      "stakeholders": [
+        "stakeholder:teammate_vegan",
+        "stakeholder:client_polished"
+      ],
+      "badge_status": "active",
+      "schedule_volatility": "high",
+      "bundle_watch": true,
+      "late_arrival_risk": false,
+      "event_sensitive": true
+    },
+    "scenario_state": {
+      "airport_priority": true,
+      "rainy": false,
+      "client_dinner": true,
+      "chain_exception": true,
+      "partner_bundle": true,
+      "event_disruption": true,
+      "badge_available": true,
+      "refund_risk": true,
+      "loyalty_focus": false,
+      "late_arrival_risk": false,
+      "teammate_vegan": true,
+      "stakeholder_ids": [
+        "stakeholder:teammate_vegan",
+        "stakeholder:client_polished"
+      ]
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "This is a partner summit, so I care about a calm but polished evening room more than novelty."
+      },
+      {
+        "speaker": "user",
+        "text": "If a venue badge unlocks a genuinely better bundle, count it, but only if the full plan still stays lean and low-risk."
+      },
+      {
+        "speaker": "user",
+        "text": "My usual travel habits are in my profile. Please use them, but do not let one-off exceptions rewrite them."
+      },
+      {
+        "speaker": "user",
+        "text": "Please remember that a genuinely quiet room matters to me; do not treat it as cosmetic."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not send me through a red-eye just because the fare is lower."
+      },
+      {
+        "speaker": "user",
+        "text": "Please filter out places that feel loud after 10pm; nightlife spillover is a real problem for this trip."
+      },
+      {
+        "speaker": "user",
+        "text": "Bring back only the relevant old preferences, not the whole history; keep active context lean."
+      },
+      {
+        "speaker": "user",
+        "text": "If you reject a hotel for noise, keep that reason around and do not surface it again unless something material changes."
+      },
+      {
+        "speaker": "user",
+        "text": "If a dinner option is out for the wrong vibe, keep it out instead of rediscovering the same mistake later."
+      },
+      {
+        "speaker": "user",
+        "text": "Remember that client-facing or partner-facing dinners should feel polished enough for conversation, not merely convenient."
+      },
+      {
+        "speaker": "user",
+        "text": "This dinner should feel polished enough for a client or partner conversation, not just convenient."
+      },
+      {
+        "speaker": "user",
+        "text": "For this trip only, airport access matters more than local character."
+      },
+      {
+        "speaker": "user",
+        "text": "After the risk update, stop carrying the old local-character preference in active context unless it becomes relevant again."
+      },
+      {
+        "speaker": "user",
+        "text": "This trip only, a chain hotel is acceptable if it clearly reduces risk; do not rewrite my normal profile with that exception."
+      },
+      {
+        "speaker": "user",
+        "text": "I heard some hotel+dinner or shuttle bundles may exist. Count them only if they improve the full plan, not just the sticker price."
+      },
+      {
+        "speaker": "user",
+        "text": "I will have the event badge this time, so if it unlocks a calmer or lower-friction option, that is relevant for this trip only."
+      },
+      {
+        "speaker": "user",
+        "text": "Timing may still move, so refundable bookings deserve real weight instead of being treated as a trivial nice-to-have."
+      },
+      {
+        "speaker": "user",
+        "text": "A teammate may join dinner and may need vegan-capable options, so group flexibility matters."
+      },
+      {
+        "speaker": "user",
+        "text": "There is a city event tonight that may change transfer friction or noise in one zone, so do not rely on stale assumptions."
+      },
+      {
+        "speaker": "user",
+        "text": "The older budget assumption is no longer valid, so retire it rather than repeating it."
+      },
+      {
+        "speaker": "user",
+        "text": "Keep the useful parts, drop stale assumptions, and adjust only what the new situation forces."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_budget",
+        "meeting_safe_arrival",
+        "quiet_hotel",
+        "zone_coherence",
+        "team_dietary_support",
+        "refund_safe",
+        "bundle_dependency_valid"
+      ],
+      "soft_tags": [
+        "quiet",
+        "low_friction",
+        "easy_airport_access",
+        "client_ready"
+      ],
+      "acceptable_flights": [
+        "FL705"
+      ],
+      "acceptable_hotels": [
+        "HT801"
+      ],
+      "good_restaurants": [
+        "RS4004"
+      ],
+      "good_activities": [
+        "ACT404_partner_lounge"
+      ],
+      "required_docs": [
+        "city_ops:TPE",
+        "constraint:badge_private_room_access",
+        "dependency:TPE_ht801_rs4004_badge_bundle",
+        "event:TPE_xinyi_expo_surge",
+        "heuristic:badge_unlock_logic",
+        "heuristic:lean_context_policy",
+        "heuristic:partner_bundle_reasoning",
+        "heuristic:refundable_schedule_risk",
+        "heuristic:rejected_option_memory",
+        "heuristic:stakeholder_balance",
+        "profile:traveler_exec",
+        "stakeholder:client_polished",
+        "stakeholder:teammate_vegan",
+        "venue:TPE_partner_summit"
+      ],
+      "stale_docs_to_retire": [
+        "stale:avoid_chain_hotels_absolute",
+        "stale:budget_cap_archive",
+        "stale:bundle_discount_always_wins",
+        "stale:local_character_default",
+        "stale:partner_social_default"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:traveler_exec_scenic_photo_walk",
+        "playbook:TPE_conference_afterparty",
+        "stale:TPE_scenic_outer_transfer_note",
+        "stale:partner_social_default"
+      ],
+      "should_retrieve": [
+        "avoid_red_eye",
+        "bundle_discount_value",
+        "chain_exception_this_trip",
+        "client_dinner_polished",
+        "conference_badge_access",
+        "low_friction_transit",
+        "prefer_airport_access",
+        "prefer_quiet_hotel",
+        "private_room_bonus",
+        "refundable_priority",
+        "team_dietary_flex"
+      ],
+      "should_retire": [
+        "avoid_chain_hotels_stable",
+        "local_character_if_safe",
+        "old_budget_cap",
+        "old_bundle_discount_absolute",
+        "old_social_bundle_default"
+      ],
+      "should_remember_rejected": [
+        "rejected_hotel_for_noise",
+        "rejected_flight_for_red_eye",
+        "rejected_restaurant_for_vibe"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "quiet_matters",
+          "client_ready_dinner"
+        ],
+        "forbidden": [
+          "red_eye",
+          "loud_after_10pm"
+        ],
+        "one_off_only": [
+          "chain_ok_this_trip",
+          "airport_access_more_important_now"
+        ],
+        "retire": [
+          "old_budget_cap",
+          "old_bundle_discount_absolute",
+          "old_chain_absolute_rule",
+          "old_local_character_priority",
+          "old_social_bundle_default"
+        ],
+        "do_not_reconsider": [
+          "noise_rejected_hotel",
+          "wrong_vibe_restaurant"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_zone": "xinyi",
+      "avoid_zone": "scenic_outer",
+      "episodic_exceptions": [
+        "airport_access_more_important_now",
+        "chain_ok_this_trip"
+      ]
+    }
+  },
+  {
+    "trip_id": "rtl7_public_medium_008",
+    "difficulty_tier": "medium",
+    "benchmark_family": "refund_volatility",
+    "family": "business_travel",
+    "city": "SIN",
+    "origin": "PUS",
+    "traveler_id": "traveler_research",
+    "nights": 2,
+    "budget_total": 570000,
+    "meeting_zone": "one_north",
+    "weather": "rainy",
+    "spoken_rule_density": "dense",
+    "scenario_hooks": {
+      "stakeholders": [
+        "stakeholder:ops_host"
+      ],
+      "badge_status": "inactive",
+      "schedule_volatility": "high",
+      "bundle_watch": false,
+      "late_arrival_risk": true,
+      "event_sensitive": false
+    },
+    "scenario_state": {
+      "airport_priority": true,
+      "rainy": false,
+      "client_dinner": false,
+      "chain_exception": true,
+      "partner_bundle": false,
+      "event_disruption": false,
+      "badge_available": false,
+      "refund_risk": true,
+      "loyalty_focus": false,
+      "late_arrival_risk": true,
+      "teammate_vegan": false,
+      "stakeholder_ids": [
+        "stakeholder:ops_host"
+      ]
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "Please build a short trip plan that keeps me functional for work, not just technically on time."
+      },
+      {
+        "speaker": "user",
+        "text": "A teammate may join dinner, so dietary flexibility matters more than a flashy venue."
+      },
+      {
+        "speaker": "user",
+        "text": "My usual travel habits are in my profile. Please use them, but do not let one-off exceptions rewrite them."
+      },
+      {
+        "speaker": "user",
+        "text": "Please remember that a genuinely quiet room matters to me; do not treat it as cosmetic."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not send me through a red-eye just because the fare is lower."
+      },
+      {
+        "speaker": "user",
+        "text": "Please filter out places that feel loud after 10pm; nightlife spillover is a real problem for this trip."
+      },
+      {
+        "speaker": "user",
+        "text": "Bring back only the relevant old preferences, not the whole history; keep active context lean."
+      },
+      {
+        "speaker": "user",
+        "text": "If you reject a hotel for noise, keep that reason around and do not surface it again unless something material changes."
+      },
+      {
+        "speaker": "user",
+        "text": "If a dinner option is out for the wrong vibe, keep it out instead of rediscovering the same mistake later."
+      },
+      {
+        "speaker": "user",
+        "text": "For this trip only, airport access matters more than local character."
+      },
+      {
+        "speaker": "user",
+        "text": "After the risk update, stop carrying the old local-character preference in active context unless it becomes relevant again."
+      },
+      {
+        "speaker": "user",
+        "text": "This trip only, a chain hotel is acceptable if it clearly reduces risk; do not rewrite my normal profile with that exception."
+      },
+      {
+        "speaker": "user",
+        "text": "Timing may still move, so refundable bookings deserve real weight instead of being treated as a trivial nice-to-have."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not assume a nominal dinner bundle still works after a late arrival; some perks disappear after check-in cutoffs."
+      },
+      {
+        "speaker": "user",
+        "text": "The older budget assumption is no longer valid, so retire it rather than repeating it."
+      },
+      {
+        "speaker": "user",
+        "text": "Keep the useful parts, drop stale assumptions, and adjust only what the new situation forces."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_budget",
+        "meeting_safe_arrival",
+        "quiet_hotel",
+        "zone_coherence",
+        "refund_safe"
+      ],
+      "soft_tags": [
+        "quiet",
+        "low_friction",
+        "easy_airport_access",
+        "vegan_friendly"
+      ],
+      "acceptable_flights": [
+        "FL801"
+      ],
+      "acceptable_hotels": [
+        "HT907"
+      ],
+      "good_restaurants": [
+        "RS2004"
+      ],
+      "good_activities": [
+        "ACT304_innovation_center"
+      ],
+      "required_docs": [
+        "city_ops:SIN",
+        "constraint:late_arrival_voids_bundle",
+        "dependency:SIN_ht907_rs2004_shuttle",
+        "event:SIN_one_north_thunderstorm",
+        "heuristic:lean_context_policy",
+        "heuristic:refundable_schedule_risk",
+        "heuristic:rejected_option_memory",
+        "heuristic:stakeholder_balance",
+        "profile:traveler_research",
+        "stakeholder:ops_host",
+        "venue:SIN_business_travel"
+      ],
+      "stale_docs_to_retire": [
+        "stale:avoid_chain_hotels_absolute",
+        "stale:budget_cap_archive",
+        "stale:late_checkin_irrelevant",
+        "stale:local_character_default"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:traveler_research_airport_lounge_habit",
+        "playbook:SIN_marina_client_evening",
+        "stale:SIN_clarke_quay_social_note"
+      ],
+      "should_retrieve": [
+        "avoid_red_eye",
+        "chain_exception_this_trip",
+        "late_checkin_risk",
+        "low_friction_transit",
+        "prefer_airport_access",
+        "prefer_quiet_hotel",
+        "refundable_priority",
+        "shuttle_bundle"
+      ],
+      "should_retire": [
+        "avoid_chain_hotels_stable",
+        "late_checkin_irrelevant",
+        "local_character_if_safe",
+        "old_budget_cap"
+      ],
+      "should_remember_rejected": [
+        "rejected_hotel_for_noise",
+        "rejected_flight_for_red_eye",
+        "rejected_restaurant_for_vibe"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "quiet_matters"
+        ],
+        "forbidden": [
+          "red_eye",
+          "loud_after_10pm"
+        ],
+        "one_off_only": [
+          "chain_ok_this_trip",
+          "airport_access_more_important_now"
+        ],
+        "retire": [
+          "late_checkin_irrelevant",
+          "old_budget_cap",
+          "old_chain_absolute_rule",
+          "old_local_character_priority"
+        ],
+        "do_not_reconsider": [
+          "noise_rejected_hotel",
+          "wrong_vibe_restaurant"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_zone": "one_north",
+      "avoid_zone": "clarke_quay",
+      "episodic_exceptions": [
+        "airport_access_more_important_now",
+        "chain_ok_this_trip"
+      ]
+    }
+  },
+  {
+    "trip_id": "rtl7_public_medium_009",
+    "difficulty_tier": "medium",
+    "benchmark_family": "client_ready_dinner",
+    "family": "board_visit",
+    "city": "OSA",
+    "origin": "GMP",
+    "traveler_id": "traveler_sales",
+    "nights": 2,
+    "budget_total": 610000,
+    "meeting_zone": "umeda",
+    "weather": "clear",
+    "spoken_rule_density": "dense",
+    "scenario_hooks": {
+      "stakeholders": [
+        "stakeholder:client_polished"
+      ],
+      "badge_status": "inactive",
+      "schedule_volatility": "normal",
+      "bundle_watch": false,
+      "late_arrival_risk": false,
+      "event_sensitive": false
+    },
+    "scenario_state": {
+      "airport_priority": false,
+      "rainy": false,
+      "client_dinner": true,
+      "chain_exception": false,
+      "partner_bundle": false,
+      "event_disruption": false,
+      "badge_available": false,
+      "refund_risk": false,
+      "loyalty_focus": true,
+      "late_arrival_risk": false,
+      "teammate_vegan": false,
+      "stakeholder_ids": [
+        "stakeholder:client_polished"
+      ]
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "This trip includes a board-facing session, so the plan should feel reliable and polished, not improvised."
+      },
+      {
+        "speaker": "user",
+        "text": "I can accept a slightly less local option if it clearly reduces friction around prep and client optics."
+      },
+      {
+        "speaker": "user",
+        "text": "My usual travel habits are in my profile. Please use them, but do not let one-off exceptions rewrite them."
+      },
+      {
+        "speaker": "user",
+        "text": "Please remember that a genuinely quiet room matters to me; do not treat it as cosmetic."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not send me through a red-eye just because the fare is lower."
+      },
+      {
+        "speaker": "user",
+        "text": "Please filter out places that feel loud after 10pm; nightlife spillover is a real problem for this trip."
+      },
+      {
+        "speaker": "user",
+        "text": "Bring back only the relevant old preferences, not the whole history; keep active context lean."
+      },
+      {
+        "speaker": "user",
+        "text": "If you reject a hotel for noise, keep that reason around and do not surface it again unless something material changes."
+      },
+      {
+        "speaker": "user",
+        "text": "If a dinner option is out for the wrong vibe, keep it out instead of rediscovering the same mistake later."
+      },
+      {
+        "speaker": "user",
+        "text": "Remember that client-facing or partner-facing dinners should feel polished enough for conversation, not merely convenient."
+      },
+      {
+        "speaker": "user",
+        "text": "This dinner should feel polished enough for a client or partner conversation, not just convenient."
+      },
+      {
+        "speaker": "user",
+        "text": "Please consider whether a loyalty perk changes the effective value of a bundle, not just the list price."
+      },
+      {
+        "speaker": "user",
+        "text": "The older budget assumption is no longer valid, so retire it rather than repeating it."
+      },
+      {
+        "speaker": "user",
+        "text": "Keep the useful parts, drop stale assumptions, and adjust only what the new situation forces."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_budget",
+        "meeting_safe_arrival",
+        "quiet_hotel",
+        "zone_coherence"
+      ],
+      "soft_tags": [
+        "quiet",
+        "low_friction",
+        "local_character",
+        "client_ready"
+      ],
+      "acceptable_flights": [
+        "FL101"
+      ],
+      "acceptable_hotels": [
+        "HT208"
+      ],
+      "good_restaurants": [
+        "RS3005"
+      ],
+      "good_activities": [
+        "ACT105_partner_lounge"
+      ],
+      "required_docs": [
+        "city_ops:OSA",
+        "event:OSA_umeda_private_room_night",
+        "heuristic:lean_context_policy",
+        "heuristic:rejected_option_memory",
+        "heuristic:stakeholder_balance",
+        "loyalty:traveler_sales",
+        "profile:traveler_sales",
+        "stakeholder:client_polished",
+        "venue:OSA_board_visit"
+      ],
+      "stale_docs_to_retire": [
+        "stale:budget_cap_archive"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:traveler_consultant_weekend_food_crawl",
+        "playbook:OSA_business_travel_afterwork_social",
+        "stale:OSA_shinsekai_shortcut"
+      ],
+      "should_retrieve": [
+        "avoid_red_eye",
+        "client_dinner_polished",
+        "local_character_if_safe",
+        "low_friction_transit",
+        "loyalty_bundle_value",
+        "prefer_quiet_hotel"
+      ],
+      "should_retire": [
+        "old_budget_cap"
+      ],
+      "should_remember_rejected": [
+        "rejected_hotel_for_noise",
+        "rejected_flight_for_red_eye",
+        "rejected_restaurant_for_vibe"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "quiet_matters",
+          "client_ready_dinner"
+        ],
+        "forbidden": [
+          "red_eye",
+          "loud_after_10pm"
+        ],
+        "one_off_only": [],
+        "retire": [
+          "old_budget_cap"
+        ],
+        "do_not_reconsider": [
+          "noise_rejected_hotel",
+          "wrong_vibe_restaurant"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_zone": "umeda",
+      "avoid_zone": "shinsekai",
+      "episodic_exceptions": []
+    }
+  },
+  {
+    "trip_id": "rtl7_public_hard_010",
+    "difficulty_tier": "hard",
+    "benchmark_family": "refund_volatility",
+    "family": "conference_trip",
+    "city": "TPE",
+    "origin": "SEL",
+    "traveler_id": "traveler_exec",
+    "nights": 2,
+    "budget_total": 510000,
+    "meeting_zone": "xinyi",
+    "weather": "clear",
+    "spoken_rule_density": "dense",
+    "scenario_hooks": {
+      "stakeholders": [],
+      "badge_status": "active",
+      "schedule_volatility": "high",
+      "bundle_watch": true,
+      "late_arrival_risk": true,
+      "event_sensitive": true
+    },
+    "scenario_state": {
+      "airport_priority": true,
+      "rainy": false,
+      "client_dinner": false,
+      "chain_exception": true,
+      "partner_bundle": true,
+      "event_disruption": true,
+      "badge_available": true,
+      "refund_risk": true,
+      "loyalty_focus": false,
+      "late_arrival_risk": true,
+      "teammate_vegan": false,
+      "stakeholder_ids": []
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "I need to arrive ready for an early conference morning, not merely arrive somehow."
+      },
+      {
+        "speaker": "user",
+        "text": "A small networking dinner is welcome only if it does not damage the next day."
+      },
+      {
+        "speaker": "user",
+        "text": "My usual travel habits are in my profile. Please use them, but do not let one-off exceptions rewrite them."
+      },
+      {
+        "speaker": "user",
+        "text": "Please remember that a genuinely quiet room matters to me; do not treat it as cosmetic."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not send me through a red-eye just because the fare is lower."
+      },
+      {
+        "speaker": "user",
+        "text": "Please filter out places that feel loud after 10pm; nightlife spillover is a real problem for this trip."
+      },
+      {
+        "speaker": "user",
+        "text": "Bring back only the relevant old preferences, not the whole history; keep active context lean."
+      },
+      {
+        "speaker": "user",
+        "text": "If you reject a hotel for noise, keep that reason around and do not surface it again unless something material changes."
+      },
+      {
+        "speaker": "user",
+        "text": "If a dinner option is out for the wrong vibe, keep it out instead of rediscovering the same mistake later."
+      },
+      {
+        "speaker": "user",
+        "text": "For this trip only, airport access matters more than local character."
+      },
+      {
+        "speaker": "user",
+        "text": "After the risk update, stop carrying the old local-character preference in active context unless it becomes relevant again."
+      },
+      {
+        "speaker": "user",
+        "text": "This trip only, a chain hotel is acceptable if it clearly reduces risk; do not rewrite my normal profile with that exception."
+      },
+      {
+        "speaker": "user",
+        "text": "I heard some hotel+dinner or shuttle bundles may exist. Count them only if they improve the full plan, not just the sticker price."
+      },
+      {
+        "speaker": "user",
+        "text": "I will have the event badge this time, so if it unlocks a calmer or lower-friction option, that is relevant for this trip only."
+      },
+      {
+        "speaker": "user",
+        "text": "Timing may still move, so refundable bookings deserve real weight instead of being treated as a trivial nice-to-have."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not assume a nominal dinner bundle still works after a late arrival; some perks disappear after check-in cutoffs."
+      },
+      {
+        "speaker": "user",
+        "text": "There is a city event tonight that may change transfer friction or noise in one zone, so do not rely on stale assumptions."
+      },
+      {
+        "speaker": "user",
+        "text": "The older budget assumption is no longer valid, so retire it rather than repeating it."
+      },
+      {
+        "speaker": "user",
+        "text": "Keep the useful parts, drop stale assumptions, and adjust only what the new situation forces."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_budget",
+        "meeting_safe_arrival",
+        "quiet_hotel",
+        "zone_coherence",
+        "refund_safe",
+        "bundle_dependency_valid"
+      ],
+      "soft_tags": [
+        "quiet",
+        "low_friction",
+        "easy_airport_access",
+        "vegan_friendly"
+      ],
+      "acceptable_flights": [
+        "FL705"
+      ],
+      "acceptable_hotels": [
+        "HT801"
+      ],
+      "good_restaurants": [
+        "RS4004"
+      ],
+      "good_activities": [
+        "ACT404_partner_lounge"
+      ],
+      "required_docs": [
+        "city_ops:TPE",
+        "constraint:badge_private_room_access",
+        "constraint:late_arrival_voids_bundle",
+        "dependency:TPE_ht801_rs4004_badge_bundle",
+        "event:TPE_xinyi_expo_surge",
+        "heuristic:badge_unlock_logic",
+        "heuristic:lean_context_policy",
+        "heuristic:partner_bundle_reasoning",
+        "heuristic:refundable_schedule_risk",
+        "heuristic:rejected_option_memory",
+        "profile:traveler_exec",
+        "promo:TPE_ht801_rs4004_badge_room",
+        "venue:TPE_conference_trip"
+      ],
+      "stale_docs_to_retire": [
+        "stale:avoid_chain_hotels_absolute",
+        "stale:budget_cap_archive",
+        "stale:bundle_discount_always_wins",
+        "stale:late_checkin_irrelevant",
+        "stale:local_character_default",
+        "stale:partner_social_default"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:traveler_exec_scenic_photo_walk",
+        "playbook:TPE_conference_afterparty",
+        "stale:TPE_scenic_outer_transfer_note",
+        "stale:partner_social_default"
+      ],
+      "should_retrieve": [
+        "avoid_red_eye",
+        "bundle_discount_value",
+        "chain_exception_this_trip",
+        "conference_badge_access",
+        "late_checkin_risk",
+        "low_friction_transit",
+        "prefer_airport_access",
+        "prefer_quiet_hotel",
+        "private_room_bonus",
+        "refundable_priority"
+      ],
+      "should_retire": [
+        "avoid_chain_hotels_stable",
+        "late_checkin_irrelevant",
+        "local_character_if_safe",
+        "old_budget_cap",
+        "old_bundle_discount_absolute",
+        "old_social_bundle_default"
+      ],
+      "should_remember_rejected": [
+        "rejected_hotel_for_noise",
+        "rejected_flight_for_red_eye",
+        "rejected_restaurant_for_vibe"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "quiet_matters"
+        ],
+        "forbidden": [
+          "red_eye",
+          "loud_after_10pm"
+        ],
+        "one_off_only": [
+          "chain_ok_this_trip",
+          "airport_access_more_important_now"
+        ],
+        "retire": [
+          "late_checkin_irrelevant",
+          "old_budget_cap",
+          "old_bundle_discount_absolute",
+          "old_chain_absolute_rule",
+          "old_local_character_priority",
+          "old_social_bundle_default"
+        ],
+        "do_not_reconsider": [
+          "noise_rejected_hotel",
+          "wrong_vibe_restaurant"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_zone": "xinyi",
+      "avoid_zone": "scenic_outer",
+      "episodic_exceptions": [
+        "airport_access_more_important_now",
+        "chain_ok_this_trip"
+      ]
+    }
+  },
+  {
+    "trip_id": "rtl7_public_hard_011",
+    "difficulty_tier": "hard",
+    "benchmark_family": "loyalty_effective_value",
+    "family": "roadshow_trip",
+    "city": "SIN",
+    "origin": "PUS",
+    "traveler_id": "traveler_ops",
+    "nights": 2,
+    "budget_total": 565000,
+    "meeting_zone": "one_north",
+    "weather": "rainy",
+    "spoken_rule_density": "dense",
+    "scenario_hooks": {
+      "stakeholders": [
+        "stakeholder:ops_host"
+      ],
+      "badge_status": "inactive",
+      "schedule_volatility": "normal",
+      "bundle_watch": true,
+      "late_arrival_risk": true,
+      "event_sensitive": true
+    },
+    "scenario_state": {
+      "airport_priority": true,
+      "rainy": true,
+      "client_dinner": false,
+      "chain_exception": true,
+      "partner_bundle": true,
+      "event_disruption": true,
+      "badge_available": false,
+      "refund_risk": false,
+      "loyalty_focus": true,
+      "late_arrival_risk": true,
+      "teammate_vegan": false,
+      "stakeholder_ids": [
+        "stakeholder:ops_host"
+      ]
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "This roadshow has moving parts, so I want a bundle that stays resilient when timing shifts."
+      },
+      {
+        "speaker": "user",
+        "text": "Please optimize the whole path — arrival, hotel, dinner, and buffer activity — instead of picking isolated winners."
+      },
+      {
+        "speaker": "user",
+        "text": "My usual travel habits are in my profile. Please use them, but do not let one-off exceptions rewrite them."
+      },
+      {
+        "speaker": "user",
+        "text": "Please remember that a genuinely quiet room matters to me; do not treat it as cosmetic."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not send me through a red-eye just because the fare is lower."
+      },
+      {
+        "speaker": "user",
+        "text": "Please filter out places that feel loud after 10pm; nightlife spillover is a real problem for this trip."
+      },
+      {
+        "speaker": "user",
+        "text": "Bring back only the relevant old preferences, not the whole history; keep active context lean."
+      },
+      {
+        "speaker": "user",
+        "text": "If you reject a hotel for noise, keep that reason around and do not surface it again unless something material changes."
+      },
+      {
+        "speaker": "user",
+        "text": "If a dinner option is out for the wrong vibe, keep it out instead of rediscovering the same mistake later."
+      },
+      {
+        "speaker": "user",
+        "text": "For this trip only, airport access matters more than local character."
+      },
+      {
+        "speaker": "user",
+        "text": "After the risk update, stop carrying the old local-character preference in active context unless it becomes relevant again."
+      },
+      {
+        "speaker": "user",
+        "text": "This trip only, a chain hotel is acceptable if it clearly reduces risk; do not rewrite my normal profile with that exception."
+      },
+      {
+        "speaker": "user",
+        "text": "Weather looks worse now, so brittle outdoor ideas should probably drop out."
+      },
+      {
+        "speaker": "user",
+        "text": "I heard some hotel+dinner or shuttle bundles may exist. Count them only if they improve the full plan, not just the sticker price."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not assume a nominal dinner bundle still works after a late arrival; some perks disappear after check-in cutoffs."
+      },
+      {
+        "speaker": "user",
+        "text": "Please consider whether a loyalty perk changes the effective value of a bundle, not just the list price."
+      },
+      {
+        "speaker": "user",
+        "text": "There is a city event tonight that may change transfer friction or noise in one zone, so do not rely on stale assumptions."
+      },
+      {
+        "speaker": "user",
+        "text": "The older budget assumption is no longer valid, so retire it rather than repeating it."
+      },
+      {
+        "speaker": "user",
+        "text": "Keep the useful parts, drop stale assumptions, and adjust only what the new situation forces."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_budget",
+        "meeting_safe_arrival",
+        "quiet_hotel",
+        "zone_coherence",
+        "weather_safe_activity",
+        "bundle_dependency_valid"
+      ],
+      "soft_tags": [
+        "quiet",
+        "low_friction",
+        "easy_airport_access",
+        "vegan_friendly",
+        "weather_safe"
+      ],
+      "acceptable_flights": [
+        "FL801"
+      ],
+      "acceptable_hotels": [
+        "HT907"
+      ],
+      "good_restaurants": [
+        "RS2004"
+      ],
+      "good_activities": [
+        "ACT304_innovation_center"
+      ],
+      "required_docs": [
+        "city_ops:SIN",
+        "constraint:late_arrival_voids_bundle",
+        "dependency:SIN_ht907_rs2004_shuttle",
+        "event:SIN_one_north_thunderstorm",
+        "heuristic:lean_context_policy",
+        "heuristic:partner_bundle_reasoning",
+        "heuristic:rejected_option_memory",
+        "heuristic:stakeholder_balance",
+        "loyalty:traveler_ops",
+        "profile:traveler_ops",
+        "promo:SIN_ht907_rs2004_shuttle_bundle",
+        "stakeholder:ops_host",
+        "venue:SIN_roadshow_trip"
+      ],
+      "stale_docs_to_retire": [
+        "stale:avoid_chain_hotels_absolute",
+        "stale:budget_cap_archive",
+        "stale:bundle_discount_always_wins",
+        "stale:dry_weather_ops_assumption",
+        "stale:late_checkin_irrelevant",
+        "stale:local_character_default",
+        "stale:partner_social_default"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:traveler_research_airport_lounge_habit",
+        "playbook:SIN_marina_client_evening",
+        "stale:SIN_clarke_quay_social_note",
+        "stale:partner_social_default"
+      ],
+      "should_retrieve": [
+        "avoid_red_eye",
+        "bundle_discount_value",
+        "chain_exception_this_trip",
+        "late_checkin_risk",
+        "low_friction_transit",
+        "loyalty_bundle_value",
+        "prefer_airport_access",
+        "prefer_quiet_hotel",
+        "private_room_bonus",
+        "shuttle_bundle",
+        "weather_safe_backup"
+      ],
+      "should_retire": [
+        "avoid_chain_hotels_stable",
+        "late_checkin_irrelevant",
+        "local_character_if_safe",
+        "old_budget_cap",
+        "old_bundle_discount_absolute",
+        "old_social_bundle_default",
+        "old_weather_assumption"
+      ],
+      "should_remember_rejected": [
+        "rejected_hotel_for_noise",
+        "rejected_flight_for_red_eye",
+        "rejected_restaurant_for_vibe"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "quiet_matters"
+        ],
+        "forbidden": [
+          "red_eye",
+          "loud_after_10pm"
+        ],
+        "one_off_only": [
+          "chain_ok_this_trip",
+          "airport_access_more_important_now"
+        ],
+        "retire": [
+          "late_checkin_irrelevant",
+          "old_budget_cap",
+          "old_bundle_discount_absolute",
+          "old_chain_absolute_rule",
+          "old_local_character_priority",
+          "old_social_bundle_default",
+          "old_weather_assumption"
+        ],
+        "do_not_reconsider": [
+          "noise_rejected_hotel",
+          "wrong_vibe_restaurant"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_zone": "one_north",
+      "avoid_zone": "clarke_quay",
+      "episodic_exceptions": [
+        "airport_access_more_important_now",
+        "chain_ok_this_trip"
+      ]
+    }
+  },
+  {
+    "trip_id": "rtl7_public_hard_012",
+    "difficulty_tier": "hard",
+    "benchmark_family": "stakeholder_tradeoff",
+    "family": "board_visit",
+    "city": "OSA",
+    "origin": "GMP",
+    "traveler_id": "traveler_sales",
+    "nights": 2,
+    "budget_total": 570000,
+    "meeting_zone": "umeda",
+    "weather": "rainy",
+    "spoken_rule_density": "dense",
+    "scenario_hooks": {
+      "stakeholders": [
+        "stakeholder:teammate_vegan",
+        "stakeholder:client_polished"
+      ],
+      "badge_status": "inactive",
+      "schedule_volatility": "high",
+      "bundle_watch": true,
+      "late_arrival_risk": true,
+      "event_sensitive": true
+    },
+    "scenario_state": {
+      "airport_priority": false,
+      "rainy": true,
+      "client_dinner": true,
+      "chain_exception": false,
+      "partner_bundle": true,
+      "event_disruption": true,
+      "badge_available": false,
+      "refund_risk": true,
+      "loyalty_focus": false,
+      "late_arrival_risk": true,
+      "teammate_vegan": true,
+      "stakeholder_ids": [
+        "stakeholder:teammate_vegan",
+        "stakeholder:client_polished"
+      ]
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "This trip includes a board-facing session, so the plan should feel reliable and polished, not improvised."
+      },
+      {
+        "speaker": "user",
+        "text": "I can accept a slightly less local option if it clearly reduces friction around prep and client optics."
+      },
+      {
+        "speaker": "user",
+        "text": "My usual travel habits are in my profile. Please use them, but do not let one-off exceptions rewrite them."
+      },
+      {
+        "speaker": "user",
+        "text": "Please remember that a genuinely quiet room matters to me; do not treat it as cosmetic."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not send me through a red-eye just because the fare is lower."
+      },
+      {
+        "speaker": "user",
+        "text": "Please filter out places that feel loud after 10pm; nightlife spillover is a real problem for this trip."
+      },
+      {
+        "speaker": "user",
+        "text": "Bring back only the relevant old preferences, not the whole history; keep active context lean."
+      },
+      {
+        "speaker": "user",
+        "text": "If you reject a hotel for noise, keep that reason around and do not surface it again unless something material changes."
+      },
+      {
+        "speaker": "user",
+        "text": "If a dinner option is out for the wrong vibe, keep it out instead of rediscovering the same mistake later."
+      },
+      {
+        "speaker": "user",
+        "text": "Remember that client-facing or partner-facing dinners should feel polished enough for conversation, not merely convenient."
+      },
+      {
+        "speaker": "user",
+        "text": "This dinner should feel polished enough for a client or partner conversation, not just convenient."
+      },
+      {
+        "speaker": "user",
+        "text": "Weather looks worse now, so brittle outdoor ideas should probably drop out."
+      },
+      {
+        "speaker": "user",
+        "text": "I heard some hotel+dinner or shuttle bundles may exist. Count them only if they improve the full plan, not just the sticker price."
+      },
+      {
+        "speaker": "user",
+        "text": "Timing may still move, so refundable bookings deserve real weight instead of being treated as a trivial nice-to-have."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not assume a nominal dinner bundle still works after a late arrival; some perks disappear after check-in cutoffs."
+      },
+      {
+        "speaker": "user",
+        "text": "A teammate may join dinner and may need vegan-capable options, so group flexibility matters."
+      },
+      {
+        "speaker": "user",
+        "text": "There is a city event tonight that may change transfer friction or noise in one zone, so do not rely on stale assumptions."
+      },
+      {
+        "speaker": "user",
+        "text": "The older budget assumption is no longer valid, so retire it rather than repeating it."
+      },
+      {
+        "speaker": "user",
+        "text": "Keep the useful parts, drop stale assumptions, and adjust only what the new situation forces."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_budget",
+        "meeting_safe_arrival",
+        "quiet_hotel",
+        "zone_coherence",
+        "weather_safe_activity",
+        "team_dietary_support",
+        "refund_safe",
+        "bundle_dependency_valid"
+      ],
+      "soft_tags": [
+        "quiet",
+        "low_friction",
+        "local_character",
+        "client_ready",
+        "weather_safe"
+      ],
+      "acceptable_flights": [
+        "FL101"
+      ],
+      "acceptable_hotels": [
+        "HT207"
+      ],
+      "good_restaurants": [
+        "RS3004"
+      ],
+      "good_activities": [
+        "ACT105_partner_lounge"
+      ],
+      "required_docs": [
+        "city_ops:OSA",
+        "constraint:late_arrival_voids_bundle",
+        "event:OSA_namba_food_fair",
+        "event:OSA_umeda_private_room_night",
+        "heuristic:lean_context_policy",
+        "heuristic:partner_bundle_reasoning",
+        "heuristic:refundable_schedule_risk",
+        "heuristic:rejected_option_memory",
+        "heuristic:stakeholder_balance",
+        "profile:traveler_sales",
+        "promo:OSA_ht207_rs3004_board_bundle",
+        "stakeholder:client_polished",
+        "stakeholder:teammate_vegan",
+        "venue:OSA_board_visit"
+      ],
+      "stale_docs_to_retire": [
+        "stale:budget_cap_archive",
+        "stale:bundle_discount_always_wins",
+        "stale:dry_weather_ops_assumption",
+        "stale:late_checkin_irrelevant",
+        "stale:partner_social_default"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:traveler_consultant_weekend_food_crawl",
+        "playbook:OSA_business_travel_afterwork_social",
+        "stale:OSA_shinsekai_shortcut",
+        "stale:partner_social_default"
+      ],
+      "should_retrieve": [
+        "avoid_red_eye",
+        "bundle_discount_value",
+        "client_dinner_polished",
+        "late_checkin_risk",
+        "local_character_if_safe",
+        "low_friction_transit",
+        "prefer_quiet_hotel",
+        "private_room_bonus",
+        "refundable_priority",
+        "team_dietary_flex",
+        "weather_safe_backup"
+      ],
+      "should_retire": [
+        "late_checkin_irrelevant",
+        "old_budget_cap",
+        "old_bundle_discount_absolute",
+        "old_social_bundle_default",
+        "old_weather_assumption"
+      ],
+      "should_remember_rejected": [
+        "rejected_hotel_for_noise",
+        "rejected_flight_for_red_eye",
+        "rejected_restaurant_for_vibe"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "quiet_matters",
+          "client_ready_dinner"
+        ],
+        "forbidden": [
+          "red_eye",
+          "loud_after_10pm"
+        ],
+        "one_off_only": [],
+        "retire": [
+          "late_checkin_irrelevant",
+          "old_budget_cap",
+          "old_bundle_discount_absolute",
+          "old_social_bundle_default",
+          "old_weather_assumption"
+        ],
+        "do_not_reconsider": [
+          "noise_rejected_hotel",
+          "wrong_vibe_restaurant"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_zone": "umeda",
+      "avoid_zone": "shinsekai",
+      "episodic_exceptions": []
+    }
+  },
+  {
+    "trip_id": "rtl7_public_hard_013",
+    "difficulty_tier": "hard",
+    "benchmark_family": "badge_unlocked_bundle",
+    "family": "partner_summit",
+    "city": "TPE",
+    "origin": "SEL",
+    "traveler_id": "traveler_exec",
+    "nights": 2,
+    "budget_total": 555000,
+    "meeting_zone": "xinyi",
+    "weather": "clear",
+    "spoken_rule_density": "dense",
+    "scenario_hooks": {
+      "stakeholders": [],
+      "badge_status": "active",
+      "schedule_volatility": "normal",
+      "bundle_watch": true,
+      "late_arrival_risk": false,
+      "event_sensitive": true
+    },
+    "scenario_state": {
+      "airport_priority": true,
+      "rainy": false,
+      "client_dinner": false,
+      "chain_exception": true,
+      "partner_bundle": true,
+      "event_disruption": true,
+      "badge_available": true,
+      "refund_risk": false,
+      "loyalty_focus": false,
+      "late_arrival_risk": false,
+      "teammate_vegan": false,
+      "stakeholder_ids": []
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "This is a partner summit, so I care about a calm but polished evening room more than novelty."
+      },
+      {
+        "speaker": "user",
+        "text": "If a venue badge unlocks a genuinely better bundle, count it, but only if the full plan still stays lean and low-risk."
+      },
+      {
+        "speaker": "user",
+        "text": "My usual travel habits are in my profile. Please use them, but do not let one-off exceptions rewrite them."
+      },
+      {
+        "speaker": "user",
+        "text": "Please remember that a genuinely quiet room matters to me; do not treat it as cosmetic."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not send me through a red-eye just because the fare is lower."
+      },
+      {
+        "speaker": "user",
+        "text": "Please filter out places that feel loud after 10pm; nightlife spillover is a real problem for this trip."
+      },
+      {
+        "speaker": "user",
+        "text": "Bring back only the relevant old preferences, not the whole history; keep active context lean."
+      },
+      {
+        "speaker": "user",
+        "text": "If you reject a hotel for noise, keep that reason around and do not surface it again unless something material changes."
+      },
+      {
+        "speaker": "user",
+        "text": "If a dinner option is out for the wrong vibe, keep it out instead of rediscovering the same mistake later."
+      },
+      {
+        "speaker": "user",
+        "text": "For this trip only, airport access matters more than local character."
+      },
+      {
+        "speaker": "user",
+        "text": "After the risk update, stop carrying the old local-character preference in active context unless it becomes relevant again."
+      },
+      {
+        "speaker": "user",
+        "text": "This trip only, a chain hotel is acceptable if it clearly reduces risk; do not rewrite my normal profile with that exception."
+      },
+      {
+        "speaker": "user",
+        "text": "I heard some hotel+dinner or shuttle bundles may exist. Count them only if they improve the full plan, not just the sticker price."
+      },
+      {
+        "speaker": "user",
+        "text": "I will have the event badge this time, so if it unlocks a calmer or lower-friction option, that is relevant for this trip only."
+      },
+      {
+        "speaker": "user",
+        "text": "There is a city event tonight that may change transfer friction or noise in one zone, so do not rely on stale assumptions."
+      },
+      {
+        "speaker": "user",
+        "text": "The older budget assumption is no longer valid, so retire it rather than repeating it."
+      },
+      {
+        "speaker": "user",
+        "text": "Keep the useful parts, drop stale assumptions, and adjust only what the new situation forces."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_budget",
+        "meeting_safe_arrival",
+        "quiet_hotel",
+        "zone_coherence",
+        "bundle_dependency_valid"
+      ],
+      "soft_tags": [
+        "quiet",
+        "low_friction",
+        "easy_airport_access",
+        "vegan_friendly"
+      ],
+      "acceptable_flights": [
+        "FL702"
+      ],
+      "acceptable_hotels": [
+        "HT801"
+      ],
+      "good_restaurants": [
+        "RS4004"
+      ],
+      "good_activities": [
+        "ACT404_partner_lounge"
+      ],
+      "required_docs": [
+        "city_ops:TPE",
+        "constraint:badge_private_room_access",
+        "dependency:TPE_ht801_rs4004_badge_bundle",
+        "event:TPE_xinyi_expo_surge",
+        "heuristic:badge_unlock_logic",
+        "heuristic:lean_context_policy",
+        "heuristic:partner_bundle_reasoning",
+        "heuristic:rejected_option_memory",
+        "profile:traveler_exec",
+        "venue:TPE_partner_summit"
+      ],
+      "stale_docs_to_retire": [
+        "stale:avoid_chain_hotels_absolute",
+        "stale:budget_cap_archive",
+        "stale:bundle_discount_always_wins",
+        "stale:local_character_default",
+        "stale:partner_social_default"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:traveler_exec_scenic_photo_walk",
+        "playbook:TPE_conference_afterparty",
+        "stale:TPE_scenic_outer_transfer_note",
+        "stale:partner_social_default"
+      ],
+      "should_retrieve": [
+        "avoid_red_eye",
+        "bundle_discount_value",
+        "chain_exception_this_trip",
+        "conference_badge_access",
+        "low_friction_transit",
+        "prefer_airport_access",
+        "prefer_quiet_hotel",
+        "private_room_bonus"
+      ],
+      "should_retire": [
+        "avoid_chain_hotels_stable",
+        "local_character_if_safe",
+        "old_budget_cap",
+        "old_bundle_discount_absolute",
+        "old_social_bundle_default"
+      ],
+      "should_remember_rejected": [
+        "rejected_hotel_for_noise",
+        "rejected_flight_for_red_eye",
+        "rejected_restaurant_for_vibe"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "quiet_matters"
+        ],
+        "forbidden": [
+          "red_eye",
+          "loud_after_10pm"
+        ],
+        "one_off_only": [
+          "chain_ok_this_trip",
+          "airport_access_more_important_now"
+        ],
+        "retire": [
+          "old_budget_cap",
+          "old_bundle_discount_absolute",
+          "old_chain_absolute_rule",
+          "old_local_character_priority",
+          "old_social_bundle_default"
+        ],
+        "do_not_reconsider": [
+          "noise_rejected_hotel",
+          "wrong_vibe_restaurant"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_zone": "xinyi",
+      "avoid_zone": "scenic_outer",
+      "episodic_exceptions": [
+        "airport_access_more_important_now",
+        "chain_ok_this_trip"
+      ]
+    }
+  },
+  {
+    "trip_id": "rtl7_public_hard_014",
+    "difficulty_tier": "hard",
+    "benchmark_family": "weather_disruption",
+    "family": "business_travel",
+    "city": "SIN",
+    "origin": "PUS",
+    "traveler_id": "traveler_consultant",
+    "nights": 2,
+    "budget_total": 530000,
+    "meeting_zone": "one_north",
+    "weather": "rainy",
+    "spoken_rule_density": "dense",
+    "scenario_hooks": {
+      "stakeholders": [],
+      "badge_status": "inactive",
+      "schedule_volatility": "normal",
+      "bundle_watch": true,
+      "late_arrival_risk": false,
+      "event_sensitive": true
+    },
+    "scenario_state": {
+      "airport_priority": true,
+      "rainy": true,
+      "client_dinner": false,
+      "chain_exception": false,
+      "partner_bundle": true,
+      "event_disruption": true,
+      "badge_available": false,
+      "refund_risk": false,
+      "loyalty_focus": false,
+      "late_arrival_risk": false,
+      "teammate_vegan": false,
+      "stakeholder_ids": []
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "Please build a short trip plan that keeps me functional for work, not just technically on time."
+      },
+      {
+        "speaker": "user",
+        "text": "A teammate may join dinner, so dietary flexibility matters more than a flashy venue."
+      },
+      {
+        "speaker": "user",
+        "text": "My usual travel habits are in my profile. Please use them, but do not let one-off exceptions rewrite them."
+      },
+      {
+        "speaker": "user",
+        "text": "Please remember that a genuinely quiet room matters to me; do not treat it as cosmetic."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not send me through a red-eye just because the fare is lower."
+      },
+      {
+        "speaker": "user",
+        "text": "Please filter out places that feel loud after 10pm; nightlife spillover is a real problem for this trip."
+      },
+      {
+        "speaker": "user",
+        "text": "Bring back only the relevant old preferences, not the whole history; keep active context lean."
+      },
+      {
+        "speaker": "user",
+        "text": "If you reject a hotel for noise, keep that reason around and do not surface it again unless something material changes."
+      },
+      {
+        "speaker": "user",
+        "text": "If a dinner option is out for the wrong vibe, keep it out instead of rediscovering the same mistake later."
+      },
+      {
+        "speaker": "user",
+        "text": "For this trip only, airport access matters more than local character."
+      },
+      {
+        "speaker": "user",
+        "text": "After the risk update, stop carrying the old local-character preference in active context unless it becomes relevant again."
+      },
+      {
+        "speaker": "user",
+        "text": "Weather looks worse now, so brittle outdoor ideas should probably drop out."
+      },
+      {
+        "speaker": "user",
+        "text": "I heard some hotel+dinner or shuttle bundles may exist. Count them only if they improve the full plan, not just the sticker price."
+      },
+      {
+        "speaker": "user",
+        "text": "There is a city event tonight that may change transfer friction or noise in one zone, so do not rely on stale assumptions."
+      },
+      {
+        "speaker": "user",
+        "text": "The older budget assumption is no longer valid, so retire it rather than repeating it."
+      },
+      {
+        "speaker": "user",
+        "text": "Keep the useful parts, drop stale assumptions, and adjust only what the new situation forces."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_budget",
+        "meeting_safe_arrival",
+        "quiet_hotel",
+        "zone_coherence",
+        "weather_safe_activity",
+        "bundle_dependency_valid"
+      ],
+      "soft_tags": [
+        "quiet",
+        "low_friction",
+        "easy_airport_access",
+        "vegan_friendly",
+        "weather_safe"
+      ],
+      "acceptable_flights": [
+        "FL801"
+      ],
+      "acceptable_hotels": [
+        "HT907"
+      ],
+      "good_restaurants": [
+        "RS2004"
+      ],
+      "good_activities": [
+        "ACT304_innovation_center"
+      ],
+      "required_docs": [
+        "city_ops:SIN",
+        "dependency:SIN_ht907_rs2004_shuttle",
+        "event:SIN_one_north_thunderstorm",
+        "heuristic:lean_context_policy",
+        "heuristic:partner_bundle_reasoning",
+        "heuristic:rejected_option_memory",
+        "profile:traveler_consultant",
+        "venue:SIN_business_travel"
+      ],
+      "stale_docs_to_retire": [
+        "stale:budget_cap_archive",
+        "stale:bundle_discount_always_wins",
+        "stale:dry_weather_ops_assumption",
+        "stale:local_character_default",
+        "stale:partner_social_default"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:traveler_research_airport_lounge_habit",
+        "playbook:SIN_marina_client_evening",
+        "stale:SIN_clarke_quay_social_note",
+        "stale:partner_social_default"
+      ],
+      "should_retrieve": [
+        "avoid_red_eye",
+        "bundle_discount_value",
+        "low_friction_transit",
+        "prefer_airport_access",
+        "prefer_quiet_hotel",
+        "private_room_bonus",
+        "shuttle_bundle",
+        "weather_safe_backup"
+      ],
+      "should_retire": [
+        "local_character_if_safe",
+        "old_budget_cap",
+        "old_bundle_discount_absolute",
+        "old_social_bundle_default",
+        "old_weather_assumption"
+      ],
+      "should_remember_rejected": [
+        "rejected_hotel_for_noise",
+        "rejected_flight_for_red_eye",
+        "rejected_restaurant_for_vibe"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "quiet_matters"
+        ],
+        "forbidden": [
+          "red_eye",
+          "loud_after_10pm"
+        ],
+        "one_off_only": [
+          "airport_access_more_important_now"
+        ],
+        "retire": [
+          "old_budget_cap",
+          "old_bundle_discount_absolute",
+          "old_local_character_priority",
+          "old_social_bundle_default",
+          "old_weather_assumption"
+        ],
+        "do_not_reconsider": [
+          "noise_rejected_hotel",
+          "wrong_vibe_restaurant"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_zone": "one_north",
+      "avoid_zone": "clarke_quay",
+      "episodic_exceptions": [
+        "airport_access_more_important_now"
+      ]
+    }
+  },
+  {
+    "trip_id": "rtl7_public_hard_015",
+    "difficulty_tier": "hard",
+    "benchmark_family": "one_off_airport_override",
+    "family": "business_travel",
+    "city": "OSA",
+    "origin": "GMP",
+    "traveler_id": "traveler_ops",
+    "nights": 2,
+    "budget_total": 530000,
+    "meeting_zone": "namba",
+    "weather": "clear",
+    "spoken_rule_density": "dense",
+    "scenario_hooks": {
+      "stakeholders": [],
+      "badge_status": "inactive",
+      "schedule_volatility": "normal",
+      "bundle_watch": false,
+      "late_arrival_risk": false,
+      "event_sensitive": false
+    },
+    "scenario_state": {
+      "airport_priority": true,
+      "rainy": false,
+      "client_dinner": false,
+      "chain_exception": true,
+      "partner_bundle": false,
+      "event_disruption": false,
+      "badge_available": false,
+      "refund_risk": false,
+      "loyalty_focus": false,
+      "late_arrival_risk": false,
+      "teammate_vegan": false,
+      "stakeholder_ids": []
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "Please build a short trip plan that keeps me functional for work, not just technically on time."
+      },
+      {
+        "speaker": "user",
+        "text": "A teammate may join dinner, so dietary flexibility matters more than a flashy venue."
+      },
+      {
+        "speaker": "user",
+        "text": "My usual travel habits are in my profile. Please use them, but do not let one-off exceptions rewrite them."
+      },
+      {
+        "speaker": "user",
+        "text": "Please remember that a genuinely quiet room matters to me; do not treat it as cosmetic."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not send me through a red-eye just because the fare is lower."
+      },
+      {
+        "speaker": "user",
+        "text": "Please filter out places that feel loud after 10pm; nightlife spillover is a real problem for this trip."
+      },
+      {
+        "speaker": "user",
+        "text": "Bring back only the relevant old preferences, not the whole history; keep active context lean."
+      },
+      {
+        "speaker": "user",
+        "text": "If you reject a hotel for noise, keep that reason around and do not surface it again unless something material changes."
+      },
+      {
+        "speaker": "user",
+        "text": "If a dinner option is out for the wrong vibe, keep it out instead of rediscovering the same mistake later."
+      },
+      {
+        "speaker": "user",
+        "text": "For this trip only, airport access matters more than local character."
+      },
+      {
+        "speaker": "user",
+        "text": "After the risk update, stop carrying the old local-character preference in active context unless it becomes relevant again."
+      },
+      {
+        "speaker": "user",
+        "text": "This trip only, a chain hotel is acceptable if it clearly reduces risk; do not rewrite my normal profile with that exception."
+      },
+      {
+        "speaker": "user",
+        "text": "The older budget assumption is no longer valid, so retire it rather than repeating it."
+      },
+      {
+        "speaker": "user",
+        "text": "Keep the useful parts, drop stale assumptions, and adjust only what the new situation forces."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_budget",
+        "meeting_safe_arrival",
+        "quiet_hotel",
+        "zone_coherence"
+      ],
+      "soft_tags": [
+        "quiet",
+        "low_friction",
+        "easy_airport_access",
+        "vegan_friendly"
+      ],
+      "acceptable_flights": [
+        "FL101"
+      ],
+      "acceptable_hotels": [
+        "HT206"
+      ],
+      "good_restaurants": [
+        "RS3001"
+      ],
+      "good_activities": [
+        "ACT101_meeting_support"
+      ],
+      "required_docs": [
+        "city_ops:OSA",
+        "dependency:OSA_ht206_rs3001_private_room",
+        "event:OSA_namba_food_fair",
+        "event:OSA_umeda_private_room_night",
+        "heuristic:lean_context_policy",
+        "heuristic:rejected_option_memory",
+        "profile:traveler_ops",
+        "promo:OSA_ht206_rs3001_private_room",
+        "venue:OSA_business_travel"
+      ],
+      "stale_docs_to_retire": [
+        "stale:avoid_chain_hotels_absolute",
+        "stale:budget_cap_archive",
+        "stale:local_character_default"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:traveler_consultant_weekend_food_crawl",
+        "playbook:OSA_business_travel_afterwork_social",
+        "stale:OSA_shinsekai_shortcut"
+      ],
+      "should_retrieve": [
+        "avoid_red_eye",
+        "chain_exception_this_trip",
+        "low_friction_transit",
+        "prefer_airport_access",
+        "prefer_quiet_hotel"
+      ],
+      "should_retire": [
+        "avoid_chain_hotels_stable",
+        "local_character_if_safe",
+        "old_budget_cap"
+      ],
+      "should_remember_rejected": [
+        "rejected_hotel_for_noise",
+        "rejected_flight_for_red_eye",
+        "rejected_restaurant_for_vibe"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "quiet_matters"
+        ],
+        "forbidden": [
+          "red_eye",
+          "loud_after_10pm"
+        ],
+        "one_off_only": [
+          "chain_ok_this_trip",
+          "airport_access_more_important_now"
+        ],
+        "retire": [
+          "old_budget_cap",
+          "old_chain_absolute_rule",
+          "old_local_character_priority"
+        ],
+        "do_not_reconsider": [
+          "noise_rejected_hotel",
+          "wrong_vibe_restaurant"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_zone": "namba",
+      "avoid_zone": "shinsekai",
+      "episodic_exceptions": [
+        "airport_access_more_important_now",
+        "chain_ok_this_trip"
+      ]
+    }
+  },
+  {
+    "trip_id": "rtl7_public_hard_016",
+    "difficulty_tier": "hard",
+    "benchmark_family": "stakeholder_tradeoff",
+    "family": "partner_summit",
+    "city": "TPE",
+    "origin": "SEL",
+    "traveler_id": "traveler_sales",
+    "nights": 2,
+    "budget_total": 555000,
+    "meeting_zone": "xinyi",
+    "weather": "clear",
+    "spoken_rule_density": "dense",
+    "scenario_hooks": {
+      "stakeholders": [
+        "stakeholder:teammate_vegan",
+        "stakeholder:client_polished"
+      ],
+      "badge_status": "active",
+      "schedule_volatility": "high",
+      "bundle_watch": true,
+      "late_arrival_risk": true,
+      "event_sensitive": true
+    },
+    "scenario_state": {
+      "airport_priority": true,
+      "rainy": false,
+      "client_dinner": true,
+      "chain_exception": true,
+      "partner_bundle": true,
+      "event_disruption": true,
+      "badge_available": true,
+      "refund_risk": true,
+      "loyalty_focus": false,
+      "late_arrival_risk": true,
+      "teammate_vegan": true,
+      "stakeholder_ids": [
+        "stakeholder:teammate_vegan",
+        "stakeholder:client_polished"
+      ]
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "This is a partner summit, so I care about a calm but polished evening room more than novelty."
+      },
+      {
+        "speaker": "user",
+        "text": "If a venue badge unlocks a genuinely better bundle, count it, but only if the full plan still stays lean and low-risk."
+      },
+      {
+        "speaker": "user",
+        "text": "My usual travel habits are in my profile. Please use them, but do not let one-off exceptions rewrite them."
+      },
+      {
+        "speaker": "user",
+        "text": "Please remember that a genuinely quiet room matters to me; do not treat it as cosmetic."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not send me through a red-eye just because the fare is lower."
+      },
+      {
+        "speaker": "user",
+        "text": "Please filter out places that feel loud after 10pm; nightlife spillover is a real problem for this trip."
+      },
+      {
+        "speaker": "user",
+        "text": "Bring back only the relevant old preferences, not the whole history; keep active context lean."
+      },
+      {
+        "speaker": "user",
+        "text": "If you reject a hotel for noise, keep that reason around and do not surface it again unless something material changes."
+      },
+      {
+        "speaker": "user",
+        "text": "If a dinner option is out for the wrong vibe, keep it out instead of rediscovering the same mistake later."
+      },
+      {
+        "speaker": "user",
+        "text": "Remember that client-facing or partner-facing dinners should feel polished enough for conversation, not merely convenient."
+      },
+      {
+        "speaker": "user",
+        "text": "This dinner should feel polished enough for a client or partner conversation, not just convenient."
+      },
+      {
+        "speaker": "user",
+        "text": "For this trip only, airport access matters more than local character."
+      },
+      {
+        "speaker": "user",
+        "text": "After the risk update, stop carrying the old local-character preference in active context unless it becomes relevant again."
+      },
+      {
+        "speaker": "user",
+        "text": "This trip only, a chain hotel is acceptable if it clearly reduces risk; do not rewrite my normal profile with that exception."
+      },
+      {
+        "speaker": "user",
+        "text": "I heard some hotel+dinner or shuttle bundles may exist. Count them only if they improve the full plan, not just the sticker price."
+      },
+      {
+        "speaker": "user",
+        "text": "I will have the event badge this time, so if it unlocks a calmer or lower-friction option, that is relevant for this trip only."
+      },
+      {
+        "speaker": "user",
+        "text": "Timing may still move, so refundable bookings deserve real weight instead of being treated as a trivial nice-to-have."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not assume a nominal dinner bundle still works after a late arrival; some perks disappear after check-in cutoffs."
+      },
+      {
+        "speaker": "user",
+        "text": "A teammate may join dinner and may need vegan-capable options, so group flexibility matters."
+      },
+      {
+        "speaker": "user",
+        "text": "There is a city event tonight that may change transfer friction or noise in one zone, so do not rely on stale assumptions."
+      },
+      {
+        "speaker": "user",
+        "text": "The older budget assumption is no longer valid, so retire it rather than repeating it."
+      },
+      {
+        "speaker": "user",
+        "text": "Keep the useful parts, drop stale assumptions, and adjust only what the new situation forces."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_budget",
+        "meeting_safe_arrival",
+        "quiet_hotel",
+        "zone_coherence",
+        "team_dietary_support",
+        "refund_safe",
+        "bundle_dependency_valid"
+      ],
+      "soft_tags": [
+        "quiet",
+        "low_friction",
+        "easy_airport_access",
+        "client_ready"
+      ],
+      "acceptable_flights": [
+        "FL705"
+      ],
+      "acceptable_hotels": [
+        "HT801"
+      ],
+      "good_restaurants": [
+        "RS4004"
+      ],
+      "good_activities": [
+        "ACT404_partner_lounge"
+      ],
+      "required_docs": [
+        "city_ops:TPE",
+        "constraint:badge_private_room_access",
+        "constraint:late_arrival_voids_bundle",
+        "dependency:TPE_ht801_rs4004_badge_bundle",
+        "event:TPE_xinyi_expo_surge",
+        "heuristic:badge_unlock_logic",
+        "heuristic:lean_context_policy",
+        "heuristic:partner_bundle_reasoning",
+        "heuristic:refundable_schedule_risk",
+        "heuristic:rejected_option_memory",
+        "heuristic:stakeholder_balance",
+        "profile:traveler_sales",
+        "stakeholder:client_polished",
+        "stakeholder:teammate_vegan",
+        "venue:TPE_partner_summit"
+      ],
+      "stale_docs_to_retire": [
+        "stale:avoid_chain_hotels_absolute",
+        "stale:budget_cap_archive",
+        "stale:bundle_discount_always_wins",
+        "stale:late_checkin_irrelevant",
+        "stale:local_character_default",
+        "stale:partner_social_default"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:traveler_exec_scenic_photo_walk",
+        "playbook:TPE_conference_afterparty",
+        "stale:TPE_scenic_outer_transfer_note",
+        "stale:partner_social_default"
+      ],
+      "should_retrieve": [
+        "avoid_red_eye",
+        "bundle_discount_value",
+        "chain_exception_this_trip",
+        "client_dinner_polished",
+        "conference_badge_access",
+        "late_checkin_risk",
+        "low_friction_transit",
+        "prefer_airport_access",
+        "prefer_quiet_hotel",
+        "private_room_bonus",
+        "refundable_priority",
+        "team_dietary_flex"
+      ],
+      "should_retire": [
+        "avoid_chain_hotels_stable",
+        "late_checkin_irrelevant",
+        "local_character_if_safe",
+        "old_budget_cap",
+        "old_bundle_discount_absolute",
+        "old_social_bundle_default"
+      ],
+      "should_remember_rejected": [
+        "rejected_hotel_for_noise",
+        "rejected_flight_for_red_eye",
+        "rejected_restaurant_for_vibe"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "quiet_matters",
+          "client_ready_dinner"
+        ],
+        "forbidden": [
+          "red_eye",
+          "loud_after_10pm"
+        ],
+        "one_off_only": [
+          "chain_ok_this_trip",
+          "airport_access_more_important_now"
+        ],
+        "retire": [
+          "late_checkin_irrelevant",
+          "old_budget_cap",
+          "old_bundle_discount_absolute",
+          "old_chain_absolute_rule",
+          "old_local_character_priority",
+          "old_social_bundle_default"
+        ],
+        "do_not_reconsider": [
+          "noise_rejected_hotel",
+          "wrong_vibe_restaurant"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_zone": "xinyi",
+      "avoid_zone": "scenic_outer",
+      "episodic_exceptions": [
+        "airport_access_more_important_now",
+        "chain_ok_this_trip"
+      ]
+    }
+  },
+  {
+    "trip_id": "rtl7_public_hard_017",
+    "difficulty_tier": "hard",
+    "benchmark_family": "refund_volatility",
+    "family": "roadshow_trip",
+    "city": "SIN",
+    "origin": "PUS",
+    "traveler_id": "traveler_sales",
+    "nights": 2,
+    "budget_total": 565000,
+    "meeting_zone": "one_north",
+    "weather": "rainy",
+    "spoken_rule_density": "dense",
+    "scenario_hooks": {
+      "stakeholders": [
+        "stakeholder:client_polished"
+      ],
+      "badge_status": "inactive",
+      "schedule_volatility": "high",
+      "bundle_watch": true,
+      "late_arrival_risk": true,
+      "event_sensitive": true
+    },
+    "scenario_state": {
+      "airport_priority": true,
+      "rainy": true,
+      "client_dinner": true,
+      "chain_exception": false,
+      "partner_bundle": true,
+      "event_disruption": true,
+      "badge_available": false,
+      "refund_risk": true,
+      "loyalty_focus": false,
+      "late_arrival_risk": true,
+      "teammate_vegan": false,
+      "stakeholder_ids": [
+        "stakeholder:client_polished"
+      ]
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "This roadshow has moving parts, so I want a bundle that stays resilient when timing shifts."
+      },
+      {
+        "speaker": "user",
+        "text": "Please optimize the whole path — arrival, hotel, dinner, and buffer activity — instead of picking isolated winners."
+      },
+      {
+        "speaker": "user",
+        "text": "My usual travel habits are in my profile. Please use them, but do not let one-off exceptions rewrite them."
+      },
+      {
+        "speaker": "user",
+        "text": "Please remember that a genuinely quiet room matters to me; do not treat it as cosmetic."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not send me through a red-eye just because the fare is lower."
+      },
+      {
+        "speaker": "user",
+        "text": "Please filter out places that feel loud after 10pm; nightlife spillover is a real problem for this trip."
+      },
+      {
+        "speaker": "user",
+        "text": "Bring back only the relevant old preferences, not the whole history; keep active context lean."
+      },
+      {
+        "speaker": "user",
+        "text": "If you reject a hotel for noise, keep that reason around and do not surface it again unless something material changes."
+      },
+      {
+        "speaker": "user",
+        "text": "If a dinner option is out for the wrong vibe, keep it out instead of rediscovering the same mistake later."
+      },
+      {
+        "speaker": "user",
+        "text": "Remember that client-facing or partner-facing dinners should feel polished enough for conversation, not merely convenient."
+      },
+      {
+        "speaker": "user",
+        "text": "This dinner should feel polished enough for a client or partner conversation, not just convenient."
+      },
+      {
+        "speaker": "user",
+        "text": "For this trip only, airport access matters more than local character."
+      },
+      {
+        "speaker": "user",
+        "text": "After the risk update, stop carrying the old local-character preference in active context unless it becomes relevant again."
+      },
+      {
+        "speaker": "user",
+        "text": "Weather looks worse now, so brittle outdoor ideas should probably drop out."
+      },
+      {
+        "speaker": "user",
+        "text": "I heard some hotel+dinner or shuttle bundles may exist. Count them only if they improve the full plan, not just the sticker price."
+      },
+      {
+        "speaker": "user",
+        "text": "Timing may still move, so refundable bookings deserve real weight instead of being treated as a trivial nice-to-have."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not assume a nominal dinner bundle still works after a late arrival; some perks disappear after check-in cutoffs."
+      },
+      {
+        "speaker": "user",
+        "text": "There is a city event tonight that may change transfer friction or noise in one zone, so do not rely on stale assumptions."
+      },
+      {
+        "speaker": "user",
+        "text": "The older budget assumption is no longer valid, so retire it rather than repeating it."
+      },
+      {
+        "speaker": "user",
+        "text": "Keep the useful parts, drop stale assumptions, and adjust only what the new situation forces."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_budget",
+        "meeting_safe_arrival",
+        "quiet_hotel",
+        "zone_coherence",
+        "weather_safe_activity",
+        "refund_safe",
+        "bundle_dependency_valid"
+      ],
+      "soft_tags": [
+        "quiet",
+        "low_friction",
+        "easy_airport_access",
+        "client_ready",
+        "weather_safe"
+      ],
+      "acceptable_flights": [
+        "FL801"
+      ],
+      "acceptable_hotels": [
+        "HT907"
+      ],
+      "good_restaurants": [
+        "RS2004"
+      ],
+      "good_activities": [
+        "ACT304_innovation_center"
+      ],
+      "required_docs": [
+        "city_ops:SIN",
+        "constraint:late_arrival_voids_bundle",
+        "dependency:SIN_ht907_rs2004_shuttle",
+        "event:SIN_one_north_thunderstorm",
+        "heuristic:lean_context_policy",
+        "heuristic:partner_bundle_reasoning",
+        "heuristic:refundable_schedule_risk",
+        "heuristic:rejected_option_memory",
+        "heuristic:stakeholder_balance",
+        "profile:traveler_sales",
+        "promo:SIN_ht907_rs2004_shuttle_bundle",
+        "stakeholder:client_polished",
+        "venue:SIN_roadshow_trip"
+      ],
+      "stale_docs_to_retire": [
+        "stale:budget_cap_archive",
+        "stale:bundle_discount_always_wins",
+        "stale:dry_weather_ops_assumption",
+        "stale:late_checkin_irrelevant",
+        "stale:local_character_default",
+        "stale:partner_social_default"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:traveler_research_airport_lounge_habit",
+        "playbook:SIN_marina_client_evening",
+        "stale:SIN_clarke_quay_social_note",
+        "stale:partner_social_default"
+      ],
+      "should_retrieve": [
+        "avoid_red_eye",
+        "bundle_discount_value",
+        "client_dinner_polished",
+        "late_checkin_risk",
+        "low_friction_transit",
+        "prefer_airport_access",
+        "prefer_quiet_hotel",
+        "private_room_bonus",
+        "refundable_priority",
+        "shuttle_bundle",
+        "weather_safe_backup"
+      ],
+      "should_retire": [
+        "late_checkin_irrelevant",
+        "local_character_if_safe",
+        "old_budget_cap",
+        "old_bundle_discount_absolute",
+        "old_social_bundle_default",
+        "old_weather_assumption"
+      ],
+      "should_remember_rejected": [
+        "rejected_hotel_for_noise",
+        "rejected_flight_for_red_eye",
+        "rejected_restaurant_for_vibe"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "quiet_matters",
+          "client_ready_dinner"
+        ],
+        "forbidden": [
+          "red_eye",
+          "loud_after_10pm"
+        ],
+        "one_off_only": [
+          "airport_access_more_important_now"
+        ],
+        "retire": [
+          "late_checkin_irrelevant",
+          "old_budget_cap",
+          "old_bundle_discount_absolute",
+          "old_local_character_priority",
+          "old_social_bundle_default",
+          "old_weather_assumption"
+        ],
+        "do_not_reconsider": [
+          "noise_rejected_hotel",
+          "wrong_vibe_restaurant"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_zone": "one_north",
+      "avoid_zone": "clarke_quay",
+      "episodic_exceptions": [
+        "airport_access_more_important_now"
+      ]
+    }
+  },
+  {
+    "trip_id": "rtl7_public_hard_018",
+    "difficulty_tier": "hard",
+    "benchmark_family": "event_sensitive_replanning",
+    "family": "board_visit",
+    "city": "OSA",
+    "origin": "GMP",
+    "traveler_id": "traveler_ops",
+    "nights": 2,
+    "budget_total": 570000,
+    "meeting_zone": "umeda",
+    "weather": "clear",
+    "spoken_rule_density": "dense",
+    "scenario_hooks": {
+      "stakeholders": [
+        "stakeholder:ops_host",
+        "stakeholder:client_polished"
+      ],
+      "badge_status": "inactive",
+      "schedule_volatility": "normal",
+      "bundle_watch": false,
+      "late_arrival_risk": false,
+      "event_sensitive": true
+    },
+    "scenario_state": {
+      "airport_priority": true,
+      "rainy": false,
+      "client_dinner": true,
+      "chain_exception": true,
+      "partner_bundle": false,
+      "event_disruption": true,
+      "badge_available": false,
+      "refund_risk": false,
+      "loyalty_focus": true,
+      "late_arrival_risk": false,
+      "teammate_vegan": false,
+      "stakeholder_ids": [
+        "stakeholder:ops_host",
+        "stakeholder:client_polished"
+      ]
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "This trip includes a board-facing session, so the plan should feel reliable and polished, not improvised."
+      },
+      {
+        "speaker": "user",
+        "text": "I can accept a slightly less local option if it clearly reduces friction around prep and client optics."
+      },
+      {
+        "speaker": "user",
+        "text": "My usual travel habits are in my profile. Please use them, but do not let one-off exceptions rewrite them."
+      },
+      {
+        "speaker": "user",
+        "text": "Please remember that a genuinely quiet room matters to me; do not treat it as cosmetic."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not send me through a red-eye just because the fare is lower."
+      },
+      {
+        "speaker": "user",
+        "text": "Please filter out places that feel loud after 10pm; nightlife spillover is a real problem for this trip."
+      },
+      {
+        "speaker": "user",
+        "text": "Bring back only the relevant old preferences, not the whole history; keep active context lean."
+      },
+      {
+        "speaker": "user",
+        "text": "If you reject a hotel for noise, keep that reason around and do not surface it again unless something material changes."
+      },
+      {
+        "speaker": "user",
+        "text": "If a dinner option is out for the wrong vibe, keep it out instead of rediscovering the same mistake later."
+      },
+      {
+        "speaker": "user",
+        "text": "Remember that client-facing or partner-facing dinners should feel polished enough for conversation, not merely convenient."
+      },
+      {
+        "speaker": "user",
+        "text": "This dinner should feel polished enough for a client or partner conversation, not just convenient."
+      },
+      {
+        "speaker": "user",
+        "text": "For this trip only, airport access matters more than local character."
+      },
+      {
+        "speaker": "user",
+        "text": "After the risk update, stop carrying the old local-character preference in active context unless it becomes relevant again."
+      },
+      {
+        "speaker": "user",
+        "text": "This trip only, a chain hotel is acceptable if it clearly reduces risk; do not rewrite my normal profile with that exception."
+      },
+      {
+        "speaker": "user",
+        "text": "Please consider whether a loyalty perk changes the effective value of a bundle, not just the list price."
+      },
+      {
+        "speaker": "user",
+        "text": "There is a city event tonight that may change transfer friction or noise in one zone, so do not rely on stale assumptions."
+      },
+      {
+        "speaker": "user",
+        "text": "The older budget assumption is no longer valid, so retire it rather than repeating it."
+      },
+      {
+        "speaker": "user",
+        "text": "Keep the useful parts, drop stale assumptions, and adjust only what the new situation forces."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_budget",
+        "meeting_safe_arrival",
+        "quiet_hotel",
+        "zone_coherence"
+      ],
+      "soft_tags": [
+        "quiet",
+        "low_friction",
+        "easy_airport_access",
+        "client_ready"
+      ],
+      "acceptable_flights": [
+        "FL101"
+      ],
+      "acceptable_hotels": [
+        "HT208"
+      ],
+      "good_restaurants": [
+        "RS3005"
+      ],
+      "good_activities": [
+        "ACT105_partner_lounge"
+      ],
+      "required_docs": [
+        "city_ops:OSA",
+        "event:OSA_umeda_private_room_night",
+        "heuristic:lean_context_policy",
+        "heuristic:rejected_option_memory",
+        "heuristic:stakeholder_balance",
+        "loyalty:traveler_ops",
+        "profile:traveler_ops",
+        "stakeholder:client_polished",
+        "stakeholder:ops_host",
+        "venue:OSA_board_visit"
+      ],
+      "stale_docs_to_retire": [
+        "stale:avoid_chain_hotels_absolute",
+        "stale:budget_cap_archive",
+        "stale:local_character_default",
+        "stale:partner_social_default"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:traveler_consultant_weekend_food_crawl",
+        "playbook:OSA_business_travel_afterwork_social",
+        "stale:OSA_shinsekai_shortcut"
+      ],
+      "should_retrieve": [
+        "avoid_red_eye",
+        "chain_exception_this_trip",
+        "client_dinner_polished",
+        "low_friction_transit",
+        "loyalty_bundle_value",
+        "prefer_airport_access",
+        "prefer_quiet_hotel"
+      ],
+      "should_retire": [
+        "avoid_chain_hotels_stable",
+        "local_character_if_safe",
+        "old_budget_cap",
+        "old_social_bundle_default"
+      ],
+      "should_remember_rejected": [
+        "rejected_hotel_for_noise",
+        "rejected_flight_for_red_eye",
+        "rejected_restaurant_for_vibe"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "quiet_matters",
+          "client_ready_dinner"
+        ],
+        "forbidden": [
+          "red_eye",
+          "loud_after_10pm"
+        ],
+        "one_off_only": [
+          "chain_ok_this_trip",
+          "airport_access_more_important_now"
+        ],
+        "retire": [
+          "old_budget_cap",
+          "old_chain_absolute_rule",
+          "old_local_character_priority",
+          "old_social_bundle_default"
+        ],
+        "do_not_reconsider": [
+          "noise_rejected_hotel",
+          "wrong_vibe_restaurant"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_zone": "umeda",
+      "avoid_zone": "shinsekai",
+      "episodic_exceptions": [
+        "airport_access_more_important_now",
+        "chain_ok_this_trip"
+      ]
+    }
+  },
+  {
+    "trip_id": "rtl7_public_hard_019",
+    "difficulty_tier": "hard",
+    "benchmark_family": "stakeholder_tradeoff",
+    "family": "conference_trip",
+    "city": "TPE",
+    "origin": "SEL",
+    "traveler_id": "traveler_consultant",
+    "nights": 2,
+    "budget_total": 510000,
+    "meeting_zone": "xinyi",
+    "weather": "clear",
+    "spoken_rule_density": "dense",
+    "scenario_hooks": {
+      "stakeholders": [
+        "stakeholder:teammate_vegan",
+        "stakeholder:client_polished"
+      ],
+      "badge_status": "inactive",
+      "schedule_volatility": "normal",
+      "bundle_watch": false,
+      "late_arrival_risk": false,
+      "event_sensitive": true
+    },
+    "scenario_state": {
+      "airport_priority": true,
+      "rainy": false,
+      "client_dinner": true,
+      "chain_exception": false,
+      "partner_bundle": false,
+      "event_disruption": true,
+      "badge_available": false,
+      "refund_risk": false,
+      "loyalty_focus": false,
+      "late_arrival_risk": false,
+      "teammate_vegan": true,
+      "stakeholder_ids": [
+        "stakeholder:teammate_vegan",
+        "stakeholder:client_polished"
+      ]
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "I need to arrive ready for an early conference morning, not merely arrive somehow."
+      },
+      {
+        "speaker": "user",
+        "text": "A small networking dinner is welcome only if it does not damage the next day."
+      },
+      {
+        "speaker": "user",
+        "text": "My usual travel habits are in my profile. Please use them, but do not let one-off exceptions rewrite them."
+      },
+      {
+        "speaker": "user",
+        "text": "Please remember that a genuinely quiet room matters to me; do not treat it as cosmetic."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not send me through a red-eye just because the fare is lower."
+      },
+      {
+        "speaker": "user",
+        "text": "Please filter out places that feel loud after 10pm; nightlife spillover is a real problem for this trip."
+      },
+      {
+        "speaker": "user",
+        "text": "Bring back only the relevant old preferences, not the whole history; keep active context lean."
+      },
+      {
+        "speaker": "user",
+        "text": "If you reject a hotel for noise, keep that reason around and do not surface it again unless something material changes."
+      },
+      {
+        "speaker": "user",
+        "text": "If a dinner option is out for the wrong vibe, keep it out instead of rediscovering the same mistake later."
+      },
+      {
+        "speaker": "user",
+        "text": "Remember that client-facing or partner-facing dinners should feel polished enough for conversation, not merely convenient."
+      },
+      {
+        "speaker": "user",
+        "text": "This dinner should feel polished enough for a client or partner conversation, not just convenient."
+      },
+      {
+        "speaker": "user",
+        "text": "For this trip only, airport access matters more than local character."
+      },
+      {
+        "speaker": "user",
+        "text": "After the risk update, stop carrying the old local-character preference in active context unless it becomes relevant again."
+      },
+      {
+        "speaker": "user",
+        "text": "A teammate may join dinner and may need vegan-capable options, so group flexibility matters."
+      },
+      {
+        "speaker": "user",
+        "text": "There is a city event tonight that may change transfer friction or noise in one zone, so do not rely on stale assumptions."
+      },
+      {
+        "speaker": "user",
+        "text": "The older budget assumption is no longer valid, so retire it rather than repeating it."
+      },
+      {
+        "speaker": "user",
+        "text": "Keep the useful parts, drop stale assumptions, and adjust only what the new situation forces."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_budget",
+        "meeting_safe_arrival",
+        "quiet_hotel",
+        "zone_coherence",
+        "team_dietary_support"
+      ],
+      "soft_tags": [
+        "quiet",
+        "low_friction",
+        "easy_airport_access",
+        "client_ready"
+      ],
+      "acceptable_flights": [
+        "FL702"
+      ],
+      "acceptable_hotels": [
+        "HT806"
+      ],
+      "good_restaurants": [
+        "RS4005"
+      ],
+      "good_activities": [
+        "ACT401_client_visit"
+      ],
+      "required_docs": [
+        "city_ops:TPE",
+        "event:TPE_xinyi_expo_surge",
+        "heuristic:lean_context_policy",
+        "heuristic:rejected_option_memory",
+        "heuristic:stakeholder_balance",
+        "profile:traveler_consultant",
+        "stakeholder:client_polished",
+        "stakeholder:teammate_vegan",
+        "venue:TPE_conference_trip"
+      ],
+      "stale_docs_to_retire": [
+        "stale:budget_cap_archive",
+        "stale:local_character_default",
+        "stale:partner_social_default"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:traveler_exec_scenic_photo_walk",
+        "playbook:TPE_conference_afterparty",
+        "stale:TPE_scenic_outer_transfer_note"
+      ],
+      "should_retrieve": [
+        "avoid_red_eye",
+        "client_dinner_polished",
+        "low_friction_transit",
+        "prefer_airport_access",
+        "prefer_quiet_hotel",
+        "team_dietary_flex"
+      ],
+      "should_retire": [
+        "local_character_if_safe",
+        "old_budget_cap",
+        "old_social_bundle_default"
+      ],
+      "should_remember_rejected": [
+        "rejected_hotel_for_noise",
+        "rejected_flight_for_red_eye",
+        "rejected_restaurant_for_vibe"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "quiet_matters",
+          "client_ready_dinner"
+        ],
+        "forbidden": [
+          "red_eye",
+          "loud_after_10pm"
+        ],
+        "one_off_only": [
+          "airport_access_more_important_now"
+        ],
+        "retire": [
+          "old_budget_cap",
+          "old_local_character_priority",
+          "old_social_bundle_default"
+        ],
+        "do_not_reconsider": [
+          "noise_rejected_hotel",
+          "wrong_vibe_restaurant"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_zone": "xinyi",
+      "avoid_zone": "scenic_outer",
+      "episodic_exceptions": [
+        "airport_access_more_important_now"
+      ]
+    }
+  },
+  {
+    "trip_id": "rtl7_public_hard_020",
+    "difficulty_tier": "hard",
+    "benchmark_family": "bundle_cutoff_reasoning",
+    "family": "business_travel",
+    "city": "SIN",
+    "origin": "PUS",
+    "traveler_id": "traveler_ops",
+    "nights": 2,
+    "budget_total": 530000,
+    "meeting_zone": "one_north",
+    "weather": "rainy",
+    "spoken_rule_density": "dense",
+    "scenario_hooks": {
+      "stakeholders": [
+        "stakeholder:ops_host"
+      ],
+      "badge_status": "inactive",
+      "schedule_volatility": "normal",
+      "bundle_watch": true,
+      "late_arrival_risk": true,
+      "event_sensitive": true
+    },
+    "scenario_state": {
+      "airport_priority": true,
+      "rainy": true,
+      "client_dinner": false,
+      "chain_exception": true,
+      "partner_bundle": true,
+      "event_disruption": true,
+      "badge_available": false,
+      "refund_risk": false,
+      "loyalty_focus": false,
+      "late_arrival_risk": true,
+      "teammate_vegan": false,
+      "stakeholder_ids": [
+        "stakeholder:ops_host"
+      ]
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "Please build a short trip plan that keeps me functional for work, not just technically on time."
+      },
+      {
+        "speaker": "user",
+        "text": "A teammate may join dinner, so dietary flexibility matters more than a flashy venue."
+      },
+      {
+        "speaker": "user",
+        "text": "My usual travel habits are in my profile. Please use them, but do not let one-off exceptions rewrite them."
+      },
+      {
+        "speaker": "user",
+        "text": "Please remember that a genuinely quiet room matters to me; do not treat it as cosmetic."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not send me through a red-eye just because the fare is lower."
+      },
+      {
+        "speaker": "user",
+        "text": "Please filter out places that feel loud after 10pm; nightlife spillover is a real problem for this trip."
+      },
+      {
+        "speaker": "user",
+        "text": "Bring back only the relevant old preferences, not the whole history; keep active context lean."
+      },
+      {
+        "speaker": "user",
+        "text": "If you reject a hotel for noise, keep that reason around and do not surface it again unless something material changes."
+      },
+      {
+        "speaker": "user",
+        "text": "If a dinner option is out for the wrong vibe, keep it out instead of rediscovering the same mistake later."
+      },
+      {
+        "speaker": "user",
+        "text": "For this trip only, airport access matters more than local character."
+      },
+      {
+        "speaker": "user",
+        "text": "After the risk update, stop carrying the old local-character preference in active context unless it becomes relevant again."
+      },
+      {
+        "speaker": "user",
+        "text": "This trip only, a chain hotel is acceptable if it clearly reduces risk; do not rewrite my normal profile with that exception."
+      },
+      {
+        "speaker": "user",
+        "text": "Weather looks worse now, so brittle outdoor ideas should probably drop out."
+      },
+      {
+        "speaker": "user",
+        "text": "I heard some hotel+dinner or shuttle bundles may exist. Count them only if they improve the full plan, not just the sticker price."
+      },
+      {
+        "speaker": "user",
+        "text": "Do not assume a nominal dinner bundle still works after a late arrival; some perks disappear after check-in cutoffs."
+      },
+      {
+        "speaker": "user",
+        "text": "There is a city event tonight that may change transfer friction or noise in one zone, so do not rely on stale assumptions."
+      },
+      {
+        "speaker": "user",
+        "text": "The older budget assumption is no longer valid, so retire it rather than repeating it."
+      },
+      {
+        "speaker": "user",
+        "text": "Keep the useful parts, drop stale assumptions, and adjust only what the new situation forces."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_budget",
+        "meeting_safe_arrival",
+        "quiet_hotel",
+        "zone_coherence",
+        "weather_safe_activity",
+        "bundle_dependency_valid"
+      ],
+      "soft_tags": [
+        "quiet",
+        "low_friction",
+        "easy_airport_access",
+        "vegan_friendly",
+        "weather_safe"
+      ],
+      "acceptable_flights": [
+        "FL801"
+      ],
+      "acceptable_hotels": [
+        "HT907"
+      ],
+      "good_restaurants": [
+        "RS2004"
+      ],
+      "good_activities": [
+        "ACT304_innovation_center"
+      ],
+      "required_docs": [
+        "city_ops:SIN",
+        "constraint:late_arrival_voids_bundle",
+        "dependency:SIN_ht907_rs2004_shuttle",
+        "event:SIN_one_north_thunderstorm",
+        "heuristic:lean_context_policy",
+        "heuristic:partner_bundle_reasoning",
+        "heuristic:rejected_option_memory",
+        "heuristic:stakeholder_balance",
+        "profile:traveler_ops",
+        "stakeholder:ops_host",
+        "venue:SIN_business_travel"
+      ],
+      "stale_docs_to_retire": [
+        "stale:avoid_chain_hotels_absolute",
+        "stale:budget_cap_archive",
+        "stale:bundle_discount_always_wins",
+        "stale:dry_weather_ops_assumption",
+        "stale:late_checkin_irrelevant",
+        "stale:local_character_default",
+        "stale:partner_social_default"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:traveler_research_airport_lounge_habit",
+        "playbook:SIN_marina_client_evening",
+        "stale:SIN_clarke_quay_social_note",
+        "stale:partner_social_default"
+      ],
+      "should_retrieve": [
+        "avoid_red_eye",
+        "bundle_discount_value",
+        "chain_exception_this_trip",
+        "late_checkin_risk",
+        "low_friction_transit",
+        "prefer_airport_access",
+        "prefer_quiet_hotel",
+        "private_room_bonus",
+        "shuttle_bundle",
+        "weather_safe_backup"
+      ],
+      "should_retire": [
+        "avoid_chain_hotels_stable",
+        "late_checkin_irrelevant",
+        "local_character_if_safe",
+        "old_budget_cap",
+        "old_bundle_discount_absolute",
+        "old_social_bundle_default",
+        "old_weather_assumption"
+      ],
+      "should_remember_rejected": [
+        "rejected_hotel_for_noise",
+        "rejected_flight_for_red_eye",
+        "rejected_restaurant_for_vibe"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "quiet_matters"
+        ],
+        "forbidden": [
+          "red_eye",
+          "loud_after_10pm"
+        ],
+        "one_off_only": [
+          "chain_ok_this_trip",
+          "airport_access_more_important_now"
+        ],
+        "retire": [
+          "late_checkin_irrelevant",
+          "old_budget_cap",
+          "old_bundle_discount_absolute",
+          "old_chain_absolute_rule",
+          "old_local_character_priority",
+          "old_social_bundle_default",
+          "old_weather_assumption"
+        ],
+        "do_not_reconsider": [
+          "noise_rejected_hotel",
+          "wrong_vibe_restaurant"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_zone": "one_north",
+      "avoid_zone": "clarke_quay",
+      "episodic_exceptions": [
+        "airport_access_more_important_now",
+        "chain_ok_this_trip"
+      ]
+    }
+  }
+]

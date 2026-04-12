@@ -1,0 +1,20 @@
+{
+  "SIN": {
+    "airport_to_clarke_quay": 35,
+    "airport_to_bugis": 28,
+    "airport_to_chinatown": 44
+  },
+  "TPE": {
+    "airport_to_songshan": 18,
+    "airport_to_ximending": 42
+  },
+  "OSA": {
+    "airport_to_namba": 41,
+    "airport_to_umeda": 52
+  },
+  "TYO": {
+    "airport_to_ueno": 39,
+    "airport_to_shinjuku": 57,
+    "airport_to_ikebukuro": 62
+  }
+}

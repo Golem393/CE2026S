@@ -1,0 +1,29 @@
+{
+  "OSA": {
+    "doc_id": "city_ops:OSA",
+    "text": "Ops note: Namba is efficient for central meetings, while Shinsekai tends to be louder after 22:00. Umeda can support polished dinners, but some partner bundles stop working after late check-in.",
+    "avoid_zone": "shinsekai",
+    "risk_tags": [
+      "noise_risk",
+      "late_checkin_risk"
+    ]
+  },
+  "TPE": {
+    "doc_id": "city_ops:TPE",
+    "text": "Ops note: Xinyi works best for conference mornings. Airport access is smoother from the blue-line corridor, and expo nights can make scenic outer areas slower than they look. Badge-enabled partner rooms can matter.",
+    "avoid_zone": "scenic_outer",
+    "risk_tags": [
+      "late_return_risk",
+      "badge_access"
+    ]
+  },
+  "SIN": {
+    "doc_id": "city_ops:SIN",
+    "text": "Ops note: One-North is dependable for business travel during wet weather. Marina dinners can look polished but add transfer overhead, while shuttle-linked bundles hold up better on rainy nights.",
+    "avoid_zone": "clarke_quay",
+    "risk_tags": [
+      "weather_transfer_risk",
+      "shuttle_bundle"
+    ]
+  }
+}

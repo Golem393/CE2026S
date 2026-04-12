@@ -1,0 +1,59 @@
+[
+  {
+    "dependency_id": "dependency:OSA_ht206_rs3001_private_room",
+    "doc_id": "dependency:OSA_ht206_rs3001_private_room",
+    "city": "OSA",
+    "hotel_id": "HT206",
+    "restaurant_id": "RS3001",
+    "activity_id": null,
+    "condition_tags": [
+      "private_room_bonus"
+    ],
+    "effect": "boost",
+    "score_bonus": 1.7,
+    "text": "HT206 makes RS3001 more viable because the private-room package reduces late noise exposure if check-in is early enough.",
+    "tags": [
+      "bundle_discount_value",
+      "private_room_bonus"
+    ]
+  },
+  {
+    "dependency_id": "dependency:TPE_ht801_rs4004_badge_bundle",
+    "doc_id": "dependency:TPE_ht801_rs4004_badge_bundle",
+    "city": "TPE",
+    "hotel_id": "HT801",
+    "restaurant_id": "RS4004",
+    "activity_id": "ACT404_partner_lounge",
+    "condition_tags": [
+      "conference_badge_access"
+    ],
+    "effect": "boost",
+    "score_bonus": 2.0,
+    "text": "With the summit badge active, HT801 + RS4004 + ACT404 becomes a calmer, tighter partner bundle.",
+    "tags": [
+      "conference_badge_access",
+      "bundle_discount_value",
+      "private_room_bonus"
+    ]
+  },
+  {
+    "dependency_id": "dependency:SIN_ht907_rs2004_shuttle",
+    "doc_id": "dependency:SIN_ht907_rs2004_shuttle",
+    "city": "SIN",
+    "hotel_id": "HT907",
+    "restaurant_id": "RS2004",
+    "activity_id": "ACT304_innovation_center",
+    "condition_tags": [
+      "shuttle_bundle",
+      "weather_safe_backup"
+    ],
+    "effect": "boost",
+    "score_bonus": 2.1,
+    "text": "HT907, RS2004, and ACT304 reinforce each other under rain because the shuttle and covered transfers lower friction materially.",
+    "tags": [
+      "shuttle_bundle",
+      "weather_safe_backup",
+      "low_friction_transit"
+    ]
+  }
+]

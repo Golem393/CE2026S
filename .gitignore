@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.venv/
+
+# Build and generated releases
+final_project/_build/
+final_project/student_release/
+*.zip
+
+# Run artifacts
+final_project/runs/
+trace.jsonl
+llm_results_public*.json
+llm_results_hidden_sample*.json
+llm_eval_summary*.md
+offline_metric_audit*.json
+reference_*.json
+reference_solver_*eval.json
+
+# Environment
+.env
+
+# Local caches
+final_project/dynamic_travel_replanning/.cache/
+
+# Student-visible repo only
+final_project/ta_only/
+
+# Temporary archives and notes
+*.zip
+*.bak
+*_notes.md
+*_audit*.json
+
+# Build and run artifacts
+final_project/_build/
+final_project/dist/
+final_project/build/

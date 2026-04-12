@@ -1,0 +1,200 @@
+[
+  {
+    "restaurant_id": "RS3001",
+    "city": "OSA",
+    "cuisine": "vegan_bistro",
+    "price_level": 2,
+    "dietary_flags": [
+      "vegan"
+    ],
+    "area": "namba",
+    "hours": "18:00-21:30",
+    "quiet_score": 8.6,
+    "client_ready_score": 7.2
+  },
+  {
+    "restaurant_id": "RS3002",
+    "city": "OSA",
+    "cuisine": "izakaya",
+    "price_level": 2,
+    "dietary_flags": [],
+    "area": "shinsekai",
+    "hours": "18:00-23:30",
+    "quiet_score": 4.2,
+    "client_ready_score": 4.0
+  },
+  {
+    "restaurant_id": "RS3003",
+    "city": "OSA",
+    "cuisine": "kaiseki_bistro",
+    "price_level": 3,
+    "dietary_flags": [
+      "vegetarian"
+    ],
+    "area": "namba",
+    "hours": "18:00-22:00",
+    "quiet_score": 8.2,
+    "client_ready_score": 8.4
+  },
+  {
+    "restaurant_id": "RS4001",
+    "city": "TPE",
+    "cuisine": "taiwanese_bistro",
+    "price_level": 2,
+    "dietary_flags": [],
+    "area": "xinyi",
+    "hours": "11:00-21:00",
+    "quiet_score": 8.1,
+    "client_ready_score": 8.3
+  },
+  {
+    "restaurant_id": "RS4002",
+    "city": "TPE",
+    "cuisine": "night_market_small_plates",
+    "price_level": 1,
+    "dietary_flags": [
+      "vegetarian"
+    ],
+    "area": "ximending",
+    "hours": "17:00-23:30",
+    "quiet_score": 4.9,
+    "client_ready_score": 3.8
+  },
+  {
+    "restaurant_id": "RS4003",
+    "city": "TPE",
+    "cuisine": "tea_house_bistro",
+    "price_level": 2,
+    "dietary_flags": [
+      "vegetarian"
+    ],
+    "area": "songshan",
+    "hours": "17:30-21:30",
+    "quiet_score": 8.9,
+    "client_ready_score": 7.8
+  },
+  {
+    "restaurant_id": "RS2001",
+    "city": "SIN",
+    "cuisine": "vegetarian_fusion",
+    "price_level": 2,
+    "dietary_flags": [
+      "vegetarian"
+    ],
+    "area": "clarke_quay",
+    "hours": "11:30-22:30",
+    "quiet_score": 5.1,
+    "client_ready_score": 5.3
+  },
+  {
+    "restaurant_id": "RS2002",
+    "city": "SIN",
+    "cuisine": "vegan_bistro",
+    "price_level": 2,
+    "dietary_flags": [
+      "vegan"
+    ],
+    "area": "one_north",
+    "hours": "11:30-21:30",
+    "quiet_score": 8.7,
+    "client_ready_score": 7.1
+  },
+  {
+    "restaurant_id": "RS2003",
+    "city": "SIN",
+    "cuisine": "client_bistro",
+    "price_level": 3,
+    "dietary_flags": [
+      "vegetarian"
+    ],
+    "area": "marina",
+    "hours": "18:00-22:00",
+    "quiet_score": 8.0,
+    "client_ready_score": 8.9
+  },
+  {
+    "restaurant_id": "RS3004",
+    "city": "OSA",
+    "cuisine": "kaiseki",
+    "price_level": 4,
+    "dietary_flags": [
+      "vegan_preorder"
+    ],
+    "area": "namba",
+    "quiet_score": 8.6,
+    "client_ready_score": 8.7,
+    "private_room": true,
+    "booking_cutoff": "20:30"
+  },
+  {
+    "restaurant_id": "RS3005",
+    "city": "OSA",
+    "cuisine": "bistro",
+    "price_level": 2,
+    "dietary_flags": [
+      "vegan"
+    ],
+    "area": "umeda",
+    "quiet_score": 7.9,
+    "client_ready_score": 6.9,
+    "private_room": false,
+    "booking_cutoff": "21:30"
+  },
+  {
+    "restaurant_id": "RS4004",
+    "city": "TPE",
+    "cuisine": "taiwanese_set",
+    "price_level": 4,
+    "dietary_flags": [
+      "vegan_preorder"
+    ],
+    "area": "xinyi",
+    "quiet_score": 8.4,
+    "client_ready_score": 8.6,
+    "private_room": true,
+    "booking_cutoff": "20:45",
+    "badge_only": true
+  },
+  {
+    "restaurant_id": "RS4005",
+    "city": "TPE",
+    "cuisine": "plant_forward",
+    "price_level": 3,
+    "dietary_flags": [
+      "vegan"
+    ],
+    "area": "blue_line_corridor",
+    "quiet_score": 8.0,
+    "client_ready_score": 7.1,
+    "private_room": false,
+    "booking_cutoff": "21:00"
+  },
+  {
+    "restaurant_id": "RS2004",
+    "city": "SIN",
+    "cuisine": "modern_asian",
+    "price_level": 3,
+    "dietary_flags": [
+      "vegan_preorder"
+    ],
+    "area": "one_north",
+    "quiet_score": 8.3,
+    "client_ready_score": 7.8,
+    "private_room": true,
+    "booking_cutoff": "20:15"
+  },
+  {
+    "restaurant_id": "RS2005",
+    "city": "SIN",
+    "cuisine": "marina_grill",
+    "price_level": 4,
+    "dietary_flags": [
+      "vegan_preorder"
+    ],
+    "area": "marina",
+    "quiet_score": 7.8,
+    "client_ready_score": 8.8,
+    "private_room": true,
+    "booking_cutoff": "21:00"
+  }
+]

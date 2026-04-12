@@ -1,0 +1,113 @@
+[
+  {
+    "promo_id": "promo:OSA_ht206_rs3001_private_room",
+    "doc_id": "promo:OSA_ht206_rs3001_private_room",
+    "city": "OSA",
+    "family": "business_travel",
+    "hotel_id": "HT206",
+    "restaurant_id": "RS3001",
+    "activity_id": null,
+    "discount_krw": 35000,
+    "score_bonus": 3.2,
+    "benefit_tags": [
+      "bundle_discount_value",
+      "private_room_bonus",
+      "late_checkin_risk"
+    ],
+    "badge_required": false,
+    "arrival_before": "20:30",
+    "text": "HT206 guests can access a quieter private-room seating at RS3001 with a set-menu credit, but the bundle expires after a late check-in."
+  },
+  {
+    "promo_id": "promo:OSA_ht207_rs3004_board_bundle",
+    "doc_id": "promo:OSA_ht207_rs3004_board_bundle",
+    "city": "OSA",
+    "family": "board_visit",
+    "hotel_id": "HT207",
+    "restaurant_id": "RS3004",
+    "activity_id": null,
+    "discount_krw": 42000,
+    "score_bonus": 3.8,
+    "benefit_tags": [
+      "bundle_discount_value",
+      "private_room_bonus"
+    ],
+    "badge_required": false,
+    "arrival_before": "21:00",
+    "text": "For board-facing trips, HT207 and RS3004 run a quiet private-room dinner bundle close to the meeting zone."
+  },
+  {
+    "promo_id": "promo:TPE_ht801_rs4004_badge_room",
+    "doc_id": "promo:TPE_ht801_rs4004_badge_room",
+    "city": "TPE",
+    "family": "conference_trip",
+    "hotel_id": "HT801",
+    "restaurant_id": "RS4004",
+    "activity_id": null,
+    "discount_krw": 30000,
+    "score_bonus": 3.6,
+    "benefit_tags": [
+      "bundle_discount_value",
+      "conference_badge_access",
+      "private_room_bonus"
+    ],
+    "badge_required": true,
+    "arrival_before": "21:00",
+    "text": "Conference badge holders staying at HT801 can access RS4004's calmer partner room with a fixed-menu credit."
+  },
+  {
+    "promo_id": "promo:TPE_ht807_rs4005_airport_corridor",
+    "doc_id": "promo:TPE_ht807_rs4005_airport_corridor",
+    "city": "TPE",
+    "family": "partner_summit",
+    "hotel_id": "HT807",
+    "restaurant_id": "RS4005",
+    "activity_id": "ACT405_innovation_gallery",
+    "discount_krw": 28000,
+    "score_bonus": 2.8,
+    "benefit_tags": [
+      "bundle_discount_value",
+      "low_friction_transit"
+    ],
+    "badge_required": false,
+    "arrival_before": null,
+    "text": "The blue-line corridor bundle links HT807, RS4005, and ACT405 for a lower-friction partner summit evening."
+  },
+  {
+    "promo_id": "promo:SIN_ht907_rs2004_shuttle_bundle",
+    "doc_id": "promo:SIN_ht907_rs2004_shuttle_bundle",
+    "city": "SIN",
+    "family": "roadshow_trip",
+    "hotel_id": "HT907",
+    "restaurant_id": "RS2004",
+    "activity_id": "ACT304_innovation_center",
+    "discount_krw": 32000,
+    "score_bonus": 3.5,
+    "benefit_tags": [
+      "bundle_discount_value",
+      "shuttle_bundle",
+      "weather_safe_backup"
+    ],
+    "badge_required": false,
+    "arrival_before": "20:30",
+    "text": "HT907 runs a shuttle-linked One-North bundle with RS2004 and ACT304 that stays resilient under rain, but late arrivals erode the dinner benefit."
+  },
+  {
+    "promo_id": "promo:SIN_ht908_rs2005_client_reception",
+    "doc_id": "promo:SIN_ht908_rs2005_client_reception",
+    "city": "SIN",
+    "family": "business_travel",
+    "hotel_id": "HT908",
+    "restaurant_id": "RS2005",
+    "activity_id": null,
+    "discount_krw": 25000,
+    "score_bonus": 2.4,
+    "benefit_tags": [
+      "bundle_discount_value",
+      "client_dinner_polished"
+    ],
+    "badge_required": false,
+    "arrival_before": null,
+    "text": "Airport-link guests at HT908 get a modest credit at RS2005, but the marina transfer still needs to be justified on a work trip."
+  }
+]

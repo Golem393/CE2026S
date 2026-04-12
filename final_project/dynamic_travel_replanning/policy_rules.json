@@ -1,0 +1,10 @@
+{
+  "default": {
+    "hotel_soft_cap_per_night": 250000,
+    "airfare_soft_cap": 700000,
+    "quiet_hotel_threshold": 7.5,
+    "airport_access_threshold": 8.0,
+    "disallow_cancelled_flights": true,
+    "require_weather_safe_swap": true
+  }
+}

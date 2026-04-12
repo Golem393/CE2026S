@@ -1,0 +1,48 @@
+{
+  "spoken_rule_categories": {
+    "must_remember": {
+      "description": "Long-lived rule or preference the system should explicitly keep available."
+    },
+    "one_off_exception": {
+      "description": "A temporary override that must not overwrite the stable profile."
+    },
+    "forbidden_filter": {
+      "description": "A natural-language ban or filter to apply to candidate options."
+    },
+    "retire_instruction": {
+      "description": "An instruction that stale assumptions must be removed from active context."
+    },
+    "rejected_option_memory": {
+      "description": "The system should remember why an option was rejected and avoid reconsidering it."
+    },
+    "retrieval_discipline": {
+      "description": "Only relevant memory should be activated; irrelevant memory should remain retrievable but inactive."
+    },
+    "dependency_reasoning": {
+      "description": "Some options materially change the value or feasibility of others, such as partner bundles, badge gates, or late-arrival cutoffs."
+    }
+  },
+  "episode_axes": {
+    "family": [
+      "board_visit",
+      "business_travel",
+      "conference_trip",
+      "partner_summit",
+      "roadshow_trip"
+    ],
+    "difficulty": [
+      "easy",
+      "medium",
+      "hard"
+    ],
+    "dependency_layers": [
+      "partner_bundle",
+      "badge_unlock",
+      "event_disruption",
+      "refund_risk",
+      "loyalty_value",
+      "late_arrival_cutoff",
+      "stakeholder_tradeoff"
+    ]
+  }
+}

@@ -1,0 +1,1181 @@
+[
+  {
+    "traveler_id": "traveler_consultant",
+    "doc_id": "profile:traveler_consultant",
+    "text": "Stable profile: avoid red-eyes, protect prep evenings before meetings, prefers quiet hotel rooms over flashy design, values local character when schedule risk is low, vegan-friendly group dinners help the team.",
+    "stable_prefs": [
+      "avoid_red_eye",
+      "protect_prep_evening",
+      "prefer_quiet_hotel",
+      "local_character_if_safe",
+      "vegan_team_meal"
+    ],
+    "avoid_zones": [
+      "nightlife_strip"
+    ],
+    "preferred_zones": [
+      "central",
+      "namba",
+      "xinyi",
+      "one_north"
+    ],
+    "memory_type": "profile",
+    "status": "current",
+    "city": null,
+    "family": null,
+    "tags": [
+      "avoid_red_eye",
+      "protect_prep_evening",
+      "prefer_quiet_hotel",
+      "local_character_if_safe",
+      "vegan_team_meal"
+    ]
+  },
+  {
+    "traveler_id": "traveler_exec",
+    "doc_id": "profile:traveler_exec",
+    "text": "Stable profile: airport access usually matters, direct flights are worth a small premium, hotel noise is costly, client-facing dinners should feel polished, avoid chaotic late-night districts unless explicitly overridden.",
+    "stable_prefs": [
+      "prefer_airport_access",
+      "prefer_direct_flight",
+      "prefer_quiet_hotel",
+      "client_dinner_polished"
+    ],
+    "avoid_zones": [
+      "nightlife_strip"
+    ],
+    "preferred_zones": [
+      "airport_link",
+      "marina",
+      "central",
+      "xinyi"
+    ],
+    "memory_type": "profile",
+    "status": "current",
+    "city": null,
+    "family": null,
+    "tags": [
+      "prefer_airport_access",
+      "prefer_direct_flight",
+      "prefer_quiet_hotel",
+      "client_dinner_polished"
+    ]
+  },
+  {
+    "traveler_id": "traveler_research",
+    "doc_id": "profile:traveler_research",
+    "text": "Stable profile: low-friction transit and time to think matter, likes calm local places over touristy bustle, can accept simple meals, avoids unnecessary hotel changes once settled.",
+    "stable_prefs": [
+      "low_friction_transit",
+      "prefer_calm_local",
+      "avoid_rebooking_if_possible"
+    ],
+    "avoid_zones": [
+      "airport_far_edge"
+    ],
+    "preferred_zones": [
+      "one_north",
+      "xinyi",
+      "umeda"
+    ],
+    "memory_type": "profile",
+    "status": "current",
+    "city": null,
+    "family": null,
+    "tags": [
+      "low_friction_transit",
+      "prefer_calm_local",
+      "avoid_rebooking_if_possible"
+    ]
+  },
+  {
+    "doc_id": "venue:OSA_business_travel",
+    "text": "Meeting brief: morning client workshops happen near Namba. A calm breakfast radius matters more than nightlife. Late arrivals hurt prep quality. Short hops to the venue are valuable.",
+    "soft_tags": [
+      "business_friendly",
+      "quiet",
+      "low_friction",
+      "central_bundle"
+    ],
+    "preferred_zone": "namba",
+    "memory_type": "venue",
+    "status": "current",
+    "city": "OSA",
+    "family": "business_travel",
+    "traveler_id": null,
+    "tags": [
+      "business_friendly",
+      "quiet",
+      "low_friction",
+      "central_bundle"
+    ]
+  },
+  {
+    "doc_id": "venue:TPE_conference_trip",
+    "text": "Conference brief: early keynote near Xinyi. Reliable morning transit and quick venue access matter. Networking dinner is acceptable if it stays calm and close to the venue.",
+    "soft_tags": [
+      "quiet",
+      "easy_airport_access",
+      "low_friction",
+      "conference_ready"
+    ],
+    "preferred_zone": "xinyi",
+    "memory_type": "venue",
+    "status": "current",
+    "city": "TPE",
+    "family": "conference_trip",
+    "traveler_id": null,
+    "tags": [
+      "quiet",
+      "easy_airport_access",
+      "low_friction",
+      "conference_ready"
+    ]
+  },
+  {
+    "doc_id": "venue:SIN_business_travel",
+    "text": "Site visit brief: sessions are split between One-North and the airport corridor. Rain often disrupts outdoor movement. Plans that keep the hotel and dinner within easy transfer reach score better than vivid but fragile itineraries.",
+    "soft_tags": [
+      "easy_airport_access",
+      "weather_safe",
+      "low_friction",
+      "business_friendly"
+    ],
+    "preferred_zone": "one_north",
+    "memory_type": "venue",
+    "status": "current",
+    "city": "SIN",
+    "family": "business_travel",
+    "traveler_id": null,
+    "tags": [
+      "easy_airport_access",
+      "weather_safe",
+      "low_friction",
+      "business_friendly"
+    ]
+  },
+  {
+    "doc_id": "city_ops:OSA",
+    "text": "Ops note: Namba is efficient for central meetings, while Shinsekai tends to be louder after 22:00. Umeda can support polished dinners, but some partner bundles stop working after late check-in.",
+    "avoid_zone": "shinsekai",
+    "risk_tags": [
+      "noise_risk",
+      "late_checkin_risk"
+    ],
+    "memory_type": "city_ops",
+    "status": "current",
+    "city": "OSA",
+    "family": null,
+    "traveler_id": null,
+    "tags": [
+      "noise_risk",
+      "late_checkin_risk"
+    ]
+  },
+  {
+    "doc_id": "city_ops:TPE",
+    "text": "Ops note: Xinyi works best for conference mornings. Airport access is smoother from the blue-line corridor, and expo nights can make scenic outer areas slower than they look. Badge-enabled partner rooms can matter.",
+    "avoid_zone": "scenic_outer",
+    "risk_tags": [
+      "late_return_risk",
+      "badge_access"
+    ],
+    "memory_type": "city_ops",
+    "status": "current",
+    "city": "TPE",
+    "family": null,
+    "traveler_id": null,
+    "tags": [
+      "late_return_risk",
+      "badge_access"
+    ]
+  },
+  {
+    "doc_id": "city_ops:SIN",
+    "text": "Ops note: One-North is dependable for business travel during wet weather. Marina dinners can look polished but add transfer overhead, while shuttle-linked bundles hold up better on rainy nights.",
+    "avoid_zone": "clarke_quay",
+    "risk_tags": [
+      "weather_transfer_risk",
+      "shuttle_bundle"
+    ],
+    "memory_type": "city_ops",
+    "status": "current",
+    "city": "SIN",
+    "family": null,
+    "traveler_id": null,
+    "tags": [
+      "weather_transfer_risk",
+      "shuttle_bundle"
+    ]
+  },
+  {
+    "doc_id": "heuristic:lean_context_policy",
+    "memory_type": "heuristic",
+    "status": "current",
+    "city": null,
+    "family": null,
+    "traveler_id": null,
+    "tags": [
+      "keep_context_lean",
+      "active_context"
+    ],
+    "text": "Lean-context policy: keep only budget, weather, meeting zone, hard spoken rules, and currently relevant exceptions active. Retire stale assumptions explicitly rather than carrying them forward."
+  },
+  {
+    "doc_id": "heuristic:rejected_option_memory",
+    "memory_type": "heuristic",
+    "status": "current",
+    "city": null,
+    "family": null,
+    "traveler_id": null,
+    "tags": [
+      "do_not_reconsider",
+      "rejected_options"
+    ],
+    "text": "Rejected-option memory rule: if an option already failed for noise, red-eye, or wrong vibe, keep the reason attached and do not resurface it without a material change."
+  },
+  {
+    "doc_id": "heuristic:rainy_day_indoor_backup",
+    "memory_type": "heuristic",
+    "status": "current",
+    "city": "SIN",
+    "family": "business_travel",
+    "traveler_id": null,
+    "tags": [
+      "weather_safe",
+      "indoor"
+    ],
+    "text": "Rain-day playbook: in wet-weather business travel, prefer indoor activities and keep hotel, dinner, and meeting support within easy covered transfer distance."
+  },
+  {
+    "doc_id": "heuristic:airport_access_one_off",
+    "memory_type": "heuristic",
+    "status": "current",
+    "city": null,
+    "family": null,
+    "traveler_id": null,
+    "tags": [
+      "one_off_only",
+      "airport_access"
+    ],
+    "text": "One-off override handling: when airport access becomes the temporary priority, keep it active for this trip only and retire the old local-character preference from active context."
+  },
+  {
+    "doc_id": "heuristic:client_dinner_polish",
+    "memory_type": "heuristic",
+    "status": "current",
+    "city": null,
+    "family": "conference_trip",
+    "traveler_id": "traveler_exec",
+    "tags": [
+      "client_ready_dinner"
+    ],
+    "text": "Client dinner heuristic: a polished but calm room beats novelty. Prefer restaurants that support conversation and avoid noisy districts after 22:00."
+  },
+  {
+    "doc_id": "heuristic:chain_hotel_exception",
+    "memory_type": "heuristic",
+    "status": "current",
+    "city": null,
+    "family": null,
+    "traveler_id": null,
+    "tags": [
+      "one_off_only",
+      "chain_hotel"
+    ],
+    "text": "Chain-hotel exception note: a chain hotel can be acceptable for one trip if it clearly lowers risk, but that should not rewrite the stable preference for local character."
+  },
+  {
+    "doc_id": "playbook:OSA_business_travel_afterwork_social",
+    "memory_type": "venue_playbook",
+    "status": "partial",
+    "city": "OSA",
+    "family": "business_travel",
+    "traveler_id": null,
+    "tags": [
+      "afterwork",
+      "social"
+    ],
+    "text": "Alternative playbook: if the trip is mostly social, Shinsekai food alleys create memorable team energy. This is not ideal for prep-heavy mornings."
+  },
+  {
+    "doc_id": "playbook:TPE_conference_afterparty",
+    "memory_type": "venue_playbook",
+    "status": "partial",
+    "city": "TPE",
+    "family": "conference_trip",
+    "traveler_id": null,
+    "tags": [
+      "afterparty",
+      "networking"
+    ],
+    "text": "Expo afterparty note: scenic outer venues can feel more memorable, but they trade off next-morning reliability and smooth airport access."
+  },
+  {
+    "doc_id": "playbook:SIN_marina_client_evening",
+    "memory_type": "venue_playbook",
+    "status": "partial",
+    "city": "SIN",
+    "family": "business_travel",
+    "traveler_id": null,
+    "tags": [
+      "marina",
+      "client_ready"
+    ],
+    "text": "Marina evening playbook: a polished marina dinner works for client optics but adds transfer overhead if the working day centers on One-North."
+  },
+  {
+    "doc_id": "distractor:traveler_consultant_weekend_food_crawl",
+    "memory_type": "profile_noise",
+    "status": "distractor",
+    "city": "OSA",
+    "family": null,
+    "traveler_id": "traveler_consultant",
+    "tags": [
+      "foodie",
+      "nightlife"
+    ],
+    "text": "Old weekend note: the consultant once enjoyed a late Shinsekai food crawl on a leisure trip. That preference should not dominate work travel."
+  },
+  {
+    "doc_id": "distractor:traveler_exec_scenic_photo_walk",
+    "memory_type": "profile_noise",
+    "status": "distractor",
+    "city": "TPE",
+    "family": null,
+    "traveler_id": "traveler_exec",
+    "tags": [
+      "scenic",
+      "leisure"
+    ],
+    "text": "Leisure note: the executive liked a scenic outer-district photo walk on a holiday. It is not a conference-morning planning signal."
+  },
+  {
+    "doc_id": "distractor:traveler_research_airport_lounge_habit",
+    "memory_type": "profile_noise",
+    "status": "distractor",
+    "city": null,
+    "family": null,
+    "traveler_id": "traveler_research",
+    "tags": [
+      "airport",
+      "lounge"
+    ],
+    "text": "Peripheral note: the researcher once spent extra time at an airport lounge during a long-haul layover. It is not a reason to optimize for airport-linked nightlife districts."
+  },
+  {
+    "doc_id": "stale:budget_cap_archive",
+    "memory_type": "stale_policy",
+    "status": "stale",
+    "city": null,
+    "family": null,
+    "traveler_id": null,
+    "tags": [
+      "old_budget_cap"
+    ],
+    "text": "Archived budget note: older internal guidance used a tighter budget cap. Current spoken updates override this and the archive should be retired when mentioned."
+  },
+  {
+    "doc_id": "stale:local_character_default",
+    "memory_type": "stale_policy",
+    "status": "stale",
+    "city": null,
+    "family": null,
+    "traveler_id": null,
+    "tags": [
+      "old_local_character_priority"
+    ],
+    "text": "Default planning archive: local character usually beats chain convenience when the trip is stable. Retire this from active context when airport access temporarily becomes more important."
+  },
+  {
+    "doc_id": "stale:avoid_chain_hotels_absolute",
+    "memory_type": "stale_policy",
+    "status": "stale",
+    "city": null,
+    "family": null,
+    "traveler_id": null,
+    "tags": [
+      "avoid_chain_hotels_stable"
+    ],
+    "text": "Legacy hotel note: avoid chain hotels categorically. This should be retired if a spoken one-off chain exception is introduced for the current trip."
+  },
+  {
+    "doc_id": "stale:dry_weather_ops_assumption",
+    "memory_type": "stale_policy",
+    "status": "stale",
+    "city": "SIN",
+    "family": "business_travel",
+    "traveler_id": null,
+    "tags": [
+      "old_weather_assumption"
+    ],
+    "text": "Old ops assumption: outdoor movement is acceptable when weather is dry. Retire this as soon as the spoken update shifts the trip into a rainy-risk context."
+  },
+  {
+    "doc_id": "stale:OSA_shinsekai_shortcut",
+    "memory_type": "stale_city_ops",
+    "status": "stale",
+    "city": "OSA",
+    "family": null,
+    "traveler_id": null,
+    "tags": [
+      "nightlife_strip"
+    ],
+    "text": "Old Osaka ops note: Shinsekai nightlife once looked convenient for late dinners, but the note is stale for prep-heavy business trips because of persistent noise spillover."
+  },
+  {
+    "doc_id": "stale:TPE_scenic_outer_transfer_note",
+    "memory_type": "stale_city_ops",
+    "status": "stale",
+    "city": "TPE",
+    "family": null,
+    "traveler_id": null,
+    "tags": [
+      "scenic_outer"
+    ],
+    "text": "Outdated Taipei ops note: scenic outer stays were once recommended for atmosphere, but current conference mornings favor Xinyi and blue-line airport access."
+  },
+  {
+    "doc_id": "stale:SIN_clarke_quay_social_note",
+    "memory_type": "stale_city_ops",
+    "status": "stale",
+    "city": "SIN",
+    "family": null,
+    "traveler_id": null,
+    "tags": [
+      "clarke_quay"
+    ],
+    "text": "Legacy Singapore note: Clarke Quay can be fun for social travel, but the note should be retired for rainy business itineraries due transfer friction and fatigue."
+  },
+  {
+    "traveler_id": "traveler_sales",
+    "doc_id": "profile:traveler_sales",
+    "text": "Stable profile: values polished but calm dinners, accepts bundles if they reduce friction, prefers refundable plans when partner schedules look volatile, and dislikes carrying too many conditional notes in active context.",
+    "stable_prefs": [
+      "client_dinner_polished",
+      "low_friction_transit",
+      "refundable_priority",
+      "relevant_only"
+    ],
+    "avoid_zones": [
+      "nightlife_strip"
+    ],
+    "preferred_zones": [
+      "namba",
+      "xinyi",
+      "one_north",
+      "marina"
+    ],
+    "memory_type": "profile",
+    "status": "current",
+    "city": null,
+    "family": null,
+    "tags": [
+      "client_dinner_polished",
+      "low_friction_transit",
+      "refundable_priority",
+      "relevant_only"
+    ]
+  },
+  {
+    "traveler_id": "traveler_ops",
+    "doc_id": "profile:traveler_ops",
+    "text": "Stable profile: airport access, transfer resilience, and quiet sleep matter. Will accept a chain when it meaningfully lowers operational risk, but does not want stale exceptions to rewrite the normal profile.",
+    "stable_prefs": [
+      "prefer_airport_access",
+      "low_friction_transit",
+      "prefer_quiet_hotel",
+      "chain_exception_this_trip"
+    ],
+    "avoid_zones": [
+      "nightlife_strip"
+    ],
+    "preferred_zones": [
+      "airport_link",
+      "blue_line_corridor",
+      "one_north"
+    ],
+    "memory_type": "profile",
+    "status": "current",
+    "city": null,
+    "family": null,
+    "tags": [
+      "prefer_airport_access",
+      "low_friction_transit",
+      "prefer_quiet_hotel",
+      "chain_exception_this_trip"
+    ]
+  },
+  {
+    "doc_id": "venue:OSA_board_visit",
+    "text": "Board-visit brief: meetings concentrate around Umeda with one evening stakeholder dinner. Quiet prep time and a room that supports polished conversation matter. A private-room bundle can be valuable if it stays calm and close.",
+    "soft_tags": [
+      "business_friendly",
+      "quiet",
+      "low_friction",
+      "client_ready",
+      "central_bundle"
+    ],
+    "preferred_zone": "umeda",
+    "memory_type": "venue",
+    "status": "current",
+    "city": "OSA",
+    "family": "board_visit",
+    "traveler_id": null,
+    "tags": [
+      "business_friendly",
+      "quiet",
+      "low_friction",
+      "client_ready",
+      "central_bundle"
+    ]
+  },
+  {
+    "doc_id": "venue:TPE_partner_summit",
+    "text": "Partner summit brief: sessions cluster around Xinyi and the blue-line corridor. Badge-enabled partner rooms can reduce noise and transit friction, but scenic detours often become brittle when schedules move.",
+    "soft_tags": [
+      "quiet",
+      "easy_airport_access",
+      "low_friction",
+      "conference_ready",
+      "client_ready"
+    ],
+    "preferred_zone": "xinyi",
+    "memory_type": "venue",
+    "status": "current",
+    "city": "TPE",
+    "family": "partner_summit",
+    "traveler_id": null,
+    "tags": [
+      "quiet",
+      "easy_airport_access",
+      "low_friction",
+      "conference_ready",
+      "client_ready"
+    ]
+  },
+  {
+    "doc_id": "venue:SIN_roadshow_trip",
+    "text": "Roadshow brief: the day oscillates between One-North and the airport corridor. Rain or a late arrival can quickly invalidate fragile dinner bundles, so resilient shuttle-linked plans score best.",
+    "soft_tags": [
+      "easy_airport_access",
+      "weather_safe",
+      "low_friction",
+      "business_friendly",
+      "central_bundle"
+    ],
+    "preferred_zone": "one_north",
+    "memory_type": "venue",
+    "status": "current",
+    "city": "SIN",
+    "family": "roadshow_trip",
+    "traveler_id": null,
+    "tags": [
+      "easy_airport_access",
+      "weather_safe",
+      "low_friction",
+      "business_friendly",
+      "central_bundle"
+    ]
+  },
+  {
+    "doc_id": "heuristic:partner_bundle_reasoning",
+    "memory_type": "heuristic",
+    "status": "current",
+    "city": null,
+    "family": null,
+    "traveler_id": null,
+    "tags": [
+      "bundle_discount_value",
+      "private_room_bonus",
+      "late_checkin_risk",
+      "shuttle_bundle"
+    ],
+    "text": "Partner-bundle rule: value a bundle only if the combined hotel+dinner+transfer path improves materially. Do not let a nominal discount outrank quietness, arrival quality, or stakeholder fit."
+  },
+  {
+    "doc_id": "heuristic:stakeholder_balance",
+    "memory_type": "heuristic",
+    "status": "current",
+    "city": null,
+    "family": null,
+    "traveler_id": null,
+    "tags": [
+      "team_dietary_flex",
+      "client_dinner_polished"
+    ],
+    "text": "Stakeholder balance rule: teammate dietary needs and client-facing tone can coexist, but only if the room stays calm enough for conversation."
+  },
+  {
+    "doc_id": "heuristic:refundable_schedule_risk",
+    "memory_type": "heuristic",
+    "status": "current",
+    "city": null,
+    "family": null,
+    "traveler_id": null,
+    "tags": [
+      "refundable_priority"
+    ],
+    "text": "Volatile-schedule rule: refundable bookings deserve meaningful weight when the meeting window is still moving."
+  },
+  {
+    "doc_id": "heuristic:badge_unlock_logic",
+    "memory_type": "heuristic",
+    "status": "current",
+    "city": "TPE",
+    "family": null,
+    "traveler_id": null,
+    "tags": [
+      "conference_badge_access",
+      "private_room_bonus"
+    ],
+    "text": "Badge-unlock rule: treat badge-only rooms as trip-specific advantages, not stable preferences."
+  },
+  {
+    "doc_id": "stale:partner_social_default",
+    "memory_type": "stale_policy",
+    "status": "stale",
+    "city": null,
+    "family": null,
+    "traveler_id": null,
+    "tags": [
+      "old_social_bundle_default"
+    ],
+    "text": "Old social note: after-work bundles used to be treated as broadly good. Retire that assumption when prep quality, rain, or stakeholder fit dominates."
+  },
+  {
+    "doc_id": "stale:bundle_discount_always_wins",
+    "memory_type": "stale_policy",
+    "status": "stale",
+    "city": null,
+    "family": null,
+    "traveler_id": null,
+    "tags": [
+      "old_bundle_discount_absolute"
+    ],
+    "text": "Old discount note: a nominal discount always beats a quieter fit. This is stale and should be retired when the bundle is conditional or noisy."
+  },
+  {
+    "doc_id": "stale:late_checkin_irrelevant",
+    "memory_type": "stale_policy",
+    "status": "stale",
+    "city": null,
+    "family": null,
+    "traveler_id": null,
+    "tags": [
+      "late_checkin_irrelevant"
+    ],
+    "text": "Outdated late-checkin note: arrival time does not affect dinner viability. Retire this whenever a bundle has a real cutoff."
+  },
+  {
+    "promo_id": "promo:OSA_ht206_rs3001_private_room",
+    "doc_id": "promo:OSA_ht206_rs3001_private_room",
+    "city": "OSA",
+    "family": "business_travel",
+    "hotel_id": "HT206",
+    "restaurant_id": "RS3001",
+    "activity_id": null,
+    "discount_krw": 35000,
+    "score_bonus": 3.2,
+    "benefit_tags": [
+      "bundle_discount_value",
+      "private_room_bonus",
+      "late_checkin_risk"
+    ],
+    "badge_required": false,
+    "arrival_before": "20:30",
+    "text": "HT206 guests can access a quieter private-room seating at RS3001 with a set-menu credit, but the bundle expires after a late check-in.",
+    "memory_type": "partner_promo",
+    "status": "current",
+    "traveler_id": null,
+    "tags": [
+      "bundle_discount_value",
+      "private_room_bonus",
+      "late_checkin_risk"
+    ]
+  },
+  {
+    "promo_id": "promo:OSA_ht207_rs3004_board_bundle",
+    "doc_id": "promo:OSA_ht207_rs3004_board_bundle",
+    "city": "OSA",
+    "family": "board_visit",
+    "hotel_id": "HT207",
+    "restaurant_id": "RS3004",
+    "activity_id": null,
+    "discount_krw": 42000,
+    "score_bonus": 3.8,
+    "benefit_tags": [
+      "bundle_discount_value",
+      "private_room_bonus"
+    ],
+    "badge_required": false,
+    "arrival_before": "21:00",
+    "text": "For board-facing trips, HT207 and RS3004 run a quiet private-room dinner bundle close to the meeting zone.",
+    "memory_type": "partner_promo",
+    "status": "current",
+    "traveler_id": null,
+    "tags": [
+      "bundle_discount_value",
+      "private_room_bonus"
+    ]
+  },
+  {
+    "promo_id": "promo:TPE_ht801_rs4004_badge_room",
+    "doc_id": "promo:TPE_ht801_rs4004_badge_room",
+    "city": "TPE",
+    "family": "conference_trip",
+    "hotel_id": "HT801",
+    "restaurant_id": "RS4004",
+    "activity_id": null,
+    "discount_krw": 30000,
+    "score_bonus": 3.6,
+    "benefit_tags": [
+      "bundle_discount_value",
+      "conference_badge_access",
+      "private_room_bonus"
+    ],
+    "badge_required": true,
+    "arrival_before": "21:00",
+    "text": "Conference badge holders staying at HT801 can access RS4004's calmer partner room with a fixed-menu credit.",
+    "memory_type": "partner_promo",
+    "status": "current",
+    "traveler_id": null,
+    "tags": [
+      "bundle_discount_value",
+      "conference_badge_access",
+      "private_room_bonus"
+    ]
+  },
+  {
+    "promo_id": "promo:TPE_ht807_rs4005_airport_corridor",
+    "doc_id": "promo:TPE_ht807_rs4005_airport_corridor",
+    "city": "TPE",
+    "family": "partner_summit",
+    "hotel_id": "HT807",
+    "restaurant_id": "RS4005",
+    "activity_id": "ACT405_innovation_gallery",
+    "discount_krw": 28000,
+    "score_bonus": 2.8,
+    "benefit_tags": [
+      "bundle_discount_value",
+      "low_friction_transit"
+    ],
+    "badge_required": false,
+    "arrival_before": null,
+    "text": "The blue-line corridor bundle links HT807, RS4005, and ACT405 for a lower-friction partner summit evening.",
+    "memory_type": "partner_promo",
+    "status": "current",
+    "traveler_id": null,
+    "tags": [
+      "bundle_discount_value",
+      "low_friction_transit"
+    ]
+  },
+  {
+    "promo_id": "promo:SIN_ht907_rs2004_shuttle_bundle",
+    "doc_id": "promo:SIN_ht907_rs2004_shuttle_bundle",
+    "city": "SIN",
+    "family": "roadshow_trip",
+    "hotel_id": "HT907",
+    "restaurant_id": "RS2004",
+    "activity_id": "ACT304_innovation_center",
+    "discount_krw": 32000,
+    "score_bonus": 3.5,
+    "benefit_tags": [
+      "bundle_discount_value",
+      "shuttle_bundle",
+      "weather_safe_backup"
+    ],
+    "badge_required": false,
+    "arrival_before": "20:30",
+    "text": "HT907 runs a shuttle-linked One-North bundle with RS2004 and ACT304 that stays resilient under rain, but late arrivals erode the dinner benefit.",
+    "memory_type": "partner_promo",
+    "status": "current",
+    "traveler_id": null,
+    "tags": [
+      "bundle_discount_value",
+      "shuttle_bundle",
+      "weather_safe_backup"
+    ]
+  },
+  {
+    "promo_id": "promo:SIN_ht908_rs2005_client_reception",
+    "doc_id": "promo:SIN_ht908_rs2005_client_reception",
+    "city": "SIN",
+    "family": "business_travel",
+    "hotel_id": "HT908",
+    "restaurant_id": "RS2005",
+    "activity_id": null,
+    "discount_krw": 25000,
+    "score_bonus": 2.4,
+    "benefit_tags": [
+      "bundle_discount_value",
+      "client_dinner_polished"
+    ],
+    "badge_required": false,
+    "arrival_before": null,
+    "text": "Airport-link guests at HT908 get a modest credit at RS2005, but the marina transfer still needs to be justified on a work trip.",
+    "memory_type": "partner_promo",
+    "status": "current",
+    "traveler_id": null,
+    "tags": [
+      "bundle_discount_value",
+      "client_dinner_polished"
+    ]
+  },
+  {
+    "event_id": "event:OSA_namba_food_fair",
+    "doc_id": "event:OSA_namba_food_fair",
+    "city": "OSA",
+    "affected_zone": "namba",
+    "effect_type": "noise_surge",
+    "blocked_restaurant_id": null,
+    "boosted_hotel_id": null,
+    "text": "A Namba food fair brings more crowd spillover after 21:30. Quiet rooms and private dining matter more than usual.",
+    "tags": [
+      "loud_after_10pm",
+      "transfer_friction_risk"
+    ],
+    "memory_type": "event_ops",
+    "status": "current",
+    "family": null,
+    "traveler_id": null
+  },
+  {
+    "event_id": "event:OSA_umeda_private_room_night",
+    "doc_id": "event:OSA_umeda_private_room_night",
+    "city": "OSA",
+    "affected_zone": "umeda",
+    "effect_type": "private_room_boost",
+    "blocked_restaurant_id": null,
+    "boosted_hotel_id": "HT207",
+    "text": "A quiet private-room night in Umeda makes polished dinners unusually viable if the bundle still stays lean.",
+    "tags": [
+      "private_room_bonus"
+    ],
+    "memory_type": "event_ops",
+    "status": "current",
+    "family": null,
+    "traveler_id": null
+  },
+  {
+    "event_id": "event:TPE_xinyi_expo_surge",
+    "doc_id": "event:TPE_xinyi_expo_surge",
+    "city": "TPE",
+    "affected_zone": "xinyi",
+    "effect_type": "transit_congestion",
+    "blocked_restaurant_id": null,
+    "boosted_hotel_id": "HT807",
+    "text": "Expo traffic slows Xinyi edge routes, which makes blue-line corridor access and pre-booked quiet rooms more valuable.",
+    "tags": [
+      "transfer_friction_risk",
+      "prefer_airport_access"
+    ],
+    "memory_type": "event_ops",
+    "status": "current",
+    "family": null,
+    "traveler_id": null
+  },
+  {
+    "event_id": "event:TPE_riverside_buyout",
+    "doc_id": "event:TPE_riverside_buyout",
+    "city": "TPE",
+    "affected_zone": "scenic_outer",
+    "effect_type": "buyout",
+    "blocked_restaurant_id": "RS4002",
+    "boosted_hotel_id": null,
+    "text": "A riverside buyout removes one scenic dinner option and increases the cost of relying on outdated nightlife assumptions.",
+    "tags": [
+      "transfer_friction_risk"
+    ],
+    "memory_type": "event_ops",
+    "status": "current",
+    "family": null,
+    "traveler_id": null
+  },
+  {
+    "event_id": "event:SIN_one_north_thunderstorm",
+    "doc_id": "event:SIN_one_north_thunderstorm",
+    "city": "SIN",
+    "affected_zone": "one_north",
+    "effect_type": "rain_transfer",
+    "blocked_restaurant_id": null,
+    "boosted_hotel_id": "HT907",
+    "text": "Thunderstorms increase transfer friction, so covered routes and shuttle-linked bundles outperform brittle scenic plans.",
+    "tags": [
+      "weather_safe_backup",
+      "shuttle_bundle",
+      "transfer_friction_risk"
+    ],
+    "memory_type": "event_ops",
+    "status": "current",
+    "family": null,
+    "traveler_id": null
+  },
+  {
+    "event_id": "event:SIN_marina_reception",
+    "doc_id": "event:SIN_marina_reception",
+    "city": "SIN",
+    "affected_zone": "marina",
+    "effect_type": "client_optics",
+    "blocked_restaurant_id": null,
+    "boosted_hotel_id": null,
+    "text": "A marina reception temporarily improves client optics there, but the transfer burden still needs to be justified.",
+    "tags": [
+      "client_dinner_polished"
+    ],
+    "memory_type": "event_ops",
+    "status": "current",
+    "family": null,
+    "traveler_id": null
+  },
+  {
+    "traveler_id": "traveler_exec",
+    "doc_id": "loyalty:traveler_exec",
+    "hotel_partner_ids": [
+      "HT202",
+      "HT206",
+      "HT807",
+      "HT907",
+      "HT908"
+    ],
+    "preferred_flight_ids": [
+      "FL105",
+      "FL705",
+      "FL806"
+    ],
+    "hotel_credit_krw": 18000,
+    "bonus_tags": [
+      "loyalty_bundle_value",
+      "prefer_airport_access"
+    ],
+    "text": "Executive loyalty profile: selected chain stays include breakfast or late checkout, slightly improving effective value when the operational fit is already good.",
+    "memory_type": "loyalty",
+    "status": "current",
+    "city": null,
+    "family": null,
+    "tags": [
+      "loyalty_bundle_value",
+      "prefer_airport_access"
+    ]
+  },
+  {
+    "traveler_id": "traveler_sales",
+    "doc_id": "loyalty:traveler_sales",
+    "hotel_partner_ids": [
+      "HT208",
+      "HT807",
+      "HT907"
+    ],
+    "preferred_flight_ids": [
+      "FL106",
+      "FL706",
+      "FL806"
+    ],
+    "hotel_credit_krw": 22000,
+    "bonus_tags": [
+      "loyalty_bundle_value",
+      "refundable_priority"
+    ],
+    "text": "Sales loyalty profile: premium but flexible chain bookings get extra value when schedule volatility is non-trivial.",
+    "memory_type": "loyalty",
+    "status": "current",
+    "city": null,
+    "family": null,
+    "tags": [
+      "loyalty_bundle_value",
+      "refundable_priority"
+    ]
+  },
+  {
+    "traveler_id": "traveler_ops",
+    "doc_id": "loyalty:traveler_ops",
+    "hotel_partner_ids": [
+      "HT208",
+      "HT807",
+      "HT908"
+    ],
+    "preferred_flight_ids": [
+      "FL106",
+      "FL706",
+      "FL806"
+    ],
+    "hotel_credit_krw": 20000,
+    "bonus_tags": [
+      "loyalty_bundle_value",
+      "low_friction_transit"
+    ],
+    "text": "Ops loyalty profile: airport-linked chain stays receive value from priority check-in and operational support when the trip gets messy.",
+    "memory_type": "loyalty",
+    "status": "current",
+    "city": null,
+    "family": null,
+    "tags": [
+      "loyalty_bundle_value",
+      "low_friction_transit"
+    ]
+  },
+  {
+    "stakeholder_id": "stakeholder:teammate_vegan",
+    "doc_id": "stakeholder:teammate_vegan",
+    "text": "Potential dinner stakeholder: a teammate may join and needs genuinely vegan-capable options, not token substitutions.",
+    "tags": [
+      "team_dietary_flex"
+    ],
+    "memory_type": "stakeholder",
+    "status": "current",
+    "city": null,
+    "family": null,
+    "traveler_id": null
+  },
+  {
+    "stakeholder_id": "stakeholder:client_polished",
+    "doc_id": "stakeholder:client_polished",
+    "text": "Potential dinner stakeholder: the guest values a polished but calm room suitable for sustained conversation.",
+    "tags": [
+      "client_dinner_polished",
+      "private_room_bonus"
+    ],
+    "memory_type": "stakeholder",
+    "status": "current",
+    "city": null,
+    "family": null,
+    "traveler_id": null
+  },
+  {
+    "stakeholder_id": "stakeholder:ops_host",
+    "doc_id": "stakeholder:ops_host",
+    "text": "Operational host note: transfer reliability matters more than novelty if the schedule is moving.",
+    "tags": [
+      "low_friction_transit",
+      "refundable_priority"
+    ],
+    "memory_type": "stakeholder",
+    "status": "current",
+    "city": null,
+    "family": null,
+    "traveler_id": null
+  },
+  {
+    "constraint_id": "constraint:badge_private_room_access",
+    "doc_id": "constraint:badge_private_room_access",
+    "city": "TPE",
+    "family": null,
+    "tags": [
+      "conference_badge_access"
+    ],
+    "text": "Some partner rooms are accessible only when the conference or summit badge is active.",
+    "memory_type": "booking_constraint",
+    "status": "current",
+    "traveler_id": null
+  },
+  {
+    "constraint_id": "constraint:late_arrival_voids_bundle",
+    "doc_id": "constraint:late_arrival_voids_bundle",
+    "city": null,
+    "family": null,
+    "tags": [
+      "late_checkin_risk",
+      "bundle_discount_value"
+    ],
+    "text": "Certain hotel+dinner bundles expire after late check-in, so late arrivals can erase nominal discounts.",
+    "memory_type": "booking_constraint",
+    "status": "current",
+    "traveler_id": null
+  },
+  {
+    "constraint_id": "constraint:refund_priority_due_schedule_risk",
+    "doc_id": "constraint:refund_priority_due_schedule_risk",
+    "city": null,
+    "family": null,
+    "tags": [
+      "refundable_priority"
+    ],
+    "text": "When schedule volatility is high, refundable bookings should receive real weight rather than a token bonus.",
+    "memory_type": "booking_constraint",
+    "status": "current",
+    "traveler_id": null
+  },
+  {
+    "constraint_id": "constraint:team_dietary_support",
+    "doc_id": "constraint:team_dietary_support",
+    "city": null,
+    "family": null,
+    "tags": [
+      "team_dietary_flex"
+    ],
+    "text": "If a teammate joins dinner, the restaurant should be meaningfully vegan-capable or flexible for group ordering.",
+    "memory_type": "booking_constraint",
+    "status": "current",
+    "traveler_id": null
+  },
+  {
+    "dependency_id": "dependency:OSA_ht206_rs3001_private_room",
+    "doc_id": "dependency:OSA_ht206_rs3001_private_room",
+    "city": "OSA",
+    "hotel_id": "HT206",
+    "restaurant_id": "RS3001",
+    "activity_id": null,
+    "condition_tags": [
+      "private_room_bonus"
+    ],
+    "effect": "boost",
+    "score_bonus": 1.7,
+    "text": "HT206 makes RS3001 more viable because the private-room package reduces late noise exposure if check-in is early enough.",
+    "tags": [
+      "bundle_discount_value",
+      "private_room_bonus"
+    ],
+    "memory_type": "dependency",
+    "status": "current",
+    "family": null,
+    "traveler_id": null
+  },
+  {
+    "dependency_id": "dependency:TPE_ht801_rs4004_badge_bundle",
+    "doc_id": "dependency:TPE_ht801_rs4004_badge_bundle",
+    "city": "TPE",
+    "hotel_id": "HT801",
+    "restaurant_id": "RS4004",
+    "activity_id": "ACT404_partner_lounge",
+    "condition_tags": [
+      "conference_badge_access"
+    ],
+    "effect": "boost",
+    "score_bonus": 2.0,
+    "text": "With the summit badge active, HT801 + RS4004 + ACT404 becomes a calmer, tighter partner bundle.",
+    "tags": [
+      "conference_badge_access",
+      "bundle_discount_value",
+      "private_room_bonus"
+    ],
+    "memory_type": "dependency",
+    "status": "current",
+    "family": null,
+    "traveler_id": null
+  },
+  {
+    "dependency_id": "dependency:SIN_ht907_rs2004_shuttle",
+    "doc_id": "dependency:SIN_ht907_rs2004_shuttle",
+    "city": "SIN",
+    "hotel_id": "HT907",
+    "restaurant_id": "RS2004",
+    "activity_id": "ACT304_innovation_center",
+    "condition_tags": [
+      "shuttle_bundle",
+      "weather_safe_backup"
+    ],
+    "effect": "boost",
+    "score_bonus": 2.1,
+    "text": "HT907, RS2004, and ACT304 reinforce each other under rain because the shuttle and covered transfers lower friction materially.",
+    "tags": [
+      "shuttle_bundle",
+      "weather_safe_backup",
+      "low_friction_transit"
+    ],
+    "memory_type": "dependency",
+    "status": "current",
+    "family": null,
+    "traveler_id": null
+  }
+]

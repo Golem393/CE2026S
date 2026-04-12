@@ -1,0 +1,71 @@
+{
+  "OSA_business_travel": {
+    "doc_id": "venue:OSA_business_travel",
+    "text": "Meeting brief: morning client workshops happen near Namba. A calm breakfast radius matters more than nightlife. Late arrivals hurt prep quality. Short hops to the venue are valuable.",
+    "soft_tags": [
+      "business_friendly",
+      "quiet",
+      "low_friction",
+      "central_bundle"
+    ],
+    "preferred_zone": "namba"
+  },
+  "TPE_conference_trip": {
+    "doc_id": "venue:TPE_conference_trip",
+    "text": "Conference brief: early keynote near Xinyi. Reliable morning transit and quick venue access matter. Networking dinner is acceptable if it stays calm and close to the venue.",
+    "soft_tags": [
+      "quiet",
+      "easy_airport_access",
+      "low_friction",
+      "conference_ready"
+    ],
+    "preferred_zone": "xinyi"
+  },
+  "SIN_business_travel": {
+    "doc_id": "venue:SIN_business_travel",
+    "text": "Site visit brief: sessions are split between One-North and the airport corridor. Rain often disrupts outdoor movement. Plans that keep the hotel and dinner within easy transfer reach score better than vivid but fragile itineraries.",
+    "soft_tags": [
+      "easy_airport_access",
+      "weather_safe",
+      "low_friction",
+      "business_friendly"
+    ],
+    "preferred_zone": "one_north"
+  },
+  "OSA_board_visit": {
+    "doc_id": "venue:OSA_board_visit",
+    "text": "Board-visit brief: meetings concentrate around Umeda with one evening stakeholder dinner. Quiet prep time and a room that supports polished conversation matter. A private-room bundle can be valuable if it stays calm and close.",
+    "soft_tags": [
+      "business_friendly",
+      "quiet",
+      "low_friction",
+      "client_ready",
+      "central_bundle"
+    ],
+    "preferred_zone": "umeda"
+  },
+  "TPE_partner_summit": {
+    "doc_id": "venue:TPE_partner_summit",
+    "text": "Partner summit brief: sessions cluster around Xinyi and the blue-line corridor. Badge-enabled partner rooms can reduce noise and transit friction, but scenic detours often become brittle when schedules move.",
+    "soft_tags": [
+      "quiet",
+      "easy_airport_access",
+      "low_friction",
+      "conference_ready",
+      "client_ready"
+    ],
+    "preferred_zone": "xinyi"
+  },
+  "SIN_roadshow_trip": {
+    "doc_id": "venue:SIN_roadshow_trip",
+    "text": "Roadshow brief: the day oscillates between One-North and the airport corridor. Rain or a late arrival can quickly invalidate fragile dinner bundles, so resilient shuttle-linked plans score best.",
+    "soft_tags": [
+      "easy_airport_access",
+      "weather_safe",
+      "low_friction",
+      "business_friendly",
+      "central_bundle"
+    ],
+    "preferred_zone": "one_north"
+  }
+}

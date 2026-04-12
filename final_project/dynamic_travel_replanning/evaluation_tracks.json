@@ -1,0 +1,126 @@
+{
+  "starter_public": [
+    "rtl7_public_easy_002",
+    "rtl7_public_easy_011",
+    "rtl7_public_medium_003",
+    "rtl7_public_medium_005",
+    "rtl7_public_medium_012",
+    "rtl7_public_hard_007"
+  ],
+  "core_public": [
+    "rtl7_public_easy_002",
+    "rtl7_public_easy_011",
+    "rtl7_public_medium_001",
+    "rtl7_public_medium_003",
+    "rtl7_public_medium_005",
+    "rtl7_public_medium_012",
+    "rtl7_public_medium_014",
+    "rtl7_public_hard_004",
+    "rtl7_public_hard_006",
+    "rtl7_public_hard_007",
+    "rtl7_public_hard_009",
+    "rtl7_public_hard_016"
+  ],
+  "full_public": [
+    "rtl7_public_medium_001",
+    "rtl7_public_easy_002",
+    "rtl7_public_medium_003",
+    "rtl7_public_hard_004",
+    "rtl7_public_medium_005",
+    "rtl7_public_hard_006",
+    "rtl7_public_hard_007",
+    "rtl7_public_hard_008",
+    "rtl7_public_hard_009",
+    "rtl7_public_hard_010",
+    "rtl7_public_easy_011",
+    "rtl7_public_medium_012",
+    "rtl7_public_medium_013",
+    "rtl7_public_medium_014",
+    "rtl7_public_hard_015",
+    "rtl7_public_hard_016",
+    "rtl7_public_hard_017",
+    "rtl7_public_hard_018",
+    "rtl7_public_medium_019",
+    "rtl7_public_hard_020"
+  ],
+  "hidden_shadow_sample": [
+    "rtl7_hidden_001",
+    "rtl7_hidden_003",
+    "rtl7_hidden_007",
+    "rtl7_hidden_011",
+    "rtl7_hidden_017",
+    "rtl7_hidden_023"
+  ],
+  "hidden_final_all": [
+    "rtl7_hidden_001",
+    "rtl7_hidden_002",
+    "rtl7_hidden_003",
+    "rtl7_hidden_004",
+    "rtl7_hidden_005",
+    "rtl7_hidden_006",
+    "rtl7_hidden_007",
+    "rtl7_hidden_008",
+    "rtl7_hidden_009",
+    "rtl7_hidden_010",
+    "rtl7_hidden_011",
+    "rtl7_hidden_012",
+    "rtl7_hidden_013",
+    "rtl7_hidden_014",
+    "rtl7_hidden_015",
+    "rtl7_hidden_016",
+    "rtl7_hidden_017",
+    "rtl7_hidden_018",
+    "rtl7_hidden_019",
+    "rtl7_hidden_020",
+    "rtl7_hidden_021",
+    "rtl7_hidden_022",
+    "rtl7_hidden_023",
+    "rtl7_hidden_024",
+    "rtl7_hidden_025",
+    "rtl7_hidden_026",
+    "rtl7_hidden_027",
+    "rtl7_hidden_028",
+    "rtl7_hidden_029",
+    "rtl7_hidden_030"
+  ],
+  "balanced_public_by_metadata": {
+    "easy": [
+      "rtl7_public_easy_002",
+      "rtl7_public_easy_011"
+    ],
+    "medium": [
+      "rtl7_public_medium_001",
+      "rtl7_public_medium_003",
+      "rtl7_public_medium_005"
+    ],
+    "hard": [
+      "rtl7_public_hard_004",
+      "rtl7_public_hard_006",
+      "rtl7_public_hard_007"
+    ]
+  },
+  "balanced_hidden_by_metadata": {
+    "easy": [
+      "rtl7_hidden_003",
+      "rtl7_hidden_004"
+    ],
+    "medium": [
+      "rtl7_hidden_001",
+      "rtl7_hidden_002",
+      "rtl7_hidden_005"
+    ],
+    "hard": [
+      "rtl7_hidden_007",
+      "rtl7_hidden_011",
+      "rtl7_hidden_012"
+    ]
+  },
+  "retiered_trip_ids": [
+    "rtl7_hidden_001",
+    "rtl7_hidden_002",
+    "rtl7_hidden_007",
+    "rtl7_public_medium_001",
+    "rtl7_public_hard_004"
+  ],
+  "note": "Some trip ids retain legacy easy/medium strings in their names; use difficulty_tier metadata and tier_manifest.json for current tiering."
+}

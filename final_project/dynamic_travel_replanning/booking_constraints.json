@@ -1,0 +1,43 @@
+[
+  {
+    "constraint_id": "constraint:badge_private_room_access",
+    "doc_id": "constraint:badge_private_room_access",
+    "city": "TPE",
+    "family": null,
+    "tags": [
+      "conference_badge_access"
+    ],
+    "text": "Some partner rooms are accessible only when the conference or summit badge is active."
+  },
+  {
+    "constraint_id": "constraint:late_arrival_voids_bundle",
+    "doc_id": "constraint:late_arrival_voids_bundle",
+    "city": null,
+    "family": null,
+    "tags": [
+      "late_checkin_risk",
+      "bundle_discount_value"
+    ],
+    "text": "Certain hotel+dinner bundles expire after late check-in, so late arrivals can erase nominal discounts."
+  },
+  {
+    "constraint_id": "constraint:refund_priority_due_schedule_risk",
+    "doc_id": "constraint:refund_priority_due_schedule_risk",
+    "city": null,
+    "family": null,
+    "tags": [
+      "refundable_priority"
+    ],
+    "text": "When schedule volatility is high, refundable bookings should receive real weight rather than a token bonus."
+  },
+  {
+    "constraint_id": "constraint:team_dietary_support",
+    "doc_id": "constraint:team_dietary_support",
+    "city": null,
+    "family": null,
+    "tags": [
+      "team_dietary_flex"
+    ],
+    "text": "If a teammate joins dinner, the restaurant should be meaningfully vegan-capable or flexible for group ordering."
+  }
+]

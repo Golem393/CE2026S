@@ -1,0 +1,54 @@
+{
+  "public_count": 20,
+  "hidden_count": 30,
+  "family_count": 10,
+  "benchmark_families": [
+    "badge_unlocked_bundle",
+    "bundle_cutoff_reasoning",
+    "client_ready_dinner",
+    "core_memory_replanning",
+    "event_sensitive_replanning",
+    "loyalty_effective_value",
+    "one_off_airport_override",
+    "refund_volatility",
+    "stakeholder_tradeoff",
+    "weather_disruption"
+  ],
+  "rich_hook_tasks": 42,
+  "public_family_counts": {
+    "core_memory_replanning": 1,
+    "client_ready_dinner": 2,
+    "loyalty_effective_value": 2,
+    "bundle_cutoff_reasoning": 2,
+    "weather_disruption": 2,
+    "stakeholder_tradeoff": 5,
+    "refund_volatility": 3,
+    "badge_unlocked_bundle": 1,
+    "one_off_airport_override": 1,
+    "event_sensitive_replanning": 1
+  },
+  "hidden_family_counts": {
+    "core_memory_replanning": 1,
+    "client_ready_dinner": 2,
+    "loyalty_effective_value": 4,
+    "bundle_cutoff_reasoning": 4,
+    "weather_disruption": 2,
+    "stakeholder_tradeoff": 7,
+    "refund_volatility": 7,
+    "badge_unlocked_bundle": 1,
+    "one_off_airport_override": 1,
+    "event_sensitive_replanning": 1
+  },
+  "public_exact_duplicate_prompt_groups": [],
+  "hidden_exact_duplicate_prompt_groups": [],
+  "public_tier_counts": {
+    "easy": 2,
+    "medium": 7,
+    "hard": 11
+  },
+  "hidden_tier_counts": {
+    "easy": 4,
+    "medium": 13,
+    "hard": 13
+  }
+}

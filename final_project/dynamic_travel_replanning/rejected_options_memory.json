@@ -1,0 +1,112 @@
+[
+  {
+    "memory_id": "reject:OSA:hotel:HT205",
+    "city": "OSA",
+    "family": "business_travel",
+    "traveler_id": null,
+    "kind": "hotel",
+    "option_id": "HT205",
+    "reason_key": "rejected_hotel_for_noise",
+    "text": "HT205 was previously rejected because Shinsekai late-night spillover and low quiet score make prep-heavy mornings worse."
+  },
+  {
+    "memory_id": "reject:OSA:flight:FL103",
+    "city": "OSA",
+    "family": "business_travel",
+    "traveler_id": null,
+    "kind": "flight",
+    "option_id": "FL103",
+    "reason_key": "rejected_flight_for_red_eye",
+    "text": "FL103 was rejected because the red-eye arrival undermines next-morning functionality."
+  },
+  {
+    "memory_id": "reject:OSA:restaurant:RS3002",
+    "city": "OSA",
+    "family": "business_travel",
+    "traveler_id": null,
+    "kind": "restaurant",
+    "option_id": "RS3002",
+    "reason_key": "rejected_restaurant_for_vibe",
+    "text": "RS3002 was rejected because the nightlife-strip vibe stays loud late and is wrong for prep-night dinners."
+  },
+  {
+    "memory_id": "reject:TPE:hotel:HT802",
+    "city": "TPE",
+    "family": "conference_trip",
+    "traveler_id": null,
+    "kind": "hotel",
+    "option_id": "HT802",
+    "reason_key": "rejected_hotel_for_noise",
+    "text": "HT802 was rejected because scenic outer positioning and middling quiet control hurt conference-morning readiness."
+  },
+  {
+    "memory_id": "reject:TPE:flight:FL704",
+    "city": "TPE",
+    "family": "conference_trip",
+    "traveler_id": null,
+    "kind": "flight",
+    "option_id": "FL704",
+    "reason_key": "rejected_flight_for_red_eye",
+    "text": "FL704 was rejected because the red-eye arrival increases fatigue before the keynote morning."
+  },
+  {
+    "memory_id": "reject:TPE:restaurant:RS4002",
+    "city": "TPE",
+    "family": "partner_summit",
+    "traveler_id": null,
+    "kind": "restaurant",
+    "option_id": "RS4002",
+    "reason_key": "rejected_restaurant_for_vibe",
+    "text": "RS4002 is too exposed to late crowd energy for a summit dinner."
+  },
+  {
+    "memory_id": "reject:SIN:hotel:HT901",
+    "city": "SIN",
+    "family": "business_travel",
+    "traveler_id": null,
+    "kind": "hotel",
+    "option_id": "HT901",
+    "reason_key": "rejected_hotel_for_noise",
+    "text": "HT901 was rejected because Clarke Quay activity creates fatigue and rain-transfer friction despite strong airport access."
+  },
+  {
+    "memory_id": "reject:SIN:flight:FL803",
+    "city": "SIN",
+    "family": "business_travel",
+    "traveler_id": null,
+    "kind": "flight",
+    "option_id": "FL803",
+    "reason_key": "rejected_flight_for_red_eye",
+    "text": "FL803 was rejected because the overnight arrival is too fatiguing for business functionality."
+  },
+  {
+    "memory_id": "reject:SIN:restaurant:RS2001",
+    "city": "SIN",
+    "family": "business_travel",
+    "traveler_id": null,
+    "kind": "restaurant",
+    "option_id": "RS2001",
+    "reason_key": "rejected_restaurant_for_vibe",
+    "text": "RS2001 was rejected because Clarke Quay late energy is the wrong vibe for a lean work trip."
+  },
+  {
+    "memory_id": "reject:OSA:restaurant:RS3005",
+    "city": "OSA",
+    "family": "board_visit",
+    "traveler_id": null,
+    "kind": "restaurant",
+    "option_id": "RS3005",
+    "reason_key": "rejected_restaurant_for_vibe",
+    "text": "RS3005 can be fine casually, but the room tone is too casual for a board-facing dinner."
+  },
+  {
+    "memory_id": "reject:SIN:restaurant:RS2005",
+    "city": "SIN",
+    "family": "roadshow_trip",
+    "traveler_id": null,
+    "kind": "restaurant",
+    "option_id": "RS2005",
+    "reason_key": "rejected_restaurant_for_vibe",
+    "text": "RS2005 can look polished, but the transfer overhead makes it wrong for a rainy roadshow night unless the client optics are unusually important."
+  }
+]

@@ -1,0 +1,84 @@
+[
+  {
+    "event_id": "event:OSA_namba_food_fair",
+    "doc_id": "event:OSA_namba_food_fair",
+    "city": "OSA",
+    "affected_zone": "namba",
+    "effect_type": "noise_surge",
+    "blocked_restaurant_id": null,
+    "boosted_hotel_id": null,
+    "text": "A Namba food fair brings more crowd spillover after 21:30. Quiet rooms and private dining matter more than usual.",
+    "tags": [
+      "loud_after_10pm",
+      "transfer_friction_risk"
+    ]
+  },
+  {
+    "event_id": "event:OSA_umeda_private_room_night",
+    "doc_id": "event:OSA_umeda_private_room_night",
+    "city": "OSA",
+    "affected_zone": "umeda",
+    "effect_type": "private_room_boost",
+    "blocked_restaurant_id": null,
+    "boosted_hotel_id": "HT207",
+    "text": "A quiet private-room night in Umeda makes polished dinners unusually viable if the bundle still stays lean.",
+    "tags": [
+      "private_room_bonus"
+    ]
+  },
+  {
+    "event_id": "event:TPE_xinyi_expo_surge",
+    "doc_id": "event:TPE_xinyi_expo_surge",
+    "city": "TPE",
+    "affected_zone": "xinyi",
+    "effect_type": "transit_congestion",
+    "blocked_restaurant_id": null,
+    "boosted_hotel_id": "HT807",
+    "text": "Expo traffic slows Xinyi edge routes, which makes blue-line corridor access and pre-booked quiet rooms more valuable.",
+    "tags": [
+      "transfer_friction_risk",
+      "prefer_airport_access"
+    ]
+  },
+  {
+    "event_id": "event:TPE_riverside_buyout",
+    "doc_id": "event:TPE_riverside_buyout",
+    "city": "TPE",
+    "affected_zone": "scenic_outer",
+    "effect_type": "buyout",
+    "blocked_restaurant_id": "RS4002",
+    "boosted_hotel_id": null,
+    "text": "A riverside buyout removes one scenic dinner option and increases the cost of relying on outdated nightlife assumptions.",
+    "tags": [
+      "transfer_friction_risk"
+    ]
+  },
+  {
+    "event_id": "event:SIN_one_north_thunderstorm",
+    "doc_id": "event:SIN_one_north_thunderstorm",
+    "city": "SIN",
+    "affected_zone": "one_north",
+    "effect_type": "rain_transfer",
+    "blocked_restaurant_id": null,
+    "boosted_hotel_id": "HT907",
+    "text": "Thunderstorms increase transfer friction, so covered routes and shuttle-linked bundles outperform brittle scenic plans.",
+    "tags": [
+      "weather_safe_backup",
+      "shuttle_bundle",
+      "transfer_friction_risk"
+    ]
+  },
+  {
+    "event_id": "event:SIN_marina_reception",
+    "doc_id": "event:SIN_marina_reception",
+    "city": "SIN",
+    "affected_zone": "marina",
+    "effect_type": "client_optics",
+    "blocked_restaurant_id": null,
+    "boosted_hotel_id": null,
+    "text": "A marina reception temporarily improves client optics there, but the transfer burden still needs to be justified.",
+    "tags": [
+      "client_dinner_polished"
+    ]
+  }
+]

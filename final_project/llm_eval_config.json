@@ -1,0 +1,253 @@
+{
+  "allowed_generation_models": [
+    "gpt-4o-mini",
+    "gpt-5-nano",
+    "gpt-5-mini",
+    "gpt-5.4-nano"
+  ],
+  "allowed_embedding_models": [
+    "text-embedding-3-small"
+  ],
+  "default_systems": {
+    "student_solver": {
+      "model": "gpt-5.4-nano",
+      "embedding_model": "text-embedding-3-small",
+      "use_embeddings_for_docs": true,
+      "use_verifier": false,
+      "max_revision_rounds": 0,
+      "max_output_tokens": 800,
+      "max_tool_results": 4,
+      "primitive_tools_only": true,
+      "system_name": "student_solver",
+      "retrieval_strategy": "embedding",
+      "retirement_policy": true,
+      "max_tool_rounds": 9,
+      "solver_module": "student_solver"
+    },
+    "student_solver_example": {
+      "model": "gpt-5.4-nano",
+      "embedding_model": "text-embedding-3-small",
+      "use_embeddings_for_docs": true,
+      "use_verifier": false,
+      "max_revision_rounds": 0,
+      "max_output_tokens": 800,
+      "max_tool_results": 4,
+      "primitive_tools_only": true,
+      "system_name": "student_solver_example",
+      "retrieval_strategy": "embedding",
+      "retirement_policy": true,
+      "max_tool_rounds": 9,
+      "solver_module": "student_solver_example"
+    }
+  },
+  "pricing_usd_per_1m_tokens": {
+    "gpt-4o-mini": {
+      "input": 0.15,
+      "output": 0.6
+    },
+    "gpt-5-nano": {
+      "input": 0.05,
+      "output": 0.4
+    },
+    "gpt-5-mini": {
+      "input": 0.25,
+      "output": 2.0
+    },
+    "gpt-5.4-nano": {
+      "input": 0.1,
+      "output": 0.625
+    },
+    "text-embedding-3-small": {
+      "input": 0.02
+    }
+  },
+  "public_eval_file": "dynamic_travel_replanning/episodes_public_example.json",
+  "hidden_eval_sample_size": 5,
+  "student_tunable_budgets": {
+    "llm_single_baseline": {
+      "max_tool_rounds": {
+        "type": "integer",
+        "min": 1,
+        "max": 16,
+        "description": "Maximum tool-call rounds for the single baseline planner."
+      },
+      "max_tool_results": {
+        "type": "integer",
+        "min": 1,
+        "max": 8,
+        "description": "Maximum tool results returned per primitive search call."
+      },
+      "max_output_tokens": {
+        "type": "integer",
+        "min": 300,
+        "max": 1400,
+        "description": "Maximum structured output tokens for the single baseline planner."
+      }
+    },
+    "llm_memory_single": {
+      "max_tool_rounds": {
+        "type": "integer",
+        "min": 1,
+        "max": 16,
+        "description": "Maximum tool-call rounds for the memory-aware single agent."
+      },
+      "max_tool_results": {
+        "type": "integer",
+        "min": 1,
+        "max": 8,
+        "description": "Maximum tool results returned per primitive search call."
+      },
+      "max_output_tokens": {
+        "type": "integer",
+        "min": 300,
+        "max": 1500,
+        "description": "Maximum structured output tokens for the memory-aware single agent."
+      }
+    },
+    "llm_anchor_mas": {
+      "memory_manager_max_tool_rounds": {
+        "type": "integer",
+        "min": 1,
+        "max": 14,
+        "description": "Maximum tool-call rounds for the MAS memory manager."
+      },
+      "planner_max_tool_rounds": {
+        "type": "integer",
+        "min": 1,
+        "max": 14,
+        "description": "Maximum tool-call rounds for the MAS planner."
+      },
+      "verifier_max_tool_rounds": {
+        "type": "integer",
+        "min": 1,
+        "max": 12,
+        "description": "Maximum tool-call rounds for the MAS verifier."
+      },
+      "max_tool_results": {
+        "type": "integer",
+        "min": 1,
+        "max": 8,
+        "description": "Maximum tool results returned per primitive search call."
+      },
+      "memory_manager_max_output_tokens": {
+        "type": "integer",
+        "min": 300,
+        "max": 1500,
+        "description": "Maximum structured output tokens for the MAS memory manager."
+      },
+      "planner_max_output_tokens": {
+        "type": "integer",
+        "min": 300,
+        "max": 1400,
+        "description": "Maximum structured output tokens for the MAS planner."
+      },
+      "verifier_max_output_tokens": {
+        "type": "integer",
+        "min": 250,
+        "max": 1000,
+        "description": "Maximum structured output tokens for the MAS verifier."
+      },
+      "max_revision_rounds": {
+        "type": "integer",
+        "min": 0,
+        "max": 2,
+        "description": "Maximum verifier-triggered planner revisions for MAS."
+      }
+    },
+    "student_solver": {
+      "max_tool_rounds": {
+        "type": "integer",
+        "min": 1,
+        "max": 16,
+        "description": "Maximum tool-call rounds for the memory-aware single agent."
+      },
+      "max_tool_results": {
+        "type": "integer",
+        "min": 1,
+        "max": 8,
+        "description": "Maximum tool results returned per primitive search call."
+      },
+      "max_output_tokens": {
+        "type": "integer",
+        "min": 300,
+        "max": 1500,
+        "description": "Maximum structured output tokens for the memory-aware single agent."
+      }
+    },
+    "student_solver_example": {
+      "max_tool_rounds": {
+        "type": "integer",
+        "min": 1,
+        "max": 16,
+        "description": "Maximum tool-call rounds for the memory-aware single agent."
+      },
+      "max_tool_results": {
+        "type": "integer",
+        "min": 1,
+        "max": 8,
+        "description": "Maximum tool results returned per primitive search call."
+      },
+      "max_output_tokens": {
+        "type": "integer",
+        "min": 300,
+        "max": 1500,
+        "description": "Maximum structured output tokens for the memory-aware single agent."
+      }
+    },
+    "student_solver2": {
+      "memory_manager_max_tool_rounds": {
+        "type": "integer",
+        "min": 1,
+        "max": 14,
+        "description": "Maximum tool-call rounds for the MAS memory manager."
+      },
+      "planner_max_tool_rounds": {
+        "type": "integer",
+        "min": 1,
+        "max": 14,
+        "description": "Maximum tool-call rounds for the MAS planner."
+      },
+      "verifier_max_tool_rounds": {
+        "type": "integer",
+        "min": 1,
+        "max": 12,
+        "description": "Maximum tool-call rounds for the MAS verifier."
+      },
+      "max_tool_results": {
+        "type": "integer",
+        "min": 1,
+        "max": 8,
+        "description": "Maximum tool results returned per primitive search call."
+      },
+      "memory_manager_max_output_tokens": {
+        "type": "integer",
+        "min": 300,
+        "max": 1500,
+        "description": "Maximum structured output tokens for the MAS memory manager."
+      },
+      "planner_max_output_tokens": {
+        "type": "integer",
+        "min": 300,
+        "max": 1400,
+        "description": "Maximum structured output tokens for the MAS planner."
+      },
+      "verifier_max_output_tokens": {
+        "type": "integer",
+        "min": 250,
+        "max": 1000,
+        "description": "Maximum structured output tokens for the MAS verifier."
+      },
+      "max_revision_rounds": {
+        "type": "integer",
+        "min": 0,
+        "max": 2,
+        "description": "Maximum verifier-triggered planner revisions for MAS."
+      }
+    }
+  },
+  "response_max_retries": 5,
+  "embedding_max_retries": 4,
+  "response_retry_backoff_base_seconds": 2.0,
+  "response_retry_backoff_cap_seconds": 18.0,
+  "response_retry_jitter_seconds": 1.25
+}
