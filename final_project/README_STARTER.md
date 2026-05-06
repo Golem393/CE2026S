@@ -26,6 +26,8 @@ source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.sample .env
 # add OPENAI_API_KEY to .env
+cp llm_eval_config.json llm_eval_config_student.json
+# modify your configs
 
 python run_student.py --solver student_solver_example --limit-public 2 --output-dir runs/example_smoke
 ```
@@ -64,4 +66,4 @@ Hard caps remain enforced by the official config.
 
 ## Submission
 
-Submit your `student_solver.py` plus any helper Python modules you import from it. Staff will rerun your code with the official runtime wrapper on hidden episodes.
+Submit your `student_solver.py`, `llm_eval_config_student.json` plus any helper Python modules you import from it. Staff will rerun your code with the official runtime wrapper on hidden episodes.
