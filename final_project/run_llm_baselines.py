@@ -329,6 +329,8 @@ def build_ablation_systems(config: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
         return systems
     for ablation_name, ablation in config["ablations"]["systems"].items():
         base_system = ablation["base_system"]
+        if base_system not in config["default_systems"]:
+            raise ValueError(f"Ablation {ablation_name!r} references unknown base_system {base_system!r}.")
         merged = merge_config(config["default_systems"][base_system], ablation["overrides"])
         merged.setdefault("runner_name", base_system)
         merged.setdefault("base_system", base_system)
@@ -617,6 +619,12 @@ def main() -> None:
 
     ablation_systems = build_ablation_systems(config)
     if args.ablation_systems:
+        missing_ablations = [name for name in args.ablation_systems if name not in ablation_systems]
+        if missing_ablations:
+            raise ValueError(
+                f"Unknown ablation system(s): {missing_ablations}. "
+                "This config may be student-facing and may not define an 'ablations' block."
+            )
         ablation_systems = {name: ablation_systems[name] for name in args.ablation_systems}
 
     trace_path = Path(args.trace_path)
@@ -700,20 +708,25 @@ def main() -> None:
             trace_logger.log("hidden_eval_skipped", reason="hidden assets unavailable")
 
         ablation_payload = {"systems": {}, "sample_trip_ids": []}
-        if not args.skip_ablations:
-            ablation_trip_ids = args.public_trip_ids or config["ablations"]["public_sample_trip_ids"]
-            ablation_eps = find_episodes_by_trip_ids(public_eps_all, ablation_trip_ids)
-            ablation_payload = run_eval_set(
-                runner=runner,
-                toolbox=toolbox,
-                systems=ablation_systems,
-                episodes=ablation_eps,
-                max_concurrency=args.max_concurrency,
-            )
-            ablation_payload["sample_trip_ids"] = ablation_trip_ids
-            ablation_payload["budget_overrides"] = applied_overrides
-            ablation_payload["generated_at"] = datetime.now(timezone.utc).isoformat()
-            trace_logger.log("ablation_eval_complete", episode_count=len(ablation_eps), trip_ids=ablation_trip_ids, systems=list(ablation_systems))
+        if not args.skip_ablations and ablation_systems:
+            ablation_trip_ids = args.public_trip_ids or (config.get("ablations") or {}).get("public_sample_trip_ids", [])
+            if not ablation_trip_ids:
+                trace_logger.log("ablation_eval_skipped", reason="no ablation public_sample_trip_ids configured")
+            else:
+                ablation_eps = find_episodes_by_trip_ids(public_eps_all, ablation_trip_ids)
+                ablation_payload = run_eval_set(
+                    runner=runner,
+                    toolbox=toolbox,
+                    systems=ablation_systems,
+                    episodes=ablation_eps,
+                    max_concurrency=args.max_concurrency,
+                )
+                ablation_payload["sample_trip_ids"] = ablation_trip_ids
+                ablation_payload["budget_overrides"] = applied_overrides
+                ablation_payload["generated_at"] = datetime.now(timezone.utc).isoformat()
+                trace_logger.log("ablation_eval_complete", episode_count=len(ablation_eps), trip_ids=ablation_trip_ids, systems=list(ablation_systems))
+        elif not args.skip_ablations:
+            trace_logger.log("ablation_eval_skipped", reason="no ablations configured")
 
         public_payload["ablations"] = ablation_payload
         public_results_path = output_dir / "llm_results_public_v2.json"

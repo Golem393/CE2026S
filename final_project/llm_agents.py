@@ -336,6 +336,138 @@ def spoken_rule_schema() -> Dict[str, Any]:
     }
 
 
+try: 
+    from ta_only.grounding_utils import ensure_grounded_submission as _ta_ensure_grounded_submission
+except Exception:  # pragma: no cover - normal in the student release
+    _ta_ensure_grounded_submission = None
+
+
+def _empty_memory_report() -> Dict[str, Any]:
+    return {
+        "retrieved": [],
+        "retired": [],
+        "retired_docs": [],
+        "rejected_option_notes": [],
+        "active_context_keys": [],
+        "docs_retrieved": [],
+        "active_docs": [],
+        "ignored_distractors": [],
+        "spoken_rule_hits": {
+            "must_remember": [],
+            "forbidden": [],
+            "one_off_only": [],
+            "retire": [],
+            "do_not_reconsider": [],
+            "keep_context_lean": [],
+        },
+        "critical_constraints": [],
+    }
+
+
+def _merge_public_memory_report(payload_report: Dict[str, Any] | None, initial_report: Dict[str, Any] | None) -> Dict[str, Any]:
+    report = _empty_memory_report()
+    for source in (initial_report or {}, payload_report or {}):
+        for key, value in source.items():
+            if key == "spoken_rule_hits" and isinstance(value, dict):
+                for subkey, subvalue in value.items():
+                    if subkey in report["spoken_rule_hits"] and isinstance(subvalue, list):
+                        for item in subvalue:
+                            if item not in report["spoken_rule_hits"][subkey]:
+                                report["spoken_rule_hits"][subkey].append(item)
+            elif key in report and isinstance(report[key], list) and isinstance(value, list):
+                for item in value:
+                    if item not in report[key]:
+                        report[key].append(item)
+    return report
+
+
+def _id_index(rows: List[Dict[str, Any]], id_key: str) -> Dict[str, Dict[str, Any]]:
+    return {str(row.get(id_key)): row for row in rows if row.get(id_key)}
+
+
+def _first_id(rows: List[Dict[str, Any]], id_key: str) -> str | None:
+    return str(rows[0][id_key]) if rows and rows[0].get(id_key) else None
+
+
+def _public_ensure_grounded_submission(
+    session: TravelToolSession,
+    episode: Dict[str, Any],
+    payload: Dict[str, Any] | None,
+    *,
+    initial_report: Dict[str, Any] | None = None,
+) -> Dict[str, Any]:
+    """Student-safe grounding fallback for the shipped baseline example.
+
+    It validates that final option IDs exist in the local simulator inventory and
+    fills missing/invalid IDs with a simple deterministic candidate.  This is not
+    intended to be a strong solver; students are expected to implement better
+    search, verification, and memory discipline in student_solver.py.
+    """
+    payload = dict(payload or {})
+    env = session.toolbox.env
+    city = episode.get("city")
+    origin = episode.get("origin")
+
+    flights = env.search_flights(origin, city) if origin and city else []
+    hotels = env.search_hotels(city) if city else []
+    restaurants = env.search_restaurants(city) if city else []
+    activities = env.search_activities(city) if city else []
+
+    # Conservative defaults: avoid red-eyes, prefer quieter/central options, and
+    # keep baseline choices grounded rather than optimal.
+    flight_candidates = sorted(
+        flights,
+        key=lambda row: (bool(row.get("red_eye")), int(row.get("fare_total", 10**9)), int(row.get("stops", 99))),
+    )
+    hotel_candidates = sorted(
+        hotels,
+        key=lambda row: (-float(row.get("quiet_score", 0)), -float(row.get("airport_access_score", 0)), int(row.get("nightly_price", 10**9))),
+    )
+    restaurant_candidates = sorted(
+        restaurants,
+        key=lambda row: (-float(row.get("quiet_score", 0)), -float(row.get("client_ready_score", 0)), int(row.get("price_level", 9))),
+    )
+    activity_candidates = sorted(
+        activities,
+        key=lambda row: (not bool(row.get("indoor")), int(row.get("price", 10**9))),
+    )
+
+    indexes = {
+        "flight_id": _id_index(flights, "flight_id"),
+        "hotel_id": _id_index(hotels, "hotel_id"),
+        "restaurant_id": _id_index(restaurants, "restaurant_id"),
+        "activity_id": _id_index(activities, "activity_id"),
+    }
+    defaults = {
+        "flight_id": _first_id(flight_candidates, "flight_id"),
+        "hotel_id": _first_id(hotel_candidates, "hotel_id"),
+        "restaurant_id": _first_id(restaurant_candidates, "restaurant_id"),
+        "activity_id": _first_id(activity_candidates, "activity_id"),
+    }
+
+    repaired: Dict[str, Any] = dict(payload)
+    for key in ("flight_id", "hotel_id", "restaurant_id", "activity_id"):
+        value = repaired.get(key)
+        if not value or str(value) not in indexes[key]:
+            repaired[key] = defaults[key]
+
+    repaired["memory_report"] = _merge_public_memory_report(repaired.get("memory_report"), initial_report)
+    repaired.setdefault("notes", payload.get("notes") or "Grounded fallback checked final IDs against local inventory.")
+    return repaired
+
+
+def ensure_grounded_submission(
+    session: TravelToolSession,
+    episode: Dict[str, Any],
+    payload: Dict[str, Any] | None,
+    *,
+    initial_report: Dict[str, Any] | None = None,
+) -> Dict[str, Any]:
+    if _ta_ensure_grounded_submission is not None:
+        return _ta_ensure_grounded_submission(session, episode, payload, initial_report=initial_report)
+    return _public_ensure_grounded_submission(session, episode, payload, initial_report=initial_report)
+
+
 def memory_report_schema() -> Dict[str, Any]:
     return {
         "type": "object",
