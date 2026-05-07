@@ -325,6 +325,8 @@ def run_eval_set(
 
 def build_ablation_systems(config: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
     systems: Dict[str, Dict[str, Any]] = {}
+    if "ablations" not in config or "systems" not in config["ablations"]:
+        return systems
     for ablation_name, ablation in config["ablations"]["systems"].items():
         base_system = ablation["base_system"]
         merged = merge_config(config["default_systems"][base_system], ablation["overrides"])

@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-DEFAULT_CONFIG = ROOT / "llm_eval_config_student.json"
+DEFAULT_CONFIG = ROOT / "llm_eval_config.json"
 
 
 def parse_args() -> argparse.Namespace:

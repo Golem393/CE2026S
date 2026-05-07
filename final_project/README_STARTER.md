@@ -65,3 +65,10 @@ Hard caps remain enforced by the official config.
 ## Submission
 
 Submit your `student_solver.py` plus any helper Python modules you import from it. Staff will rerun your code with the official runtime wrapper on hidden episodes.
+
+
+python run_llm_baselines.py --systems student_solver_example --limit-public 5 --skip-hidden --skip-ablations --output-dir results_naive
+
+
+
+python run_llm_baselines.py --systems student_solver --limit-public 5 --skip-hidden --skip-ablations --output-dir results_student
