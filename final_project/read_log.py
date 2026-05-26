@@ -35,6 +35,12 @@ _AGENT_COLOR = {
     "rule_checker": _C.WARNING,
 }
 
+_ROLE_TO_AGENT = {
+    "mas_memory_manager": "memory",
+    "mas_planner": "planner",
+    "mas_verifier": "verifier",
+}
+
 def _truncate(text: str, max_len: int = 120) -> str:
     if len(text) <= max_len:
         return text
@@ -48,7 +54,63 @@ def _format_dict_compact(d: Dict[str, Any], max_items: int = 8) -> str:
     suffix = f" +{len(d) - max_items} more" if len(d) > max_items else ""
     return ", ".join(parts) + suffix
 
-def print_log_line(entry: Dict[str, Any]):
+def find_submission_in_json(log_file_path: str, trip_id: str) -> Dict[str, Any] | None:
+    if not log_file_path:
+        return None
+    log_path = Path(log_file_path)
+    
+    # Candidate paths for result JSONs
+    candidates = [
+        log_path.parent / "llm_results_public_v2.json",
+        Path("api_student5/llm_results_public_v2.json"),
+    ]
+    # Also look at any json files in log_path's grandparents or siblings
+    try:
+        for sibling in log_path.parent.glob("*.json"):
+            candidates.append(sibling)
+    except Exception:
+        pass
+    try:
+        if Path("api_student5").exists():
+            for sibling in Path("api_student5").glob("*.json"):
+                candidates.append(sibling)
+    except Exception:
+        pass
+    try:
+        for child in Path(".").glob("**/llm_results*.json"):
+            candidates.append(child)
+    except Exception:
+        pass
+
+    # Deduplicate candidates while keeping order
+    seen = set()
+    deduped = []
+    for c in candidates:
+        abs_p = c.resolve() if c.exists() else None
+        if abs_p and abs_p not in seen:
+            seen.add(abs_p)
+            deduped.append(c)
+
+    for path in deduped:
+        try:
+            data = json.loads(path.read_text())
+            systems = data.get("systems", {})
+            if systems:
+                for system_data in systems.values():
+                    for res in system_data.get("results", []):
+                        if res.get("trip_id") == trip_id:
+                            return res.get("submission")
+            else:
+                # Maybe it's a list or directly contains results
+                results = data.get("results", [])
+                for res in results:
+                    if res.get("trip_id") == trip_id:
+                        return res.get("submission")
+        except Exception:
+            pass
+    return None
+
+def print_log_line(entry: Dict[str, Any], log_file_path: str = ""):
     event = entry.get("event")
     
     if event == "episode_start":
@@ -57,11 +119,15 @@ def print_log_line(entry: Dict[str, Any]):
         print(f"{_C.ORCHESTRATOR}{_C.BOLD}╔═══════════════════════════════════════════════════════╗{_C.RESET}")
         print(f"{_C.ORCHESTRATOR}{_C.BOLD}║  🎯 EPISODE START: {trip_id:<36s}║{_C.RESET}")
         print(f"{_C.ORCHESTRATOR}{_C.BOLD}╚═══════════════════════════════════════════════════════╝{_C.RESET}")
-        print(f"   {_C.DIM}city={_C.RESET}{entry.get('city', '?')}  {_C.DIM}origin={_C.RESET}{entry.get('origin', '?')}  {_C.DIM}family={_C.RESET}{entry.get('family', '?')}")
-        print(f"   {_C.DIM}budget={_C.RESET}{entry.get('budget', '?')}  {_C.DIM}nights={_C.RESET}{entry.get('nights', '?')}  {_C.DIM}zone={_C.RESET}{entry.get('meeting_zone', '?')}  {_C.DIM}weather={_C.RESET}{entry.get('weather', '?')}")
+        
+        # In trace.jsonl, episode details are in the json public file, but we can print what we have
+        if "city" in entry:
+            print(f"   {_C.DIM}city={_C.RESET}{entry.get('city', '?')}  {_C.DIM}origin={_C.RESET}{entry.get('origin', '?')}  {_C.DIM}family={_C.RESET}{entry.get('family', '?')}")
+            print(f"   {_C.DIM}budget={_C.RESET}{entry.get('budget', '?')}  {_C.DIM}nights={_C.RESET}{entry.get('nights', '?')}  {_C.DIM}zone={_C.RESET}{entry.get('meeting_zone', '?')}  {_C.DIM}weather={_C.RESET}{entry.get('weather', '?')}")
 
-    elif event == "phase_start":
-        agent = entry.get("agent", "?")
+    elif event == "phase_start" or event == "tool_agent_start":
+        role = entry.get("role") or entry.get("agent", "?")
+        agent = _ROLE_TO_AGENT.get(role, role)
         iteration = entry.get("iteration", 1)
         trip_id = entry.get("trip_id", "?")
         emoji = _AGENT_EMOJI.get(agent, "🔄")
@@ -80,8 +146,19 @@ def print_log_line(entry: Dict[str, Any]):
                 val_str = _truncate(str(value), 100)
                 print(f"   {_C.DIM}{key}={_C.RESET}{val_str}")
 
-    elif event == "phase_end":
-        agent = entry.get("agent", "?")
+    elif event == "tool_agent_tool_call":
+        tool = entry.get("tool", "?")
+        args = entry.get("arguments", {})
+        args_str = ", ".join(f"{k}={_truncate(str(v), 50)}" for k, v in args.items() if v is not None)
+        print(f"   {_C.TOOL}🔧 Tool Call: {tool}({args_str}){_C.RESET}")
+
+    elif event == "tool_result":
+        preview = entry.get("preview", "")
+        print(f"   {_C.INFO}   📥 Preview: {preview}{_C.RESET}")
+
+    elif event == "phase_end" or event == "tool_agent_finish":
+        role = entry.get("role") or entry.get("agent", "?")
+        agent = _ROLE_TO_AGENT.get(role, role)
         color = _AGENT_COLOR.get(agent, _C.INFO)
         output_summary = entry.get("output_summary")
         
@@ -96,10 +173,11 @@ def print_log_line(entry: Dict[str, Any]):
                     val_str = _truncate(str(value), 100)
                 print(f"   {_C.DIM}{key}:{_C.RESET} {val_str}")
 
-        duration = entry.get("duration_s", 0)
+        usage = entry.get("usage", {})
+        duration = entry.get("duration_s", 0) or entry.get("elapsed_s", 0)
         tool_call_count = entry.get("tool_call_count", 0)
-        tokens = entry.get("tokens", 0)
-        cost = entry.get("cost_usd", 0.0)
+        tokens = usage.get("total_tokens", 0) or entry.get("tokens", 0)
+        cost = usage.get("estimated_cost_usd", 0.0) or entry.get("cost_usd", 0.0)
         
         print(f"{_C.DIM}⏱  Duration: {duration:.1f}s | Tools: {tool_call_count} | Tokens: {tokens} | Cost: ${cost:.6f}{_C.RESET}")
         print(f"{_C.DIM}───────────────────────────────────────────────────────{_C.RESET}")
@@ -140,23 +218,34 @@ def print_log_line(entry: Dict[str, Any]):
             for issue in issues:
                 print(f"   {_C.ERROR}• {issue}{_C.RESET}")
 
-    elif event == "episode_finalize":
-        total_elapsed = entry.get("total_elapsed_s", 0)
-        tokens = entry.get("total_tokens", 0)
-        cost = entry.get("total_cost_usd", 0.0)
+    elif event == "episode_finalize" or event == "episode_success":
+        total_elapsed = entry.get("total_elapsed_s", 0) or entry.get("duration_s", 0)
+        tokens = entry.get("total_tokens", 0) or entry.get("tokens", 0)
+        cost = entry.get("total_cost_usd", 0.0) or entry.get("cost_usd", 0.0)
+        trip_id = entry.get("trip_id", "?")
         
         print("")
         print(f"{_C.ORCHESTRATOR}{_C.BOLD}╔═══════════════════════════════════════════════════════╗{_C.RESET}")
         print(f"{_C.ORCHESTRATOR}{_C.BOLD}║  🏁 FINAL DECISION                                  ║{_C.RESET}")
         print(f"{_C.ORCHESTRATOR}{_C.BOLD}╚═══════════════════════════════════════════════════════╝{_C.RESET}")
 
-        for key in ["flight_id", "hotel_id", "restaurant_id", "activity_id"]:
-            val = entry.get(key, "null")
-            status = _C.SUCCESS if val and val != "null" else _C.ERROR
-            symbol = "✓" if val and val != "null" else "✗"
-            print(f"   {status}{_C.BOLD}{symbol} {key}: {val}{_C.RESET}")
+        submission = find_submission_in_json(log_file_path, trip_id)
+        if submission:
+            for key in ["flight_id", "hotel_id", "restaurant_id", "activity_id"]:
+                val = submission.get(key, "null")
+                status = _C.SUCCESS if val and val != "null" else _C.ERROR
+                symbol = "✓" if val and val != "null" else "✗"
+                print(f"   {status}{_C.BOLD}{symbol} {key}: {val}{_C.RESET}")
+        else:
+            for key in ["flight_id", "hotel_id", "restaurant_id", "activity_id"]:
+                val = entry.get(key, "null")
+                status = _C.SUCCESS if val and val != "null" else _C.ERROR
+                symbol = "✓" if val and val != "null" else "✗"
+                print(f"   {status}{_C.BOLD}{symbol} {key}: {val}{_C.RESET}")
 
-        print(f"\n   {_C.DIM}Total: {total_elapsed:.1f}s | {tokens} tokens | ${cost:.6f}{_C.RESET}\n")
+        dq = entry.get("decision_quality")
+        dq_str = f" | Decision Quality: {dq}" if dq is not None else ""
+        print(f"\n   {_C.DIM}Total: {total_elapsed:.1f}s | {tokens} tokens | ${cost:.6f}{dq_str}{_C.RESET}\n")
 
 def main():
     log_file = "runs/agent_debug_log.jsonl"
@@ -176,7 +265,7 @@ def main():
                     continue
                 try:
                     entry = json.loads(line)
-                    print_log_line(entry)
+                    print_log_line(entry, log_file)
                 except json.JSONDecodeError:
                     print(f"Failed to parse JSON: {line}")
     except KeyboardInterrupt:

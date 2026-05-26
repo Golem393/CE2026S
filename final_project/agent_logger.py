@@ -267,27 +267,139 @@ class SmartAgentLogger:
         self,
         agent: str,
         board_summary: Dict[str, Any],
+        stage: str = "CURRENT",
     ) -> None:
         """Log the current state of the working memory board."""
-        self._print(f"{_C.INFO}📊 Board State:{_C.RESET}")
+        self._print(f"{_C.INFO}📊 Board State ({stage}):{_C.RESET}")
         for key, value in board_summary.items():
             if isinstance(value, list):
                 if value:
-                    val_str = str(value[:4])
-                    if len(value) > 4:
-                        val_str += f" +{len(value)-4} more"
+                    self._print(f"   {_C.BOLD}{key}:{_C.RESET}")
+                    for item in value:
+                        self._print(f"     - {item}")
                 else:
-                    val_str = "[]"
+                    self._print(f"   {_C.BOLD}{key}:{_C.RESET} []")
+            elif isinstance(value, dict):
+                self._print(f"   {_C.BOLD}{key}:{_C.RESET}")
+                for k, v in value.items():
+                    self._print(f"     {k}: {v}")
             else:
-                val_str = _truncate(str(value), 80)
-            self._print(f"   {_C.DIM}{key}:{_C.RESET} {val_str}")
+                self._print(f"   {_C.BOLD}{key}:{_C.RESET} {value}")
 
         self._write_json({
             "ts": datetime.now(timezone.utc).isoformat(),
             "event": "board_state",
             "trip_id": self.trip_id,
             "agent": agent,
+            "stage": stage,
             "board": _safe_serialize(board_summary),
+        })
+
+    def log_prompt(
+        self,
+        agent: str,
+        instructions: str,
+        input_text: str,
+    ) -> None:
+        """Log the complete prompt (instructions + input_text) sent to the LLM."""
+        color = _AGENT_COLOR.get(agent, _C.INFO)
+        emoji = _AGENT_EMOJI.get(agent, "🔄")
+        agent_upper = agent.upper().replace("_", " ")
+        
+        self._print("")
+        self._print(
+            f"{color}{_C.BOLD}"
+            f"═══════════════════════════════════════════════════════"
+            f"{_C.RESET}"
+        )
+        self._print(
+            f"{color}{_C.BOLD}"
+            f"💬 {emoji} {agent_upper} PROMPT (COMPLETE)"
+            f"{_C.RESET}"
+        )
+        self._print(
+            f"{color}{_C.BOLD}"
+            f"═══════════════════════════════════════════════════════"
+            f"{_C.RESET}"
+        )
+        self._print(f"{_C.BOLD}System Instructions:{_C.RESET}")
+        self._print(instructions)
+        self._print(f"\n{_C.BOLD}User Input:{_C.RESET}")
+        self._print(input_text)
+        self._print(
+            f"{color}{_C.BOLD}"
+            f"───────────────────────────────────────────────────────"
+            f"{_C.RESET}"
+        )
+        
+        self._write_json({
+            "ts": datetime.now(timezone.utc).isoformat(),
+            "event": "prompt",
+            "trip_id": self.trip_id,
+            "agent": agent,
+            "instructions": instructions,
+            "input_text": input_text,
+        })
+
+    def log_board_delta(
+        self,
+        agent: str,
+        before: Dict[str, Any],
+        after: Dict[str, Any],
+    ) -> None:
+        """Log the differences in the working memory board state before and after an agent phase."""
+        self._print(f"{_C.INFO}📊 Board State Changes:{_C.RESET}")
+        
+        changes_found = False
+        for key in after.keys():
+            v_before = before.get(key)
+            v_after = after.get(key)
+            
+            if v_before == v_after:
+                continue
+                
+            changes_found = True
+            
+            if isinstance(v_after, list):
+                v_before_list = v_before if isinstance(v_before, list) else []
+                added = [item for item in v_after if item not in v_before_list]
+                removed = [item for item in v_before_list if item not in v_after]
+                
+                if added or removed:
+                    self._print(f"   {_C.BOLD}{key}:{_C.RESET}")
+                    for item in added:
+                        self._print(f"     {_C.SUCCESS}+ {item}{_C.RESET}")
+                    for item in removed:
+                        self._print(f"     {_C.ERROR}- {item}{_C.RESET}")
+            elif isinstance(v_after, dict):
+                v_before_dict = v_before if isinstance(v_before, dict) else {}
+                self._print(f"   {_C.BOLD}{key}:{_C.RESET}")
+                
+                for k, v in v_after.items():
+                    b_val = v_before_dict.get(k)
+                    if b_val != v:
+                        if b_val is None:
+                            self._print(f"     {_C.SUCCESS}+ {k}: {v}{_C.RESET}")
+                        else:
+                            self._print(f"     {_C.INFO}~ {k}: {_C.ERROR}{b_val} {_C.DIM}-> {_C.SUCCESS}{v}{_C.RESET}")
+                for k in v_before_dict.keys():
+                    if k not in v_after:
+                        self._print(f"     {_C.ERROR}- {k}: {v_before_dict[k]}{_C.RESET}")
+            else:
+                str_before = _truncate(str(v_before), 60)
+                str_after = _truncate(str(v_after), 60)
+                self._print(f"   {_C.BOLD}{key}:{_C.RESET} {_C.ERROR}{str_before} {_C.DIM}-> {_C.SUCCESS}{str_after}{_C.RESET}")
+        
+        if not changes_found:
+            self._print(f"   {_C.DIM}No changes to board state.{_C.RESET}")
+
+        self._write_json({
+            "ts": datetime.now(timezone.utc).isoformat(),
+            "event": "board_delta",
+            "trip_id": self.trip_id,
+            "agent": agent,
+            "before": _safe_serialize(before),
+            "after": _safe_serialize(after),
         })
 
     # ── Violation / Rule Check Logging ───────────────────────────────

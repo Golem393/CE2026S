@@ -22,6 +22,7 @@ class StudentRuntime:
         retrieval_strategy: Optional[str] = None,
         embedding_model: Optional[str] = None,
         max_results: Optional[int] = None,
+        board: Optional[Any] = None,
     ) -> TravelToolSession:
         session = self.toolbox.new_session(
             episode=self.episode,
@@ -29,6 +30,7 @@ class StudentRuntime:
             embedding_model=embedding_model if embedding_model is not None else self.system_config.get("embedding_model"),
             max_results=max_results or self.system_config.get("max_tool_results", 4),
             role=role or self.role,
+            board=board,
         )
         session.bind_runner(self.runner)
         return session

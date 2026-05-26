@@ -23,7 +23,6 @@ from schemas import (
 from agent_logger import SmartAgentLogger
 from student_custom_tools_template import (
     automated_rule_checker,
-    extract_hard_constraints_from_rules,
     summarize_failed_searches,
 )
 
@@ -47,9 +46,11 @@ def _memory_agent_instructions() -> str:
 def _memory_agent_input(
     episode: Dict[str, Any],
     board: WorkingMemoryBoard,
+    preloaded_context: str,
     planner_feedback: str = "",
 ) -> str:
     parts = [episode_prompt(episode)]
+    parts.append(preloaded_context)
     parts.append("\n--- MEMORY BOARD STATE ---")
     parts.append(f"Hard constraints: {json.dumps(board.hard_constraints)}")
     parts.append(f"Soft constraints: {json.dumps(board.soft_constraints)}")
@@ -85,7 +86,11 @@ def _planner_instructions() -> str:
         "You are the Planner in a multi-agent travel planner. "
         "Read constraints/next_steps from Memory Agent. Search databases with "
         "filters to find flight, hotel, restaurant, activity that satisfy constraints. "
-        "Prefer focused searches over broad browsing. "
+        "CRITICAL: You MUST use filter arguments (e.g. quiet_min=8.0, dietary='vegan') "
+        "when calling search tools. Do not rely on post-search reading. "
+        "Treat constraints like quiet_score and dietary as absolute strict requirements. "
+        "Treat the budget as a flexible target: going slightly over is acceptable "
+        "ONLY if it secures a powerful bundle promotion that offsets the penalty. "
         "Propose IDs from search results only — never hallucinate IDs. "
         "Use null for items you cannot find. "
         "If you hit a dead end on all remaining items, put 'give_up' in notes."
@@ -131,7 +136,9 @@ def _verifier_instructions() -> str:
         "Cross-reference the proposed itinerary against ALL constraints: "
         "budget, zone, quiet/noise, dietary, red-eye, refundability, weather, spoken rules. "
         "Use tools to look up specific items if needed. "
-        "Set approve=true if compliant. If ANY violation, set approve=false with specific issues."
+        "Treat budget as a SOFT constraint: it is acceptable to exceed the budget "
+        "if offset by a bundle promotion. Do NOT reject solely for budget violations. "
+        "Set approve=true if compliant. If ANY violation (other than budget), set approve=false with specific issues."
     )
 
 
@@ -172,15 +179,27 @@ def _call_agent(
     schema_name: str,
     max_output_tokens: int,
     max_tool_rounds: int,
+    disable_tools: bool = False,
+    logger: SmartAgentLogger | None = None,
+    board: Any = None,
 ) -> Dict[str, Any]:
     """Generic wrapper: create session, run tool agent, return parsed + usage + session."""
     config = runtime.system_config
     model = config["model"]
 
+    if logger:
+        agent_name = role.replace("mas_", "")
+        if agent_name == "memory_manager":
+            agent_name = "memory"
+        logger.log_prompt(agent_name, instructions, input_text)
+
     session = runtime.new_session(
         role=role,
         max_results=config.get("max_tool_results", 4),
+        board=board,
     )
+    
+    tools = [] if disable_tools else session.tool_specs(primitive_only=False)
 
     result = runtime.runner.run_tool_agent_json(
         model=model,
@@ -188,7 +207,7 @@ def _call_agent(
         input_text=input_text,
         json_schema=json_schema,
         schema_name=schema_name,
-        tools=session.tool_specs(primitive_only=False),
+        tools=tools,
         tool_handler=session.dispatch,
         max_output_tokens=max_output_tokens,
         reasoning_effort="low" if model.startswith("gpt-5") else None,
@@ -213,24 +232,29 @@ def _call_agent(
 def _call_memory_agent(
     runtime: StudentRuntime,
     board: WorkingMemoryBoard,
+    preloaded_context: str,
     planner_feedback: str = "",
+    logger: SmartAgentLogger | None = None,
 ) -> Dict[str, Any]:
     cfg = runtime.system_config
     return _call_agent(
         runtime,
         role="mas_memory_manager",
         instructions=_memory_agent_instructions(),
-        input_text=_memory_agent_input(runtime.episode, board, planner_feedback),
+        input_text=_memory_agent_input(runtime.episode, board, preloaded_context, planner_feedback),
         json_schema=context_pack_schema(),
         schema_name="memory_context_pack",
         max_output_tokens=cfg.get("memory_manager_max_output_tokens", 1000),
-        max_tool_rounds=cfg.get("memory_manager_max_tool_rounds", 8),
+        max_tool_rounds=1,  # Must be >0 so runner doesn't fail
+        disable_tools=True, # 0 API calls for retrieval!
+        logger=logger,
     )
 
 
 def _call_planner_agent(
     runtime: StudentRuntime,
     board: WorkingMemoryBoard,
+    logger: SmartAgentLogger | None = None,
 ) -> Dict[str, Any]:
     cfg = runtime.system_config
     return _call_agent(
@@ -242,12 +266,15 @@ def _call_planner_agent(
         schema_name="planner_proposal",
         max_output_tokens=cfg.get("planner_max_output_tokens", 800),
         max_tool_rounds=cfg.get("planner_max_tool_rounds", 12),
+        logger=logger,
+        board=board,
     )
 
 
 def _call_verifier_agent(
     runtime: StudentRuntime,
     board: WorkingMemoryBoard,
+    logger: SmartAgentLogger | None = None,
 ) -> Dict[str, Any]:
     cfg = runtime.system_config
     return _call_agent(
@@ -259,6 +286,7 @@ def _call_verifier_agent(
         schema_name="verifier_check",
         max_output_tokens=cfg.get("verifier_max_output_tokens", 600),
         max_tool_rounds=cfg.get("verifier_max_tool_rounds", 6),
+        logger=logger,
     )
 
 
@@ -296,8 +324,11 @@ def _update_board_from_memory(
     episode: Dict[str, Any],
 ) -> None:
     """Merge Memory Agent context_pack output into the working memory board."""
-    # Hard constraints from critical_constraints
-    for c in context_pack.get("critical_constraints", []):
+    # Hard constraints from critical_constraints (cleaned)
+    clean_constraints = canonicalize_context_keys(
+        context_pack.get("critical_constraints", []), keep_doc_ids=False
+    )
+    for c in clean_constraints:
         if c and c not in board.hard_constraints:
             board.hard_constraints.append(c)
 
@@ -323,6 +354,12 @@ def _update_board_from_memory(
         forced_retired=retired,
         forced_retired_docs=context_pack.get("retired_docs", []),
     )
+    
+    # Propagate rejected options to the planner so it avoids past mistakes!
+    for note in merged.get("rejected_option_notes", []):
+        if note and note not in board.failed_searches:
+            board.failed_searches.append(note)
+
     spoken = merged.get("spoken_rule_hits", {})
     board.evaluator_tracking = MemoryReport(
         retrieved=merged.get("retrieved", []),
@@ -345,6 +382,7 @@ def _update_board_from_memory(
 
 
 def _save_planner_proposals(
+    runtime: StudentRuntime,
     board: WorkingMemoryBoard,
     planner_out: Dict[str, Any],
 ) -> str:
@@ -352,29 +390,123 @@ def _save_planner_proposals(
     feedback = []
     itin = board.current_itinerary
 
-    for key, attr in [
-        ("flight_id", "flight"),
-        ("hotel_id", "hotel"),
-        ("restaurant_id", "restaurant"),
-        ("activity_id", "activity"),
+    for key, attr, fetch_fn in [
+        ("flight_id", "flight", lambda code: [f for f in runtime.toolbox.env.search_flights(runtime.episode["origin"], runtime.episode["city"]) if f["flight_id"] == code]),
+        ("hotel_id", "hotel", lambda code: [h for h in runtime.toolbox.env.search_hotels(runtime.episode["city"]) if h["hotel_id"] == code]),
+        ("restaurant_id", "restaurant", lambda code: [r for r in runtime.toolbox.env.search_restaurants(runtime.episode["city"]) if r["restaurant_id"] == code]),
+        ("activity_id", "activity", lambda code: [a for a in runtime.toolbox.env.search_activities(runtime.episode["city"]) if a["activity_id"] == code]),
     ]:
         proposed_id = planner_out.get(key)
         current = getattr(itin, attr)
-        if proposed_id and not current:
-            setattr(itin, attr, {key: proposed_id})
-            feedback.append(f"{attr} {proposed_id} booked.")
+        if proposed_id and (not current or current.get(key) != proposed_id):
+            matched = fetch_fn(proposed_id)
+            if matched:
+                setattr(itin, attr, matched[0])
+                feedback.append(f"{attr} {proposed_id} booked.")
+            else:
+                setattr(itin, attr, {key: proposed_id})
+                feedback.append(f"{attr} {proposed_id} booked (hydration failed).")
         elif not proposed_id and not current:
             feedback.append(f"{attr} search FAILED.")
 
     notes = planner_out.get("notes", "")
     if notes:
         feedback.append(f"Planner notes: {notes}")
+        
+    from student_custom_tools_template import calculate_total_itinerary_cost
+    total_cost = calculate_total_itinerary_cost(itin.model_dump(), runtime.episode.get("nights", 1))
+    feedback.append(f"Running Total Cost: {total_cost} / {runtime.episode.get('budget_total', 0)}")
     return "\n".join(feedback)
 
 
 # ═══════════════════════════════════════════════════════════════════════
 #  MAIN ORCHESTRATION
 # ═══════════════════════════════════════════════════════════════════════
+
+def _preload_all_static_context(runtime: StudentRuntime, episode: Dict[str, Any]) -> str:
+    env = runtime.toolbox.env
+    city = episode["city"]
+    family = episode["family"]
+    traveler = episode["traveler_id"]
+
+    parts = ["\n--- PRE-LOADED STATIC CONTEXT ---"]
+    parts.append(f"\n1. Profile Brief: {json.dumps(env.get_profile_brief(traveler))}")
+    parts.append(f"\n2. Venue Brief: {json.dumps(env.get_venue_brief(city, family))}")
+    parts.append(f"\n3. City Ops Notes: {json.dumps(env.get_city_ops_notes(city))}")
+    
+    loyalty = env.get_loyalty_profile(traveler)
+    if loyalty:
+        parts.append(f"\n4. Loyalty Profile: {json.dumps(loyalty)}")
+    
+    constraints = env.get_booking_constraints(city=city, family=family)
+    if constraints:
+        parts.append(f"\n5. Booking Constraints: {json.dumps(constraints)}")
+        
+    deps = env.get_option_dependencies(city=city)
+    if deps:
+        parts.append(f"\n6. Option Dependencies: {json.dumps(deps)}")
+        
+    promos = env.get_partner_promotions(city=city, family=family)
+    if promos:
+        parts.append(f"\n7. Partner Promotions: {json.dumps(promos)}")
+        
+    events = env.get_event_calendar(city)
+    if events:
+        parts.append(f"\n8. Event Calendar: {json.dumps(events)}")
+        
+    rejected = [r for r in runtime.toolbox.rejected_options if r["city"] == city and r["family"] == family]
+    if rejected:
+        parts.append(f"\n9. Rejected Options: {json.dumps(rejected)}")
+        
+    parts.append(f"\n10. Policy: {json.dumps(env.get_policy())}")
+
+    return "\n".join(parts)
+
+
+def _register_preloaded_docs(session: Any, episode: Dict[str, Any]) -> None:
+    """Register docs that we implicitly retrieved via preloading."""
+    docs = [
+        f"profile:{episode['traveler_id']}",
+        f"venue:{episode['city']}_{episode['family']}",
+        f"city_ops:{episode['city']}"
+    ]
+    env = session.toolbox.env
+    city = episode["city"]
+    family = episode["family"]
+
+    loyalty = env.get_loyalty_profile(episode["traveler_id"])
+    if loyalty:
+        docs.append(loyalty.get("doc_id", f"loyalty:{episode['traveler_id']}"))
+
+    constraints = env.get_booking_constraints(city=city, family=family)
+    if constraints:
+        docs.extend([c.get("doc_id") for c in constraints if c.get("doc_id")])
+        
+    deps = env.get_option_dependencies(city=city)
+    if deps:
+        docs.extend([d.get("doc_id") for d in deps if d.get("doc_id")])
+        
+    promos = env.get_partner_promotions(city=city, family=family)
+    if promos:
+        docs.extend([p.get("doc_id") for p in promos if p.get("doc_id")])
+        
+    events = env.get_event_calendar(city)
+    if events:
+        docs.extend([e.get("doc_id") for e in events if e.get("doc_id")])
+
+    for d in docs:
+        if d not in session.docs_seen:
+            session.docs_seen.append(d)
+            
+    for r in session.toolbox.rejected_options:
+        if r["city"] == city and r["family"] == family:
+            reason = r.get("reason_key")
+            opt = r.get("option_id")
+            if reason and opt:
+                note = f"{reason}:{opt}"
+                if note not in session.rejected_notes_seen:
+                    session.rejected_notes_seen.append(note)
+
 
 def _board_summary(board: WorkingMemoryBoard) -> Dict[str, Any]:
     """Build a compact summary of the board state for logging."""
@@ -389,13 +521,13 @@ def _board_summary(board: WorkingMemoryBoard) -> Dict[str, Any]:
     if itin.activity:
         booked["activity"] = itin.activity.get("activity_id", "?")
     return {
-        "hard_constraints": board.hard_constraints,
-        "soft_constraints": board.soft_constraints,
-        "retired": board.retired_constraints,
-        "failed_searches": board.failed_searches[:4],
-        "booked": booked or "none",
+        "hard_constraints": list(board.hard_constraints),
+        "soft_constraints": list(board.soft_constraints),
+        "retired": list(board.retired_constraints),
+        "failed_searches": list(board.failed_searches),
+        "booked": booked,
         "missing": _missing_items(board),
-        "next_steps": board.next_steps[:120] if board.next_steps else "",
+        "next_steps": board.next_steps,
     }
 
 
@@ -435,6 +567,10 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
     total_tool_calls = 0
 
     # ── 2. Initial Memory Agent ─────────────────────────────────────
+    preloaded_context = _preload_all_static_context(runtime, episode)
+    
+    board_before_mem = _board_summary(board)
+    logger.log_board_state("memory", board_before_mem, stage="BEFORE")
     logger.phase_start("memory", iteration=1, input_summary={
         "city": episode["city"],
         "origin": episode["origin"],
@@ -442,38 +578,31 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
         "budget": episode["budget_total"],
         "missing": "flight, hotel, restaurant, activity",
     })
-    mem_res = _call_memory_agent(runtime, board)
+    mem_res = _call_memory_agent(runtime, board, preloaded_context, logger=logger)
+    _register_preloaded_docs(mem_res["session"], episode)
     _update_board_from_memory(board, mem_res["parsed"], mem_res["session"], episode)
     total_usage = runtime.combine_usages(total_usage, mem_res["usage"])
     total_tool_calls += mem_res["session"].summary()["tool_call_count"]
-
-    # Extract hard constraints from spoken rules (custom tool)
-    spoken_rules = []
-    for turn in episode.get("turns", []):
-        if turn.get("speaker") == "user":
-            spoken_rules.append(turn.get("text", ""))
-    extracted = extract_hard_constraints_from_rules(spoken_rules)
-    for c in extracted:
-        if c not in board.hard_constraints:
-            board.hard_constraints.append(c)
 
     logger.log_tool_calls("memory", mem_res["session"].summary()["tool_trace"])
     logger.phase_end("memory", output_summary={
         "hard_constraints": board.hard_constraints,
         "next_steps": board.next_steps,
-        "extracted_from_rules": extracted,
     }, usage=mem_res["usage"], tool_call_count=mem_res["session"].summary()["tool_call_count"])
-    logger.log_board_state("memory", _board_summary(board))
+    board_after_mem = _board_summary(board)
+    logger.log_board_state("memory", board_after_mem, stage="AFTER")
 
     # ── 3. Planner Loop (max 4 iterations) ──────────────────────────
     MAX_PLANNER_ITERS = 4
     for planner_iter in range(MAX_PLANNER_ITERS):
+        board_before_plan = _board_summary(board)
+        logger.log_board_state("planner", board_before_plan, stage="BEFORE")
         logger.phase_start("planner", iteration=planner_iter + 1, input_summary={
             "missing": _missing_items(board),
             "next_steps": board.next_steps[:100],
         })
 
-        plan_res = _call_planner_agent(runtime, board)
+        plan_res = _call_planner_agent(runtime, board, logger=logger)
         plan_out = plan_res["parsed"]
         total_usage = runtime.combine_usages(total_usage, plan_res["usage"])
         total_tool_calls += plan_res["session"].summary()["tool_call_count"]
@@ -481,7 +610,7 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
         logger.log_tool_calls("planner", plan_res["session"].summary()["tool_trace"])
         logger.log_decision(plan_out)
 
-        feedback = _save_planner_proposals(board, plan_out)
+        feedback = _save_planner_proposals(runtime, board, plan_out)
 
         logger.phase_end("planner", output_summary={
             "flight_id": plan_out.get("flight_id"),
@@ -490,6 +619,8 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
             "activity_id": plan_out.get("activity_id"),
             "notes": plan_out.get("notes", ""),
         }, usage=plan_res["usage"], tool_call_count=plan_res["session"].summary()["tool_call_count"])
+        board_after_plan = _board_summary(board)
+        logger.log_board_state("planner", board_after_plan, stage="AFTER")
 
         if _itinerary_complete(board) or _is_give_up(plan_out):
             break
@@ -499,11 +630,14 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
             # Summarize failed searches to keep context lean (custom tool)
             board.failed_searches = summarize_failed_searches(board.failed_searches)
 
+            board_before_mem = _board_summary(board)
+            logger.log_board_state("memory", board_before_mem, stage="BEFORE")
             logger.phase_start("memory", iteration=planner_iter + 2, input_summary={
                 "feedback": feedback[:120],
                 "missing": _missing_items(board),
             })
-            mem_res = _call_memory_agent(runtime, board, planner_feedback=feedback)
+            mem_res = _call_memory_agent(runtime, board, preloaded_context, planner_feedback=feedback, logger=logger)
+            _register_preloaded_docs(mem_res["session"], episode)
             _update_board_from_memory(
                 board, mem_res["parsed"], mem_res["session"], episode
             )
@@ -514,7 +648,8 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
                 "hard_constraints": board.hard_constraints,
                 "next_steps": board.next_steps,
             }, usage=mem_res["usage"], tool_call_count=mem_res["session"].summary()["tool_call_count"])
-            logger.log_board_state("memory", _board_summary(board))
+            board_after_mem = _board_summary(board)
+            logger.log_board_state("memory", board_after_mem, stage="AFTER")
 
     # ── 4. Pre-Verifier Rule Check (custom tool) ────────────────────
     if _itinerary_complete(board):
@@ -524,7 +659,12 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
             "restaurant": board.current_itinerary.restaurant or {},
             "activity": board.current_itinerary.activity or {},
         }
-        pre_violations = automated_rule_checker(itin_dict, board.hard_constraints)
+        pre_violations = automated_rule_checker(
+            itin_dict,
+            board.hard_constraints,
+            budget_total=runtime.episode.get("budget_total", 0.0),
+            nights=runtime.episode.get("nights", 1),
+        )
         logger.log_violations("rule_checker", pre_violations)
 
         # If there are violations, add them to failed_searches so the
@@ -539,6 +679,8 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
     revision_count = 0
     if _itinerary_complete(board):
         while True:
+            board_before_ver = _board_summary(board)
+            logger.log_board_state("verifier", board_before_ver, stage="BEFORE")
             logger.phase_start("verifier", iteration=revision_count + 1, input_summary={
                 "flight": board.current_itinerary.flight,
                 "hotel": board.current_itinerary.hotel,
@@ -546,7 +688,7 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
                 "activity": board.current_itinerary.activity,
             })
 
-            ver_res = _call_verifier_agent(runtime, board)
+            ver_res = _call_verifier_agent(runtime, board, logger=logger)
             ver_out = ver_res["parsed"]
             total_usage = runtime.combine_usages(total_usage, ver_res["usage"])
             total_tool_calls += ver_res["session"].summary()["tool_call_count"]
@@ -567,6 +709,8 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
                 "issues": issues,
                 "notes": ver_out.get("notes", ""),
             }, usage=ver_res["usage"], tool_call_count=ver_res["session"].summary()["tool_call_count"])
+            board_after_ver = _board_summary(board)
+            logger.log_board_state("verifier", board_after_ver, stage="AFTER")
 
             if approved:
                 break  # ✅ Approved
@@ -577,21 +721,27 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
             board.failed_searches = summarize_failed_searches(board.failed_searches)
             revision_count += 1
 
-            if revision_count >= max_revision_rounds:
+            if revision_count > max_revision_rounds:
                 break  # Submit best-effort
 
             # One more planner pass to fix the issue
+            board_before_plan = _board_summary(board)
+            logger.log_board_state("planner", board_before_plan, stage="BEFORE")
             logger.phase_start("planner", iteration=MAX_PLANNER_ITERS + revision_count, input_summary={
                 "revision": True,
                 "issues": issues,
             })
-            plan_res = _call_planner_agent(runtime, board)
+            plan_res = _call_planner_agent(runtime, board, logger=logger)
             plan_out = plan_res["parsed"]
             total_usage = runtime.combine_usages(total_usage, plan_res["usage"])
             total_tool_calls += plan_res["session"].summary()["tool_call_count"]
 
             logger.log_tool_calls("planner", plan_res["session"].summary()["tool_trace"])
             logger.log_decision(plan_out)
+            
+            # Hydrate itinerary using _save_planner_proposals instead of just saving IDs
+            _save_planner_proposals(runtime, board, plan_out)
+            
             logger.phase_end("planner", output_summary={
                 "flight_id": plan_out.get("flight_id"),
                 "hotel_id": plan_out.get("hotel_id"),
@@ -599,16 +749,8 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
                 "activity_id": plan_out.get("activity_id"),
             }, usage=plan_res["usage"], tool_call_count=plan_res["session"].summary()["tool_call_count"])
 
-            # Overwrite items if planner proposes replacements
-            itin = board.current_itinerary
-            if plan_out.get("flight_id"):
-                itin.flight = {"flight_id": plan_out["flight_id"]}
-            if plan_out.get("hotel_id"):
-                itin.hotel = {"hotel_id": plan_out["hotel_id"]}
-            if plan_out.get("restaurant_id"):
-                itin.restaurant = {"restaurant_id": plan_out["restaurant_id"]}
-            if plan_out.get("activity_id"):
-                itin.activity = {"activity_id": plan_out["activity_id"]}
+            board_after_plan = _board_summary(board)
+            logger.log_board_state("planner", board_after_plan, stage="AFTER")
 
     # ── 6. Build final TravelDecision ───────────────────────────────
     itin = board.current_itinerary

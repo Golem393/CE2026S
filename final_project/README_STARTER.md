@@ -75,3 +75,6 @@ python run_llm_baselines.py --systems student_solver_example --limit-public 5 --
 
 python run_llm_baselines.py --systems student_solver --limit-public 5 --skip-hidden --skip-ablations --output-dir results_student
 Submit your `student_solver.py`, `llm_eval_config_student.json` plus any helper Python modules you import from it. Staff will rerun your code with the official runtime wrapper on hidden episodes.
+
+
+grep "rtl7_public_easy_001" api_student5/trace.jsonl > scratch_easy_001.jsonl && python3 read_log.py scratch_easy_001.jsonl

@@ -631,7 +631,7 @@ def main() -> None:
     if not trace_path.is_absolute():
         trace_path = output_dir / trace_path
     trace_path.parent.mkdir(parents=True, exist_ok=True)
-    trace_logger = TraceLogger(trace_path, console=True)
+    trace_logger = TraceLogger(trace_path, console=False)
     trace_logger.log(
         "run_start",
         config=args.config,

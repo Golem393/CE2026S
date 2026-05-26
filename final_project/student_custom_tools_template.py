@@ -11,78 +11,6 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
 
-# ═══════════════════════════════════════════════════════════════════════
-#  ZONE ADJACENCY MAP — zones that are "close" to each other per city
-# ═══════════════════════════════════════════════════════════════════════
-
-_ZONE_ADJACENCY: Dict[str, Dict[str, List[str]]] = {
-    "OSA": {
-        "namba": ["namba", "umeda", "shinsekai"],
-        "umeda": ["umeda", "namba", "airport_link"],
-        "shinsekai": ["shinsekai", "namba"],
-        "airport_link": ["airport_link", "umeda"],
-    },
-    "TPE": {
-        "xinyi": ["xinyi", "songshan", "blue_line_corridor"],
-        "songshan": ["songshan", "xinyi", "blue_line_corridor"],
-        "ximending": ["ximending", "songshan"],
-        "scenic_outer": ["scenic_outer"],
-        "blue_line_corridor": ["blue_line_corridor", "xinyi", "songshan"],
-    },
-    "SIN": {
-        "clarke_quay": ["clarke_quay", "chinatown", "bugis", "marina"],
-        "chinatown": ["chinatown", "clarke_quay"],
-        "bugis": ["bugis", "clarke_quay", "marina"],
-        "one_north": ["one_north", "airport_link"],
-        "marina": ["marina", "clarke_quay", "bugis"],
-        "airport_link": ["airport_link", "one_north"],
-        "jurong": ["jurong"],
-    },
-}
-
-# Spoken-rule keyword → canonical constraint key
-_RULE_KEYWORD_MAP: Dict[str, str] = {
-    "red eye": "avoid_red_eye",
-    "red-eye": "avoid_red_eye",
-    "no red eye": "avoid_red_eye",
-    "quiet": "prefer_quiet_hotel",
-    "quiet hotel": "prefer_quiet_hotel",
-    "quiet room": "prefer_quiet_hotel",
-    "noise": "loud_after_10pm",
-    "loud": "loud_after_10pm",
-    "after 10pm": "loud_after_10pm",
-    "nightlife": "loud_after_10pm",
-    "client dinner": "client_dinner_polished",
-    "polished dinner": "client_dinner_polished",
-    "client ready": "client_dinner_polished",
-    "airport access": "prefer_airport_access",
-    "airport": "prefer_airport_access",
-    "weather": "weather_safe_backup",
-    "rainy": "weather_safe_backup",
-    "rain": "weather_safe_backup",
-    "indoor": "weather_safe_backup",
-    "vegan": "team_dietary_flex",
-    "dietary": "team_dietary_flex",
-    "refund": "refundable_priority",
-    "refundable": "refundable_priority",
-    "badge": "conference_badge_access",
-    "conference badge": "conference_badge_access",
-    "chain": "chain_ok_this_trip",
-    "chain hotel": "chain_ok_this_trip",
-    "bundle": "bundle_discount_value",
-    "discount": "bundle_discount_value",
-    "loyalty": "loyalty_bundle_value",
-    "late check": "late_checkin_risk",
-    "late arrival": "late_checkin_risk",
-    "shuttle": "shuttle_bundle",
-    "low friction": "low_friction_transit",
-    "transit": "low_friction_transit",
-    "transfer": "transfer_friction_risk",
-    "budget": "budget_cap",
-    "nonstop": "prefer_nonstop",
-    "direct flight": "prefer_nonstop",
-}
-
 
 # ═══════════════════════════════════════════════════════════════════════
 #  BUDGET & COST HELPERS
@@ -386,77 +314,6 @@ def rerank_activities(
     return [c for c, _ in scored]
 
 
-# ═══════════════════════════════════════════════════════════════════════
-#  BUNDLE & COMPATIBILITY
-# ═══════════════════════════════════════════════════════════════════════
-
-def choose_bundle(
-    bundle_candidates: List[Dict[str, Any]],
-    context: Dict[str, Any],
-) -> Dict[str, Any] | None:
-    """Score each candidate bundle and pick the best.
-
-    Each bundle is a dict with keys like flight, hotel, restaurant, activity.
-    Scoring considers total cost, constraint satisfaction, zone proximity,
-    and preference fit.
-    """
-    if not bundle_candidates:
-        return None
-
-    best_score = float("-inf")
-    best_bundle = bundle_candidates[0]
-
-    budget = float(context.get("budget_total", float("inf")))
-    nights = int(context.get("nights", 1))
-    target_zone = context.get("target_zone", "")
-    city = context.get("city", "")
-
-    for bundle in bundle_candidates:
-        score = 0.0
-
-        # Cost: under budget = good, over = bad
-        cost = calculate_total_itinerary_cost(bundle, nights)
-        if cost <= budget:
-            # Reward being under budget but not too cheap (quality matters)
-            utilization = cost / budget if budget > 0 else 0
-            score += utilization * 5.0  # Reward using 60-90% of budget
-        else:
-            score -= 20.0  # Over budget is very bad
-
-        # Zone coherence: how many items are in/near the target zone
-        zone_items = 0
-        for key, zone_key in [
-            ("hotel", "zone"),
-            ("restaurant", "area"),
-            ("activity", "location_zone"),
-        ]:
-            item = bundle.get(key) or {}
-            item_zone = item.get(zone_key, "")
-            if check_location_compatibility(item_zone, target_zone, city):
-                zone_items += 1
-        score += zone_items * 2.0
-
-        # Quality scores
-        hotel = bundle.get("hotel") or {}
-        score += float(hotel.get("quiet_score", 0)) * 1.5
-        score += float(hotel.get("airport_access_score", 0)) * 0.5
-
-        restaurant = bundle.get("restaurant") or {}
-        score += float(restaurant.get("quiet_score", 0)) * 1.0
-        score += float(restaurant.get("client_ready_score", 0)) * 1.0
-
-        flight = bundle.get("flight") or {}
-        if flight.get("red_eye") and not context.get("red_eye_ok", False):
-            score -= 10.0
-        if flight.get("refundable"):
-            score += 1.0
-
-        if score > best_score:
-            best_score = score
-            best_bundle = bundle
-
-    return best_bundle
-
 
 def find_cheapest_compliant_combo(
     flights: List[Dict[str, Any]],
@@ -509,53 +366,6 @@ def _check_combo_constraints(
     return violations
 
 
-def find_closest_hotels(
-    candidates: List[Dict[str, Any]],
-    target_zone: str,
-) -> List[Dict[str, Any]]:
-    """Filter and sort hotels by proximity to target_zone.
-
-    Exact zone match first, then adjacent zones, then everything else.
-    """
-    exact = []
-    adjacent = []
-    other = []
-
-    # Build adjacency from all cities
-    all_adjacent: set = set()
-    for city_zones in _ZONE_ADJACENCY.values():
-        if target_zone in city_zones:
-            all_adjacent = set(city_zones[target_zone])
-            break
-
-    for h in candidates:
-        zone = h.get("zone", "")
-        if zone == target_zone:
-            exact.append(h)
-        elif zone in all_adjacent:
-            adjacent.append(h)
-        else:
-            other.append(h)
-
-    return exact + adjacent + other
-
-
-def check_location_compatibility(
-    item_location: str,
-    target_zone: str,
-    city: str,
-) -> bool:
-    """Check if item_location matches or is adjacent to target_zone in city."""
-    if not item_location or not target_zone:
-        return False
-    if item_location == target_zone:
-        return True
-
-    city_zones = _ZONE_ADJACENCY.get(city, {})
-    adjacent = city_zones.get(target_zone, [])
-    return item_location in adjacent
-
-
 # ═══════════════════════════════════════════════════════════════════════
 #  SCHEDULE & CONFLICT
 # ═══════════════════════════════════════════════════════════════════════
@@ -603,32 +413,12 @@ def check_schedule_conflicts(
 #  CONSTRAINT EXTRACTION & RULE CHECKING
 # ═══════════════════════════════════════════════════════════════════════
 
-def extract_hard_constraints_from_rules(
-    spoken_rules: List[str],
-) -> List[str]:
-    """Parse spoken-rule strings into canonical constraint keys.
-
-    Scans each rule for known keywords and maps them to benchmark keys
-    like 'avoid_red_eye', 'prefer_quiet_hotel', etc.
-
-    Returns deduplicated list of canonical constraint keys.
-    """
-    found: List[str] = []
-    seen: set = set()
-
-    for rule in spoken_rules:
-        rule_lower = rule.lower()
-        for keyword, canonical in _RULE_KEYWORD_MAP.items():
-            if keyword in rule_lower and canonical not in seen:
-                found.append(canonical)
-                seen.add(canonical)
-
-    return found
-
 
 def automated_rule_checker(
     itinerary: Dict[str, Any],
     hard_constraints: List[str],
+    budget_total: float = 0.0,
+    nights: int = 1,
 ) -> List[str]:
     """Check an itinerary dict against hard constraints.
 
@@ -641,6 +431,10 @@ def automated_rule_checker(
     hotel = itinerary.get("hotel") or {}
     restaurant = itinerary.get("restaurant") or {}
     activity = itinerary.get("activity") or {}
+
+    if flight and activity:
+        conflicts = check_schedule_conflicts(flight, activity)
+        violations.extend(conflicts)
 
     for constraint in hard_constraints:
         if constraint == "avoid_red_eye":

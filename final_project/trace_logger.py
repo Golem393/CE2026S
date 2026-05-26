@@ -31,7 +31,7 @@ def _shrink(value: Any, *, depth: int = 0) -> Any:
 
 
 class TraceLogger:
-    def __init__(self, path: str | Path, *, console: bool = True) -> None:
+    def __init__(self, path: str | Path, *, console: bool = False) -> None:
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.console = console

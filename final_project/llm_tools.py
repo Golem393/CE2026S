@@ -8,6 +8,14 @@ from typing import Any, Dict, List, Optional
 
 from dynamic_travel_replanning.rtl_semantic_env import RTLSemanticEnv
 from retrieval import RetrievalCorpus, lexical_score
+from student_custom_tools_template import (
+    _score_hotel,
+    _score_flight,
+    _score_restaurant,
+    _score_activity,
+    pre_filter_by_budget,
+    get_remaining_budget,
+)
 
 
 _CONTEXT_KEY_ALIASES = {
@@ -147,6 +155,7 @@ class TravelToolbox:
         embedding_model: str | None,
         max_results: int,
         role: str,
+        board: Any = None,
     ) -> "TravelToolSession":
         return TravelToolSession(
             toolbox=self,
@@ -155,6 +164,7 @@ class TravelToolbox:
             embedding_model=embedding_model,
             max_results=max_results,
             role=role,
+            board=board,
         )
 
 
@@ -168,6 +178,7 @@ class TravelToolSession:
         embedding_model: str | None,
         max_results: int,
         role: str,
+        board: Any = None,
     ) -> None:
         self.toolbox = toolbox
         self.episode = episode
@@ -175,6 +186,7 @@ class TravelToolSession:
         self.embedding_model = embedding_model
         self.max_results = max_results
         self.role = role
+        self.board = board
         self.runner = None
         self.tool_trace: List[Dict[str, Any]] = []
         self.docs_seen: List[str] = []
@@ -304,7 +316,7 @@ class TravelToolSession:
                     "additionalProperties": False,
                 },
             )
-        if self.role in {"single_baseline", "single_memory", "mas_memory_manager", "mas_planner"}:
+        if self.role in {"single_baseline", "single_memory", "mas_memory_manager"}:
             add(
                 "get_profile_brief",
                 "Fetch the stable traveler profile brief.",
@@ -432,7 +444,7 @@ class TravelToolSession:
                     "additionalProperties": False,
                 },
             )
-        if self.role in {"single_memory", "mas_memory_manager", "mas_planner", "mas_verifier"}:
+        if self.role in {"single_memory", "mas_memory_manager", "mas_verifier"}:
             add(
                 "get_partner_promotions",
                 "Inspect hotel/restaurant/activity partner bundles and discounts instead of assuming options are independent.",
@@ -688,6 +700,39 @@ class TravelToolSession:
         self._track_docs(rows[: min(max_results, self.max_results + 1)])
         return {"items": rows[: min(max_results, self.max_results + 1)]}
 
+    def _build_scoring_context(self) -> Dict[str, Any]:
+        ctx = {}
+        if not getattr(self, "board", None):
+            return ctx
+            
+        td = getattr(self.board, "trip_details", None)
+        if td:
+            ctx["budget_total"] = getattr(td, "budget_total", 0.0)
+            ctx["nights"] = getattr(td, "nights", 1)
+            ctx["city"] = getattr(td, "city", "")
+            ctx["target_zone"] = getattr(td, "meeting_zone", "")
+            
+        hc = getattr(self.board, "hard_constraints", [])
+        if "avoid_red_eye" in hc:
+            ctx["red_eye_ok"] = False
+            ctx["meeting_safe_bonus"] = 5.0
+        if "prefer_quiet_hotel" in hc:
+            ctx["quiet_weight"] = 5.0
+        if "team_dietary_flex" in hc:
+            ctx["dietary_vegan"] = True
+        if "budget_cap" in hc:
+            ctx["price_weight"] = 2.0
+            
+        rejected_ids = []
+        for r in self.toolbox.rejected_options:
+            if "hotel_id" in r: rejected_ids.append(r["hotel_id"])
+            if "flight_id" in r: rejected_ids.append(r["flight_id"])
+            if "restaurant_id" in r: rejected_ids.append(r["restaurant_id"])
+            if "activity_id" in r: rejected_ids.append(r["activity_id"])
+        ctx["rejected_ids"] = rejected_ids
+        
+        return ctx
+
     def search_flights(
         self,
         origin: str,
@@ -721,14 +766,19 @@ class TravelToolSession:
             if nonstop_only and row.get("stops", 0) != 0:
                 continue
             out.append(row)
+        ctx = self._build_scoring_context()
+        for row in out:
+            row["heuristic_score"] = round(_score_flight(row, ctx), 2)
+            
         sort_key = {
             "fare_total": lambda row: (row["fare_total"], row.get("red_eye", False)),
             "meeting_safe": lambda row: (("meeting_safe" not in row.get("semantic_tags", [])), row["fare_total"]),
             "change_friendly": lambda row: (("change_friendly" not in row.get("semantic_tags", [])), row["fare_total"]),
-        }.get(sort_by or "meeting_safe", lambda row: (("meeting_safe" not in row.get("semantic_tags", [])), row["fare_total"]))
+            "heuristic_score": lambda row: -row.get("heuristic_score", 0),
+        }.get(sort_by or "heuristic_score", lambda row: -row.get("heuristic_score", 0))
         out.sort(key=sort_key)
         return {
-            "items": [compact_item(row, ["flight_id", "time_window", "fare_total", "depart_time", "arrival_time", "duration_minutes", "refundable", "stops", "red_eye", "semantic_tags", "description_snippet"]) for row in out[: min(max_results, self.max_results)]]
+            "items": [compact_item(row, ["flight_id", "time_window", "fare_total", "depart_time", "arrival_time", "duration_minutes", "refundable", "stops", "red_eye", "semantic_tags", "description_snippet", "heuristic_score"]) for row in out[: min(max_results, self.max_results)]]
         }
 
     def search_hotels(
@@ -763,15 +813,20 @@ class TravelToolSession:
             if max_nightly_price is not None and row["nightly_price"] > max_nightly_price:
                 continue
             out.append(row)
+        ctx = self._build_scoring_context()
+        for row in out:
+            row["heuristic_score"] = round(_score_hotel(row, ctx), 2)
+            
         sort_key = {
             "quiet_score": lambda row: (-row.get("quiet_score", 0.0), row["nightly_price"]),
             "airport_access": lambda row: (-row.get("airport_access_score", 0.0), row["nightly_price"]),
             "price": lambda row: (row["nightly_price"], -row.get("quiet_score", 0.0)),
             "zone_match": lambda row: (row.get("zone") != preferred_zone, row["nightly_price"]),
-        }.get(sort_by or "quiet_score", lambda row: (-row.get("quiet_score", 0.0), row["nightly_price"]))
+            "heuristic_score": lambda row: -row.get("heuristic_score", 0),
+        }.get(sort_by or "heuristic_score", lambda row: -row.get("heuristic_score", 0))
         out.sort(key=sort_key)
         return {
-            "items": [compact_item(row, ["hotel_id", "nightly_price", "quiet_score", "zone", "chain", "airport_access_score", "late_checkout", "meeting_shuttle", "semantic_tags", "review_snippet"]) for row in out[: min(max_results, self.max_results)]]
+            "items": [compact_item(row, ["hotel_id", "nightly_price", "quiet_score", "zone", "chain", "airport_access_score", "late_checkout", "meeting_shuttle", "semantic_tags", "review_snippet", "heuristic_score"]) for row in out[: min(max_results, self.max_results)]]
         }
 
     def search_restaurants(
@@ -806,15 +861,20 @@ class TravelToolSession:
             if max_price_level is not None and row["price_level"] > max_price_level:
                 continue
             out.append(row)
+        ctx = self._build_scoring_context()
+        for row in out:
+            row["heuristic_score"] = round(_score_restaurant(row, ctx), 2)
+            
         sort_key = {
             "quiet_score": lambda row: (-row.get("quiet_score", 0.0), row["price_level"]),
             "client_ready": lambda row: (-row.get("client_ready_score", 0.0), row["price_level"]),
             "area_match": lambda row: (row.get("area") != preferred_area, row["price_level"]),
             "price": lambda row: (row["price_level"], -row.get("quiet_score", 0.0)),
-        }.get(sort_by or "quiet_score", lambda row: (-row.get("quiet_score", 0.0), row["price_level"]))
+            "heuristic_score": lambda row: -row.get("heuristic_score", 0),
+        }.get(sort_by or "heuristic_score", lambda row: -row.get("heuristic_score", 0))
         out.sort(key=sort_key)
         return {
-            "items": [compact_item(row, ["restaurant_id", "cuisine", "price_level", "dietary_flags", "area", "quiet_score", "client_ready_score", "private_room", "booking_cutoff", "badge_only", "semantic_tags", "review_snippet"]) for row in out[: min(max_results, self.max_results)]]
+            "items": [compact_item(row, ["restaurant_id", "cuisine", "price_level", "dietary_flags", "area", "quiet_score", "client_ready_score", "private_room", "booking_cutoff", "badge_only", "semantic_tags", "review_snippet", "heuristic_score"]) for row in out[: min(max_results, self.max_results)]]
         }
 
     def search_activities(
@@ -844,12 +904,17 @@ class TravelToolSession:
             if max_price is not None and row.get("price", 0) > max_price:
                 continue
             out.append(row)
+        ctx = self._build_scoring_context()
+        for row in out:
+            row["heuristic_score"] = round(_score_activity(row, ctx), 2)
+            
         sort_key = {
             "zone_match": lambda row: (row.get("location_zone") != preferred_zone, row.get("price", 0)),
             "price": lambda row: (row.get("price", 0), row.get("indoor") is False),
             "weather_safe": lambda row: (("weather_safe" not in row.get("semantic_tags", [])), row.get("price", 0)),
-        }.get(sort_by or "weather_safe", lambda row: (("weather_safe" not in row.get("semantic_tags", [])), row.get("price", 0)))
+            "heuristic_score": lambda row: -row.get("heuristic_score", 0),
+        }.get(sort_by or "heuristic_score", lambda row: -row.get("heuristic_score", 0))
         out.sort(key=sort_key)
         return {
-            "items": [compact_item(row, ["activity_id", "category", "location_zone", "indoor", "price", "badge_only", "semantic_tags", "description_snippet"]) for row in out[: min(max_results, self.max_results)]]
+            "items": [compact_item(row, ["activity_id", "category", "location_zone", "indoor", "price", "badge_only", "semantic_tags", "description_snippet", "heuristic_score"]) for row in out[: min(max_results, self.max_results)]]
         }
