@@ -8,7 +8,7 @@
     "origin": "GMP",
     "traveler_id": "traveler_consultant",
     "nights": 2,
-    "budget_total": 610000,
+    "budget_total": 820000,
     "meeting_zone": "namba",
     "weather": "clear",
     "spoken_rule_density": "moderate",
@@ -93,7 +93,7 @@
         "FL101"
       ],
       "acceptable_hotels": [
-        "HT206"
+        "HT204"
       ],
       "good_restaurants": [
         "RS3001"
@@ -168,7 +168,7 @@
     "origin": "SEL",
     "traveler_id": "traveler_exec",
     "nights": 2,
-    "budget_total": 590000,
+    "budget_total": 970000,
     "meeting_zone": "xinyi",
     "weather": "clear",
     "spoken_rule_density": "moderate",
@@ -257,7 +257,7 @@
         "FL702"
       ],
       "acceptable_hotels": [
-        "HT806"
+        "HT801"
       ],
       "good_restaurants": [
         "RS4001"
@@ -333,7 +333,7 @@
     "origin": "GMP",
     "traveler_id": "traveler_ops",
     "nights": 2,
-    "budget_total": 570000,
+    "budget_total": 865000,
     "meeting_zone": "namba",
     "weather": "clear",
     "spoken_rule_density": "dense",
@@ -445,7 +445,7 @@
         "vegan_friendly"
       ],
       "acceptable_flights": [
-        "FL101"
+        "FL105"
       ],
       "acceptable_hotels": [
         "HT206"
@@ -546,7 +546,7 @@
     "origin": "GMP",
     "traveler_id": "traveler_consultant",
     "nights": 2,
-    "budget_total": 570000,
+    "budget_total": 770000,
     "meeting_zone": "namba",
     "weather": "clear",
     "spoken_rule_density": "dense",
@@ -649,7 +649,7 @@
         "vegan_friendly"
       ],
       "acceptable_flights": [
-        "FL101"
+        "FL103"
       ],
       "acceptable_hotels": [
         "HT206"
@@ -746,7 +746,7 @@
     "origin": "PUS",
     "traveler_id": "traveler_consultant",
     "nights": 2,
-    "budget_total": 570000,
+    "budget_total": 1125000,
     "meeting_zone": "one_north",
     "weather": "rainy",
     "spoken_rule_density": "dense",
@@ -842,16 +842,16 @@
         "weather_safe"
       ],
       "acceptable_flights": [
-        "FL801"
+        "FL805"
       ],
       "acceptable_hotels": [
-        "HT907"
+        "HT906"
       ],
       "good_restaurants": [
-        "RS2004"
+        "RS2002"
       ],
       "good_activities": [
-        "ACT304_innovation_center"
+        "ACT302_indoor"
       ],
       "required_docs": [
         "city_ops:SIN",
@@ -926,7 +926,7 @@
     "origin": "SEL",
     "traveler_id": "traveler_sales",
     "nights": 2,
-    "budget_total": 595000,
+    "budget_total": 1020000,
     "meeting_zone": "xinyi",
     "weather": "clear",
     "spoken_rule_density": "dense",
@@ -1034,8 +1034,7 @@
         "meeting_safe_arrival",
         "quiet_hotel",
         "zone_coherence",
-        "team_dietary_support",
-        "bundle_dependency_valid"
+        "team_dietary_support"
       ],
       "soft_tags": [
         "quiet",
@@ -1053,7 +1052,7 @@
         "RS4004"
       ],
       "good_activities": [
-        "ACT404_partner_lounge"
+        "ACT401_client_visit"
       ],
       "required_docs": [
         "city_ops:TPE",
@@ -1139,7 +1138,7 @@
     "origin": "SEL",
     "traveler_id": "traveler_exec",
     "nights": 2,
-    "budget_total": 595000,
+    "budget_total": 1055000,
     "meeting_zone": "xinyi",
     "weather": "clear",
     "spoken_rule_density": "dense",
@@ -1264,8 +1263,7 @@
         "quiet_hotel",
         "zone_coherence",
         "team_dietary_support",
-        "refund_safe",
-        "bundle_dependency_valid"
+        "refund_safe"
       ],
       "soft_tags": [
         "quiet",
@@ -1274,7 +1272,7 @@
         "client_ready"
       ],
       "acceptable_flights": [
-        "FL705"
+        "FL706"
       ],
       "acceptable_hotels": [
         "HT801"
@@ -1283,7 +1281,7 @@
         "RS4004"
       ],
       "good_activities": [
-        "ACT404_partner_lounge"
+        "ACT401_client_visit"
       ],
       "required_docs": [
         "city_ops:TPE",
@@ -1384,7 +1382,7 @@
     "origin": "PUS",
     "traveler_id": "traveler_research",
     "nights": 2,
-    "budget_total": 570000,
+    "budget_total": 1125000,
     "meeting_zone": "one_north",
     "weather": "rainy",
     "spoken_rule_density": "dense",
@@ -1495,16 +1493,16 @@
         "vegan_friendly"
       ],
       "acceptable_flights": [
-        "FL801"
+        "FL805"
       ],
       "acceptable_hotels": [
-        "HT907"
+        "HT906"
       ],
       "good_restaurants": [
-        "RS2004"
+        "RS2002"
       ],
       "good_activities": [
-        "ACT304_innovation_center"
+        "ACT302_indoor"
       ],
       "required_docs": [
         "city_ops:SIN",
@@ -1594,7 +1592,7 @@
     "origin": "GMP",
     "traveler_id": "traveler_sales",
     "nights": 2,
-    "budget_total": 610000,
+    "budget_total": 920000,
     "meeting_zone": "umeda",
     "weather": "clear",
     "spoken_rule_density": "dense",
@@ -1699,7 +1697,7 @@
         "FL101"
       ],
       "acceptable_hotels": [
-        "HT208"
+        "HT206"
       ],
       "good_restaurants": [
         "RS3005"
@@ -1777,7 +1775,7 @@
     "origin": "SEL",
     "traveler_id": "traveler_exec",
     "nights": 2,
-    "budget_total": 510000,
+    "budget_total": 1055000,
     "meeting_zone": "xinyi",
     "weather": "clear",
     "spoken_rule_density": "dense",
@@ -1897,7 +1895,7 @@
         "vegan_friendly"
       ],
       "acceptable_flights": [
-        "FL705"
+        "FL706"
       ],
       "acceptable_hotels": [
         "HT801"
@@ -1906,7 +1904,7 @@
         "RS4004"
       ],
       "good_activities": [
-        "ACT404_partner_lounge"
+        "ACT401_client_visit"
       ],
       "required_docs": [
         "city_ops:TPE",
@@ -2007,7 +2005,7 @@
     "origin": "PUS",
     "traveler_id": "traveler_ops",
     "nights": 2,
-    "budget_total": 565000,
+    "budget_total": 1125000,
     "meeting_zone": "one_north",
     "weather": "rainy",
     "spoken_rule_density": "dense",
@@ -2132,7 +2130,7 @@
         "weather_safe"
       ],
       "acceptable_flights": [
-        "FL801"
+        "FL803"
       ],
       "acceptable_hotels": [
         "HT907"
@@ -2246,7 +2244,7 @@
     "origin": "GMP",
     "traveler_id": "traveler_sales",
     "nights": 2,
-    "budget_total": 570000,
+    "budget_total": 920000,
     "meeting_zone": "umeda",
     "weather": "rainy",
     "spoken_rule_density": "dense",
@@ -2364,8 +2362,7 @@
         "zone_coherence",
         "weather_safe_activity",
         "team_dietary_support",
-        "refund_safe",
-        "bundle_dependency_valid"
+        "refund_safe"
       ],
       "soft_tags": [
         "quiet",
@@ -2378,10 +2375,10 @@
         "FL101"
       ],
       "acceptable_hotels": [
-        "HT207"
+        "HT206"
       ],
       "good_restaurants": [
-        "RS3004"
+        "RS3005"
       ],
       "good_activities": [
         "ACT105_partner_lounge"
@@ -2479,7 +2476,7 @@
     "origin": "SEL",
     "traveler_id": "traveler_exec",
     "nights": 2,
-    "budget_total": 555000,
+    "budget_total": 950000,
     "meeting_zone": "xinyi",
     "weather": "clear",
     "spoken_rule_density": "dense",
@@ -2580,8 +2577,7 @@
         "under_budget",
         "meeting_safe_arrival",
         "quiet_hotel",
-        "zone_coherence",
-        "bundle_dependency_valid"
+        "zone_coherence"
       ],
       "soft_tags": [
         "quiet",
@@ -2590,7 +2586,7 @@
         "vegan_friendly"
       ],
       "acceptable_flights": [
-        "FL702"
+        "FL704"
       ],
       "acceptable_hotels": [
         "HT801"
@@ -2599,7 +2595,7 @@
         "RS4004"
       ],
       "good_activities": [
-        "ACT404_partner_lounge"
+        "ACT401_client_visit"
       ],
       "required_docs": [
         "city_ops:TPE",
@@ -2692,7 +2688,7 @@
     "origin": "PUS",
     "traveler_id": "traveler_consultant",
     "nights": 2,
-    "budget_total": 530000,
+    "budget_total": 1025000,
     "meeting_zone": "one_north",
     "weather": "rainy",
     "spoken_rule_density": "dense",
@@ -2790,8 +2786,7 @@
         "meeting_safe_arrival",
         "quiet_hotel",
         "zone_coherence",
-        "weather_safe_activity",
-        "bundle_dependency_valid"
+        "weather_safe_activity"
       ],
       "soft_tags": [
         "quiet",
@@ -2801,16 +2796,16 @@
         "weather_safe"
       ],
       "acceptable_flights": [
-        "FL801"
+        "FL803"
       ],
       "acceptable_hotels": [
-        "HT907"
+        "HT906"
       ],
       "good_restaurants": [
-        "RS2004"
+        "RS2002"
       ],
       "good_activities": [
-        "ACT304_innovation_center"
+        "ACT302_indoor"
       ],
       "required_docs": [
         "city_ops:SIN",
@@ -2899,7 +2894,7 @@
     "origin": "GMP",
     "traveler_id": "traveler_ops",
     "nights": 2,
-    "budget_total": 530000,
+    "budget_total": 810000,
     "meeting_zone": "namba",
     "weather": "clear",
     "spoken_rule_density": "dense",
@@ -2997,10 +2992,10 @@
         "vegan_friendly"
       ],
       "acceptable_flights": [
-        "FL101"
+        "FL103"
       ],
       "acceptable_hotels": [
-        "HT206"
+        "HT207"
       ],
       "good_restaurants": [
         "RS3001"
@@ -3088,7 +3083,7 @@
     "origin": "SEL",
     "traveler_id": "traveler_sales",
     "nights": 2,
-    "budget_total": 555000,
+    "budget_total": 1055000,
     "meeting_zone": "xinyi",
     "weather": "clear",
     "spoken_rule_density": "dense",
@@ -3217,8 +3212,7 @@
         "quiet_hotel",
         "zone_coherence",
         "team_dietary_support",
-        "refund_safe",
-        "bundle_dependency_valid"
+        "refund_safe"
       ],
       "soft_tags": [
         "quiet",
@@ -3227,7 +3221,7 @@
         "client_ready"
       ],
       "acceptable_flights": [
-        "FL705"
+        "FL706"
       ],
       "acceptable_hotels": [
         "HT801"
@@ -3236,7 +3230,7 @@
         "RS4004"
       ],
       "good_activities": [
-        "ACT404_partner_lounge"
+        "ACT401_client_visit"
       ],
       "required_docs": [
         "city_ops:TPE",
@@ -3342,7 +3336,7 @@
     "origin": "PUS",
     "traveler_id": "traveler_sales",
     "nights": 2,
-    "budget_total": 565000,
+    "budget_total": 1225000,
     "meeting_zone": "one_north",
     "weather": "rainy",
     "spoken_rule_density": "dense",
@@ -3472,7 +3466,7 @@
         "weather_safe"
       ],
       "acceptable_flights": [
-        "FL801"
+        "FL805"
       ],
       "acceptable_hotels": [
         "HT907"
@@ -3582,7 +3576,7 @@
     "origin": "GMP",
     "traveler_id": "traveler_ops",
     "nights": 2,
-    "budget_total": 570000,
+    "budget_total": 770000,
     "meeting_zone": "umeda",
     "weather": "clear",
     "spoken_rule_density": "dense",
@@ -3702,16 +3696,16 @@
         "client_ready"
       ],
       "acceptable_flights": [
-        "FL101"
+        "FL103"
       ],
       "acceptable_hotels": [
-        "HT208"
+        "HT206"
       ],
       "good_restaurants": [
         "RS3005"
       ],
       "good_activities": [
-        "ACT105_partner_lounge"
+        "ACT103_river_walk"
       ],
       "required_docs": [
         "city_ops:OSA",
@@ -3800,7 +3794,7 @@
     "origin": "SEL",
     "traveler_id": "traveler_consultant",
     "nights": 2,
-    "budget_total": 510000,
+    "budget_total": 950000,
     "meeting_zone": "xinyi",
     "weather": "clear",
     "spoken_rule_density": "dense",
@@ -3917,13 +3911,13 @@
         "client_ready"
       ],
       "acceptable_flights": [
-        "FL702"
+        "FL704"
       ],
       "acceptable_hotels": [
-        "HT806"
+        "HT801"
       ],
       "good_restaurants": [
-        "RS4005"
+        "RS4004"
       ],
       "good_activities": [
         "ACT401_client_visit"
@@ -4008,7 +4002,7 @@
     "origin": "PUS",
     "traveler_id": "traveler_ops",
     "nights": 2,
-    "budget_total": 530000,
+    "budget_total": 1025000,
     "meeting_zone": "one_north",
     "weather": "rainy",
     "spoken_rule_density": "dense",
@@ -4118,8 +4112,7 @@
         "meeting_safe_arrival",
         "quiet_hotel",
         "zone_coherence",
-        "weather_safe_activity",
-        "bundle_dependency_valid"
+        "weather_safe_activity"
       ],
       "soft_tags": [
         "quiet",
@@ -4129,16 +4122,16 @@
         "weather_safe"
       ],
       "acceptable_flights": [
-        "FL801"
+        "FL803"
       ],
       "acceptable_hotels": [
-        "HT907"
+        "HT906"
       ],
       "good_restaurants": [
-        "RS2004"
+        "RS2002"
       ],
       "good_activities": [
-        "ACT304_innovation_center"
+        "ACT302_indoor"
       ],
       "required_docs": [
         "city_ops:SIN",

@@ -1,0 +1,342 @@
+[
+  {
+    "user_id": "user_student_anxious",
+    "doc_id": "profile:user_student_anxious",
+    "memory_type": "profile",
+    "status": "current",
+    "text": "Undergraduate student with generalised anxiety. Mornings are best for focused work. Struggles with long walks during exam periods. Has tried yoga before but quit. Avoids group fitness. Lecture at 9am.",
+    "tags": ["prefer_morning_routine", "prefer_solo_activities", "avoid_group_exercise", "lecture_9am"],
+    "context": null,
+    "family": null
+  },
+  {
+    "user_id": "user_professional_burnout",
+    "doc_id": "profile:user_professional_burnout",
+    "memory_type": "profile",
+    "status": "current",
+    "text": "Mid-career professional with burnout. Mornings only viable window. Vegan meal preference at team dinners. No late caffeine. Previously committed to 30-min runs — inactive for 3 weeks.",
+    "tags": ["prefer_morning_routine", "vegan_team_meal", "avoid_evening_caffeine", "burnout_signal"],
+    "context": null,
+    "family": null
+  },
+  {
+    "user_id": "user_new_parent_fatigued",
+    "doc_id": "profile:user_new_parent_fatigued",
+    "memory_type": "profile",
+    "status": "current",
+    "text": "New parent, 4-5 hours sleep. 10-15 minute maximum window. Prefers micro-habits, indoor, no prep. Restorative priority.",
+    "tags": ["prefer_micro_habits", "prefer_indoor", "prefer_restorative", "sleep_deprived"],
+    "context": null,
+    "family": null
+  },
+  {
+    "user_id": "user_athlete_injured",
+    "doc_id": "profile:user_athlete_injured",
+    "memory_type": "profile",
+    "status": "current",
+    "text": "Athlete with knee injury. Previously ran 5km 3x/week mornings. No weight-bearing on injured leg for 4 weeks. Needs measurable progress.",
+    "tags": ["prefer_morning_routine", "prefer_structured", "avoid_weight_bearing_lower_limb", "injury_active"],
+    "context": null,
+    "family": null
+  },
+  {
+    "user_id": "user_remote_worker_sedentary",
+    "doc_id": "profile:user_remote_worker_sedentary",
+    "memory_type": "profile",
+    "status": "current",
+    "text": "Remote worker, sedentary 8-10 hrs/day. No consistent exercise in 6 months. Streak and community accountability motivated. Good sleep baseline.",
+    "tags": ["prefer_habit_streaks", "prefer_community_accountability", "start_small_build_progressive"],
+    "context": null,
+    "family": null
+  },
+  {
+    "user_id": "user_student_anxious",
+    "doc_id": "journal:user_student_anxious_2026-04-01",
+    "memory_type": "journal",
+    "status": "current",
+    "text": "Mood 7/10, energy 6/10, slept 7.5h. Had a productive morning. No anxiety triggers today. Did 20 min yoga which felt good.",
+    "tags": ["good_sleep", "yoga_positive", "low_anxiety"],
+    "context": "WEEKDAY_NORMAL",
+    "family": "lifestyle_baseline",
+    "date": "2026-04-01"
+  },
+  {
+    "user_id": "user_student_anxious",
+    "doc_id": "journal:user_student_anxious_2026-04-15",
+    "memory_type": "journal",
+    "status": "current",
+    "text": "Mood 5/10, energy 4/10, slept 6h — woke up anxious about assignment deadline. Skipped exercise. Felt guilty about skipping.",
+    "tags": ["mild_anxiety", "exercise_skipped", "sleep_reduced", "deadline_stress"],
+    "context": "WEEKDAY_EXAM",
+    "family": "exam_crunch",
+    "date": "2026-04-15"
+  },
+  {
+    "user_id": "user_student_anxious",
+    "doc_id": "journal:user_student_anxious_2026-04-28",
+    "memory_type": "journal",
+    "status": "current",
+    "text": "Mood 3/10, energy 2/10, slept 4h. Finals week. Feel like I can't keep up. Morning run plan is impossible right now.",
+    "tags": ["high_anxiety", "sleep_deprived", "exam_peak", "routine_disrupted"],
+    "context": "WEEKDAY_EXAM",
+    "family": "exam_crunch",
+    "date": "2026-04-28"
+  },
+  {
+    "user_id": "user_student_anxious",
+    "doc_id": "stale:morning_run_5km_v1",
+    "memory_type": "stale_preference",
+    "status": "stale",
+    "text": "User previously committed to a 5km morning run three times per week as their primary exercise. This plan was made when they had no lecture until 11am. Lecture moved to 9am and sleep has been disrupted during exam period — this plan is no longer feasible.",
+    "tags": ["prefer_morning_routine", "running_plan_stale", "time_constraint_changed"],
+    "context": "WEEKDAY_EXAM",
+    "family": "exam_crunch",
+    "date": "2026-03-01"
+  },
+  {
+    "user_id": "user_student_anxious",
+    "doc_id": "distractor:original_unmodified_plan",
+    "memory_type": "distractor",
+    "status": "distractor",
+    "text": "Original full morning routine plan from semester start: 6:30 wake, 5km run, 30min yoga, full breakfast, journal — total 90 minutes. This plan assumed no exam pressure and 11am lecture. Do NOT surface as active context.",
+    "tags": ["time_heavy", "pre_exam_plan", "irrelevant_during_exam"],
+    "context": null,
+    "family": null
+  },
+  {
+    "user_id": "user_student_anxious",
+    "doc_id": "distractor:reddit_HIIT_claim",
+    "memory_type": "distractor",
+    "status": "distractor",
+    "text": "User mentioned reading a Reddit post claiming 8-minute HIIT once per week is sufficient to fix depression. This is not supported by WHO or ACSM guidelines. Do NOT incorporate into plan.",
+    "tags": ["unsupported_claim", "social_media_source"],
+    "context": null,
+    "family": null
+  },
+  {
+    "user_id": "user_professional_burnout",
+    "doc_id": "journal:user_professional_burnout_2026-04-20",
+    "memory_type": "journal",
+    "status": "current",
+    "text": "Mood 4/10, energy 3/10. Another 10-hour day. Ate vegan takeout for dinner — actually felt good about that choice. No exercise again.",
+    "tags": ["burnout_signal", "vegan_meal_positive", "exercise_skipped"],
+    "context": "WEEKDAY_HIGH_STRESS",
+    "family": "burnout_recovery",
+    "date": "2026-04-20"
+  },
+  {
+    "user_id": "user_professional_burnout",
+    "doc_id": "journal:user_professional_burnout_2026-04-25",
+    "memory_type": "journal",
+    "status": "current",
+    "text": "Mood 5/10, energy 5/10. Did a 10-min walk at lunch. Felt noticeably better. Slept 7h for the first time this week.",
+    "tags": ["walk_positive", "mood_improvement", "sleep_improved"],
+    "context": "WEEKDAY_HIGH_STRESS",
+    "family": "burnout_recovery",
+    "date": "2026-04-25"
+  },
+  {
+    "user_id": "user_professional_burnout",
+    "doc_id": "stale:30min_run_plan_v1",
+    "memory_type": "stale_preference",
+    "status": "stale",
+    "text": "Three weeks ago user committed to 30-min morning runs Monday, Wednesday, Friday. Has not completed a single session. Plan was built when user assumed lower workload. Retire this as the baseline expectation.",
+    "tags": ["running_plan_stale", "overcommitment", "burnout_adjusted"],
+    "context": null,
+    "family": null,
+    "date": "2026-04-01"
+  },
+  {
+    "user_id": "user_professional_burnout",
+    "doc_id": "distractor:old_evening_routine",
+    "memory_type": "distractor",
+    "status": "distractor",
+    "text": "Pre-burnout evening routine: gym 6pm, meal prep, 10pm sleep. Entirely incompatible with current work demands. Do NOT use as baseline.",
+    "tags": ["pre_burnout_plan", "evening_plan_stale"],
+    "context": null,
+    "family": null
+  },
+  {
+    "user_id": "user_athlete_injured",
+    "doc_id": "journal:user_athlete_injured_2026-05-01",
+    "memory_type": "journal",
+    "status": "current",
+    "text": "Mood 5/10, energy 7/10. Frustrated about the knee. Tried to go for a walk and it hurt after 5 minutes. Need low-impact alternatives that still feel like I'm doing something.",
+    "tags": ["injury_frustration", "low_impact_needed", "movement_desire"],
+    "context": "RECOVERY_MODE",
+    "family": "injury_recovery",
+    "date": "2026-05-01"
+  },
+  {
+    "user_id": "user_athlete_injured",
+    "doc_id": "journal:user_athlete_injured_2026-05-03",
+    "memory_type": "journal",
+    "status": "current",
+    "text": "Mood 6/10, energy 8/10. Did 20 min seated yoga and upper body resistance band work. Felt much better. Sleep was 8h.",
+    "tags": ["yoga_positive", "resistance_positive", "good_sleep", "injury_adapting"],
+    "context": "RECOVERY_MODE",
+    "family": "injury_recovery",
+    "date": "2026-05-03"
+  },
+  {
+    "user_id": "user_athlete_injured",
+    "doc_id": "stale:morning_run_5km_v1",
+    "memory_type": "stale_preference",
+    "status": "stale",
+    "text": "Pre-injury plan: 5km morning runs 3x/week (Monday, Wednesday, Friday) as primary exercise. Knee injury makes this contraindicated for at least 4 weeks. Retire this as active plan.",
+    "tags": ["running_plan_stale", "injury_contraindicated"],
+    "context": null,
+    "family": null,
+    "date": "2026-04-15"
+  },
+  {
+    "user_id": "user_athlete_injured",
+    "doc_id": "distractor:athlete_full_gym_plan",
+    "memory_type": "distractor",
+    "status": "distractor",
+    "text": "Pre-injury full gym plan: squats, deadlifts, leg press, running intervals. All contraindicated with current knee injury. Do NOT surface.",
+    "tags": ["contraindicated", "injury_period"],
+    "context": null,
+    "family": null
+  },
+  {
+    "user_id": "user_remote_worker_sedentary",
+    "doc_id": "journal:user_remote_worker_sedentary_2026-04-30",
+    "memory_type": "journal",
+    "status": "current",
+    "text": "Mood 6/10, energy 6/10. Started a 7-day walking challenge with the community group. Day 1: completed 10-min walk. Feels manageable.",
+    "tags": ["community_challenge_active", "walking_started", "streak_day1"],
+    "context": "WEEKDAY_NORMAL",
+    "family": "lifestyle_baseline",
+    "date": "2026-04-30"
+  },
+  {
+    "user_id": "user_remote_worker_sedentary",
+    "doc_id": "journal:user_remote_worker_sedentary_2026-05-05",
+    "memory_type": "journal",
+    "status": "current",
+    "text": "Mood 7/10, energy 7/10. Completed 6 consecutive days of 10-min walks. Streak intact. Community members gave encouraging comments.",
+    "tags": ["streak_active", "community_support", "momentum_building"],
+    "context": "WEEKDAY_NORMAL",
+    "family": "lifestyle_baseline",
+    "date": "2026-05-05"
+  },
+  {
+    "user_id": "user_remote_worker_sedentary",
+    "doc_id": "stale:no_exercise_assumption",
+    "memory_type": "stale_preference",
+    "status": "stale",
+    "text": "Previous baseline assumption: user has no exercise habit at all. Retire — user has now completed 6 consecutive days of walking with a streak active.",
+    "tags": ["sedentary_baseline_stale"],
+    "context": null,
+    "family": null,
+    "date": "2026-04-29"
+  },
+  {
+    "user_id": "user_new_parent_fatigued",
+    "doc_id": "journal:user_new_parent_fatigued_2026-05-02",
+    "memory_type": "journal",
+    "status": "current",
+    "text": "Mood 4/10, energy 3/10. Baby woke 4 times last night. Zero energy to exercise. Did manage a 5-min breathing session. Better than nothing.",
+    "tags": ["sleep_deprived", "low_energy", "breathing_positive", "micro_habit_success"],
+    "context": "RECOVERY_MODE",
+    "family": "new_parent_fatigue",
+    "date": "2026-05-02"
+  },
+  {
+    "user_id": "user_new_parent_fatigued",
+    "doc_id": "journal:user_new_parent_fatigued_2026-05-04",
+    "memory_type": "journal",
+    "status": "current",
+    "text": "Mood 5/10, energy 4/10. Partner took overnight shift. Got 6 hours sleep. Mood noticeably better. Did 10-min walk outside. Partner supportive.",
+    "tags": ["sleep_improved", "partner_support", "walk_positive", "outdoor_ok"],
+    "context": "RECOVERY_MODE",
+    "family": "new_parent_fatigue",
+    "date": "2026-05-04"
+  },
+  {
+    "user_id": "user_new_parent_fatigued",
+    "doc_id": "mood_log:user_new_parent_fatigued_2026-05-06",
+    "memory_type": "mood_log",
+    "status": "current",
+    "text": "Reported mood: 4/10. Reported energy: 3/10. Sleep: 4.5h fragmented. Notes: 'exhausted but want to do something small'.",
+    "tags": ["low_mood", "low_energy", "fragmented_sleep", "micro_habit_intent"],
+    "context": "RECOVERY_MODE",
+    "family": "new_parent_fatigue",
+    "date": "2026-05-06"
+  },
+  {
+    "user_id": "user_student_anxious",
+    "doc_id": "mood_log:user_student_anxious_2026-05-06",
+    "memory_type": "mood_log",
+    "status": "current",
+    "text": "Reported mood: 4/10. Reported energy: 3/10. Sleep: 6h. Notes: 'exam tomorrow, very anxious, can't focus'.",
+    "tags": ["high_anxiety", "sleep_reduced", "exam_stress", "focus_impaired"],
+    "context": "WEEKDAY_EXAM",
+    "family": "exam_crunch",
+    "date": "2026-05-06"
+  },
+  {
+    "user_id": "user_professional_burnout",
+    "doc_id": "mood_log:user_professional_burnout_2026-05-06",
+    "memory_type": "mood_log",
+    "status": "current",
+    "text": "Reported mood: 5/10. Reported energy: 5/10. Sleep: 7h. Notes: 'better than last week, want to start rebuilding a routine'.",
+    "tags": ["mood_improving", "routine_intent", "sleep_adequate"],
+    "context": "WEEKDAY_NORMAL",
+    "family": "burnout_recovery",
+    "date": "2026-05-06"
+  },
+  {
+    "user_id": "user_athlete_injured",
+    "doc_id": "mood_log:user_athlete_injured_2026-05-06",
+    "memory_type": "mood_log",
+    "status": "current",
+    "text": "Reported mood: 6/10. Reported energy: 7/10. Sleep: 8h. Notes: 'frustrated but adapting. knee still sore. want something challenging that won't hurt it'.",
+    "tags": ["injury_frustration", "adapting", "good_sleep", "challenge_wanted"],
+    "context": "RECOVERY_MODE",
+    "family": "injury_recovery",
+    "date": "2026-05-06"
+  },
+  {
+    "user_id": "user_remote_worker_sedentary",
+    "doc_id": "mood_log:user_remote_worker_sedentary_2026-05-06",
+    "memory_type": "mood_log",
+    "status": "current",
+    "text": "Reported mood: 7/10. Reported energy: 7/10. Sleep: 7.5h. Notes: 'feeling good about the streak. Want to see what tomorrow looks like'.",
+    "tags": ["positive_momentum", "streak_active", "good_sleep"],
+    "context": "WEEKDAY_NORMAL",
+    "family": "lifestyle_baseline",
+    "date": "2026-05-06"
+  },
+  {
+    "user_id": null,
+    "doc_id": "heuristic:lean_context_policy",
+    "memory_type": "heuristic",
+    "status": "current",
+    "text": "Active context discipline: load only the profile entries and journal/mood logs directly relevant to the current turn. Do not dump the full journal history into context. Prefer recency and relevance over completeness.",
+    "tags": ["lean_context", "relevant_only"],
+    "context": null,
+    "family": null
+  },
+  {
+    "user_id": null,
+    "doc_id": "heuristic:rejected_option_memory",
+    "memory_type": "heuristic",
+    "status": "current",
+    "text": "Rejected-activity memory discipline: if an activity was rejected for a specific reason (contraindication, user preference, past failure), do not re-surface it unless something material changes. Record the rejection reason explicitly.",
+    "tags": ["rejected_option_memory", "discipline"],
+    "context": null,
+    "family": null
+  },
+  {
+    "user_id": null,
+    "doc_id": "heuristic:temporary_override_scope",
+    "memory_type": "heuristic",
+    "status": "current",
+    "text": "Temporary spoken rules (e.g. 'just this week', 'for now') must be tagged as one_off_only and must NOT persist to future episodes or overwrite stable preference slots.",
+    "tags": ["one_off_only", "scope_discipline"],
+    "context": null,
+    "family": null
+  }
+]

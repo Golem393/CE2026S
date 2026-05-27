@@ -13,7 +13,7 @@ INCLUDE = [
     ".env.sample",
     ".gitignore",
     "allowed_models.json",
-    "README_STARTER_EN.md",
+    "README_STARTER.md",
     "requirements.txt",
     "run_student.py",
     "run_llm_baselines.py",
@@ -26,6 +26,11 @@ INCLUDE = [
     "trace_logger.py",
     "schemas.py",
     "dynamic_travel_replanning/evaluator.py",
+    "dynamic_travel_replanning/episode_generator.py",
+    "dynamic_travel_replanning/evaluation_tracks.json",
+    "dynamic_travel_replanning/task_catalog.json",
+    "dynamic_travel_replanning/task_bank_validation.json",
+    "dynamic_travel_replanning/tier_manifest.json",
     "dynamic_travel_replanning/rtl_semantic_env.py",
     "dynamic_travel_replanning/episodes_public_example.json",
     "dynamic_travel_replanning/inventory_flights.json",
@@ -52,6 +57,7 @@ INCLUDE = [
     "student_custom_tools_template.py",
     "student_solver.py",
     "student_solver_example.py",
+    "dynamic_wellness_replanning",
 ]
 
 
@@ -101,6 +107,11 @@ def build_student_config() -> dict:
 
 def build_student_evaluation_tracks() -> dict:
     tracks = _load_json("dynamic_travel_replanning/evaluation_tracks.json")
+    if "tracks" in tracks:
+        return {
+            "tracks": {k: v for k, v in tracks.get("tracks", {}).items() if k.startswith("public_")},
+            "hidden_summary": tracks.get("hidden_summary", {}),
+        }
     allowed = ["starter_public", "core_public", "full_public", "balanced_public_by_metadata", "note"]
     return {k: tracks[k] for k in allowed if k in tracks}
 
@@ -127,8 +138,12 @@ def build_student_tier_manifest() -> dict:
         "public_easy": manifest.get("public_easy", []),
         "public_medium": manifest.get("public_medium", []),
         "public_hard": manifest.get("public_hard", []),
+        "public_all": manifest.get("public_all", []),
         "public_count": manifest.get("public_count", 0),
         "public_tier_counts": manifest.get("public_tier_counts", {}),
+        "hidden_count": manifest.get("hidden_count", 30),
+        "hidden_tier_counts": manifest.get("hidden_tier_counts", {}),
+        "hidden_note": manifest.get("hidden_note", "Hidden specs and gold labels are TA-only."),
         "retiered_trip_ids": [trip_id for trip_id in manifest.get("retiered_trip_ids", []) if trip_id.startswith("rtl7_public_")],
     }
 
@@ -215,7 +230,12 @@ def main() -> None:
             continue
         dst = out / rel
         dst.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(src, dst)
+        if src.is_dir():
+            if dst.exists():
+                shutil.rmtree(dst)
+            shutil.copytree(src, dst, ignore=shutil.ignore_patterns("__pycache__", "*.pyc", ".cache"))
+        else:
+            shutil.copy2(src, dst)
 
     # Replace the student-facing runner with a slimmed copy that omits TA-only hooks.
     (out / "run_llm_baselines.py").write_text(build_student_runner_source())

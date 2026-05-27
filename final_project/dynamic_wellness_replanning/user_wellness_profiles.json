@@ -1,0 +1,91 @@
+{
+  "user_student_anxious": {
+    "user_id": "user_student_anxious",
+    "doc_id": "profile:user_student_anxious",
+    "text": "Undergraduate student with generalised anxiety. Mornings are best for focused work. Struggles with long walks during exam periods due to time pressure. Has tried yoga before but quit after two weeks; dislikes group fitness classes. Prefers low-stimulation, solo activities. Responds well to brief, evidence-backed routines. Lecture schedule typically starts at 9am.",
+    "stable_wellness_prefs": [
+      "prefer_morning_routine",
+      "prefer_solo_activities",
+      "prefer_low_stimulation",
+      "avoid_group_exercise",
+      "evidence_based_only"
+    ],
+    "avoid_modalities": ["group_exercise", "high_stimulation_social"],
+    "preferred_modalities": ["solo_aerobic", "meditation", "journaling"],
+    "physical_contraindications": [],
+    "dietary_flags": [],
+    "base_energy_points_budget": 8,
+    "schedule_anchor": "lecture_9am"
+  },
+  "user_professional_burnout": {
+    "user_id": "user_professional_burnout",
+    "doc_id": "profile:user_professional_burnout",
+    "text": "Mid-career professional experiencing burnout from a high-pressure job. Evenings are exhausted; mornings are the only viable window. Prefers activities with a clear endpoint. Has expressed preference for vegan meals at team dinners. Avoids late-night caffeine. Previously committed to 30-min runs but has not completed one in three weeks.",
+    "stable_wellness_prefs": [
+      "prefer_morning_routine",
+      "prefer_clear_endpoint",
+      "avoid_evening_caffeine",
+      "vegan_team_meal",
+      "relevant_only"
+    ],
+    "avoid_modalities": ["high_intensity_evening", "open_ended_activities"],
+    "preferred_modalities": ["structured_morning", "short_meditation", "journaling"],
+    "physical_contraindications": [],
+    "dietary_flags": ["vegan_preference"],
+    "base_energy_points_budget": 6,
+    "schedule_anchor": "work_9am"
+  },
+  "user_new_parent_fatigued": {
+    "user_id": "user_new_parent_fatigued",
+    "doc_id": "profile:user_new_parent_fatigued",
+    "text": "New parent with fragmented sleep (averaging 4-5 hours). Has limited time windows of 10-15 minutes maximum. Responsive to low-effort, high-impact micro-habits. Partner is supportive but unavailable during work hours. Sensitive to plans that require preparation or travel. Priority is restorative, not performance.",
+    "stable_wellness_prefs": [
+      "prefer_micro_habits",
+      "prefer_indoor",
+      "avoid_prep_heavy",
+      "prefer_restorative",
+      "avoid_travel_required"
+    ],
+    "avoid_modalities": ["outdoor_travel", "high_effort_setup", "high_intensity"],
+    "preferred_modalities": ["indoor_low_effort", "sleep_hygiene", "breathing"],
+    "physical_contraindications": [],
+    "dietary_flags": [],
+    "base_energy_points_budget": 4,
+    "schedule_anchor": "variable_infant_schedule"
+  },
+  "user_athlete_injured": {
+    "user_id": "user_athlete_injured",
+    "doc_id": "profile:user_athlete_injured",
+    "text": "Recreational athlete recovering from a knee injury. Was previously running 5km three times per week (morning) and attending gym twice a week. Cannot do any weight-bearing on injured leg for 4 weeks. Frustrated by reduced activity. Responds to structure and measurable progress. Needs physical outlet that respects injury constraints.",
+    "stable_wellness_prefs": [
+      "prefer_morning_routine",
+      "prefer_structured",
+      "prefer_measurable",
+      "avoid_weight_bearing_lower_limb"
+    ],
+    "avoid_modalities": ["running", "jumping", "weight_bearing_lower_limb"],
+    "preferred_modalities": ["upper_body_resistance", "swimming", "seated_yoga", "breathing"],
+    "physical_contraindications": ["acute_knee_injury", "weight_bearing_lower_limb"],
+    "dietary_flags": [],
+    "base_energy_points_budget": 7,
+    "schedule_anchor": "open_no_lecture"
+  },
+  "user_remote_worker_sedentary": {
+    "user_id": "user_remote_worker_sedentary",
+    "doc_id": "profile:user_remote_worker_sedentary",
+    "text": "Remote knowledge worker who sits 8-10 hours per day. Has not exercised consistently in six months. Motivated by habit streaks and community accountability. Vaguely interested in movement but overwhelmed by options. Prefers to start small and build progressively. Good sleep baseline. No injury or dietary constraints.",
+    "stable_wellness_prefs": [
+      "prefer_habit_streaks",
+      "prefer_community_accountability",
+      "start_small_build_progressive",
+      "avoid_overwhelming_plans",
+      "no_time_constraint"
+    ],
+    "avoid_modalities": ["complex_multi_step", "requires_equipment"],
+    "preferred_modalities": ["walking", "bodyweight", "habit_building"],
+    "physical_contraindications": [],
+    "dietary_flags": [],
+    "base_energy_points_budget": 10,
+    "schedule_anchor": "flexible_remote"
+  }
+}

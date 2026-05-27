@@ -1,0 +1,62 @@
+{
+  "user_remote_worker_sedentary": {
+    "user_id": "user_remote_worker_sedentary",
+    "doc_id": "streak:user_remote_worker_sedentary",
+    "habit_partner_ids": ["HAB_journal_morning", "HAB_social_check_in"],
+    "preferred_exercise_ids": ["EX_walk_15min", "EX_walk_30min"],
+    "xp_bonus": 150,
+    "current_streak_days": 6,
+    "longest_streak_days": 6,
+    "streak_start_date": "2026-04-30",
+    "bonus_tags": ["streak_active", "community_accountability", "prefer_habit_streaks"],
+    "text": "Remote worker currently on 6-day walking streak from community challenge. High accountability effect observed. XP bonus unlocked at day 7."
+  },
+  "user_professional_burnout": {
+    "user_id": "user_professional_burnout",
+    "doc_id": "streak:user_professional_burnout",
+    "habit_partner_ids": ["HAB_journal_morning"],
+    "preferred_exercise_ids": ["EX_walk_15min"],
+    "xp_bonus": 30,
+    "current_streak_days": 0,
+    "longest_streak_days": 12,
+    "streak_start_date": null,
+    "bonus_tags": ["streak_broken", "rebuilding"],
+    "text": "Professional burnout user had a 12-day streak earlier this month but it broke 9 days ago. Currently rebuilding. Low reward threshold appropriate."
+  },
+  "user_student_anxious": {
+    "user_id": "user_student_anxious",
+    "doc_id": "streak:user_student_anxious",
+    "habit_partner_ids": ["HAB_gratitude_3x"],
+    "preferred_exercise_ids": ["EX_yoga_gentle_15min", "EX_walk_15min"],
+    "xp_bonus": 20,
+    "current_streak_days": 0,
+    "longest_streak_days": 5,
+    "streak_start_date": null,
+    "bonus_tags": ["streak_inactive"],
+    "text": "Student user has not maintained an active streak during exam period. Gratitude habit was previously maintained for 5 consecutive days."
+  },
+  "user_athlete_injured": {
+    "user_id": "user_athlete_injured",
+    "doc_id": "streak:user_athlete_injured",
+    "habit_partner_ids": ["HAB_journal_morning"],
+    "preferred_exercise_ids": ["EX_yoga_gentle_15min", "EX_stretching_10min"],
+    "xp_bonus": 40,
+    "current_streak_days": 3,
+    "longest_streak_days": 21,
+    "streak_start_date": "2026-05-03",
+    "bonus_tags": ["streak_active", "injury_adapted"],
+    "text": "Athlete has adapted streak to injury-compatible activities. 3-day streak of journaling + gentle yoga. Pre-injury streak was 21 days."
+  },
+  "user_new_parent_fatigued": {
+    "user_id": "user_new_parent_fatigued",
+    "doc_id": "streak:user_new_parent_fatigued",
+    "habit_partner_ids": ["HAB_behavioural_activation_microstep"],
+    "preferred_exercise_ids": ["EX_stretching_10min", "EX_sunlight_10min"],
+    "xp_bonus": 10,
+    "current_streak_days": 0,
+    "longest_streak_days": 3,
+    "streak_start_date": null,
+    "bonus_tags": ["streak_inactive", "low_threshold_reward"],
+    "text": "New parent user has not maintained a streak — sleep fragmentation makes consistency very difficult. Any completion counts as a win. Reward threshold intentionally low."
+  }
+}

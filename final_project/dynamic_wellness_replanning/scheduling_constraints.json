@@ -1,0 +1,66 @@
+[
+  {
+    "constraint_id": "constraint:lecture_schedule_coherent",
+    "doc_id": "constraint:lecture_schedule_coherent",
+    "user_id": "user_student_anxious",
+    "context": "WEEKDAY_NORMAL",
+    "tags": ["schedule_coherent", "lecture_9am"],
+    "text": "Morning routine must end by 8:30am to allow transit to 9am lecture. Plans exceeding 45 minutes total must be flagged as schedule-incoherent."
+  },
+  {
+    "constraint_id": "constraint:exam_time_compression",
+    "doc_id": "constraint:exam_time_compression",
+    "user_id": "user_student_anxious",
+    "context": "WEEKDAY_EXAM",
+    "tags": ["schedule_coherent", "exam_period", "time_compressed"],
+    "text": "During exam period, total routine time must be under 30 minutes. Any plan exceeding 30 minutes total is schedule-incoherent for this user during this period."
+  },
+  {
+    "constraint_id": "constraint:energy_budget_burnout_cap",
+    "doc_id": "constraint:energy_budget_burnout_cap",
+    "user_id": "user_professional_burnout",
+    "context": "WEEKDAY_HIGH_STRESS",
+    "tags": ["under_energy_budget", "burnout_adapted"],
+    "text": "During high-stress periods, total activity energy_cost_points must not exceed 6. Plans exceeding this threshold are likely to fail and reinforce avoidance."
+  },
+  {
+    "constraint_id": "constraint:injury_contraindication_clean",
+    "doc_id": "constraint:injury_contraindication_clean",
+    "user_id": "user_athlete_injured",
+    "context": "RECOVERY_MODE",
+    "tags": ["contraindication_clean", "injury_active"],
+    "text": "Any plan for user_athlete_injured must include zero activities with 'acute_knee_injury' or 'weight_bearing_lower_limb' in contraindications. Violations invalidate the plan."
+  },
+  {
+    "constraint_id": "constraint:micro_habit_time_limit",
+    "doc_id": "constraint:micro_habit_time_limit",
+    "user_id": "user_new_parent_fatigued",
+    "context": "RECOVERY_MODE",
+    "tags": ["schedule_coherent", "micro_habit_window"],
+    "text": "Routine must not exceed 15 minutes total during standard RECOVERY_MODE windows. Exception: partner overnight shift events may allow up to 20 minutes."
+  },
+  {
+    "constraint_id": "constraint:vegan_dietary_support",
+    "doc_id": "constraint:vegan_dietary_support",
+    "user_id": "user_professional_burnout",
+    "context": null,
+    "tags": ["dietary_support", "vegan_preference"],
+    "text": "Nutrition recommendations for user_professional_burnout must include at least one vegan-flagged option when a meal recommendation is made. Non-vegan-only recommendations violate dietary_support constraint."
+  },
+  {
+    "constraint_id": "constraint:safe_for_crisis_state",
+    "doc_id": "constraint:safe_for_crisis_state",
+    "user_id": null,
+    "context": null,
+    "tags": ["safe_for_state", "crisis_protocol"],
+    "text": "If a crisis keyword is detected (per safety_policy_rules.json Tier 3), no wellness plan may be generated. Response must follow crisis bypass protocol and provide emergency resources. This constraint overrides all other plan logic."
+  },
+  {
+    "constraint_id": "constraint:no_high_intensity_low_energy",
+    "doc_id": "constraint:no_high_intensity_low_energy",
+    "user_id": null,
+    "context": null,
+    "tags": ["safe_for_state", "contraindication_clean"],
+    "text": "When user energy state is 3/10 or below OR sleep < 5h, exercises with high_intensity_flag=true are contraindicated. Plans including them violate safe_for_state constraint."
+  }
+]

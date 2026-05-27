@@ -1,0 +1,913 @@
+[
+  {
+    "trip_id": "evl7_public_medium_001",
+    "difficulty_tier": "medium",
+    "benchmark_family": "energy_state_aware_planning",
+    "family": "mood_dip",
+    "context": "WEEKDAY_HIGH_STRESS",
+    "user_id": "user_student_anxious",
+    "budget_total": 6,
+    "schedule_anchor": "lecture_9am",
+    "spoken_rule_density": "moderate",
+    "scenario_hooks": {
+      "caregivers": [],
+      "streak_status": "inactive",
+      "schedule_volatility": "normal",
+      "community_watch": false,
+      "energy_crash_risk": true,
+      "state_sensitive": true
+    },
+    "scenario_state": {
+      "low_energy": true,
+      "sleep_deprived": false,
+      "injured": false,
+      "exam_period": false,
+      "high_stress": true,
+      "caregiver_present": false,
+      "community_challenge_active": false,
+      "refund_safe_needed": false,
+      "streak_focus": false,
+      "goal_pivot": false,
+      "vegan_preference": false,
+      "caregiver_ids": []
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "Mood 4/10, energy 3/10, slept 6 hours. I have a 9am lecture in two hours. What should I do this morning?"
+      },
+      {
+        "speaker": "user",
+        "text": "I know we had a plan where I'd run before lecture, but honestly I don't think that's happening today."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_energy_budget",
+        "safe_for_state",
+        "schedule_coherent"
+      ],
+      "soft_tags": [
+        "low_intensity",
+        "accessible",
+        "grounding"
+      ],
+      "acceptable_exercises": [
+        "EX_walk_5min",
+        "EX_sunlight_10min",
+        "EX_yoga_gentle_15min"
+      ],
+      "acceptable_meditations": [
+        "MED_breathing_5min"
+      ],
+      "good_nutrition": [
+        "NUT_balanced_breakfast"
+      ],
+      "good_habits": [
+        "HAB_behavioural_activation_microstep"
+      ],
+      "required_docs": [
+        "domain_guidelines:WEEKDAY_HIGH_STRESS",
+        "profile:user_student_anxious",
+        "technique:mood_dip_high_stress",
+        "guideline:WHO-PA-2020-A2",
+        "constraint:lecture_schedule_coherent"
+      ],
+      "stale_docs_to_retire": [
+        "stale:morning_run_5km_v1"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:original_unmodified_plan"
+      ],
+      "should_retrieve": [
+        "prefer_morning_routine",
+        "current_low_energy"
+      ],
+      "should_retire": [
+        "old_morning_run_plan"
+      ],
+      "should_remember_rejected": [
+        "rejected_run_for_low_energy_state"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "run_plan_not_happening_today"
+        ],
+        "forbidden": [
+          "EX_standard_30min_aerobic_unmodified",
+          "original_90min_routine"
+        ],
+        "one_off_only": [
+          "no_run_today"
+        ],
+        "retire": [
+          "old_morning_run_plan"
+        ],
+        "do_not_reconsider": [],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_modality": "low_intensity_aerobic_or_behavioural_activation",
+      "avoid_modality": "high_intensity",
+      "episodic_exceptions": [
+        "low_energy_relaxes_intensity_floor"
+      ]
+    }
+  },
+  {
+    "trip_id": "evl7_public_medium_002",
+    "difficulty_tier": "medium",
+    "benchmark_family": "variable_reward_calibration",
+    "family": "lifestyle_baseline",
+    "context": "WEEKEND_LOW_ENERGY",
+    "user_id": "user_professional_burnout",
+    "budget_total": 6,
+    "schedule_anchor": "work_9am",
+    "spoken_rule_density": "moderate",
+    "scenario_hooks": {
+      "caregivers": [],
+      "streak_status": "active",
+      "schedule_volatility": "low",
+      "community_watch": true,
+      "energy_crash_risk": false,
+      "state_sensitive": true
+    },
+    "scenario_state": {
+      "low_energy": true,
+      "sleep_deprived": false,
+      "injured": false,
+      "exam_period": false,
+      "high_stress": false,
+      "caregiver_present": false,
+      "community_challenge_active": true,
+      "refund_safe_needed": false,
+      "streak_focus": true,
+      "goal_pivot": false,
+      "vegan_preference": false,
+      "caregiver_ids": []
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "I just completed a 10-minute walk even though I was dreading it all week. I've been struggling a lot. Did I do okay?"
+      },
+      {
+        "speaker": "user",
+        "text": "I know it's not much, but I just needed to hear whether it counts for anything."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_energy_budget",
+        "safe_for_state"
+      ],
+      "soft_tags": [
+        "calibrated",
+        "encouraging",
+        "accessible"
+      ],
+      "acceptable_exercises": [],
+      "acceptable_meditations": [],
+      "good_nutrition": [],
+      "good_habits": [
+        "HAB_calibrated_high_reward_low_baseline"
+      ],
+      "required_docs": [
+        "domain_guidelines:WEEKDAY_NORMAL",
+        "profile:user_professional_burnout",
+        "technique:burnout_recovery",
+        "streak:user_professional_burnout"
+      ],
+      "stale_docs_to_retire": [],
+      "distractor_docs_to_avoid": [],
+      "should_retrieve": [
+        "burnout_signal",
+        "low_baseline_context"
+      ],
+      "should_retire": [],
+      "should_remember_rejected": [],
+      "required_spoken_rules": {
+        "must_remember": [
+          "effort_acknowledged_relative_to_baseline"
+        ],
+        "forbidden": [
+          "generic_praise",
+          "undervalued_response",
+          "hyperbolic_response"
+        ],
+        "one_off_only": [],
+        "retire": [],
+        "do_not_reconsider": [],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_modality": "calibrated_acknowledgement",
+      "avoid_modality": null,
+      "episodic_exceptions": [
+        "burnout_context_raises_reward_ceiling"
+      ]
+    }
+  },
+  {
+    "trip_id": "evl7_public_medium_003",
+    "difficulty_tier": "medium",
+    "benchmark_family": "stale_preference_retirement",
+    "family": "injury_recovery",
+    "context": "RECOVERY_MODE",
+    "user_id": "user_athlete_injured",
+    "budget_total": 7,
+    "schedule_anchor": "open_no_lecture",
+    "spoken_rule_density": "moderate",
+    "scenario_hooks": {
+      "caregivers": [],
+      "streak_status": "broken",
+      "schedule_volatility": "normal",
+      "community_watch": false,
+      "energy_crash_risk": false,
+      "state_sensitive": true
+    },
+    "scenario_state": {
+      "low_energy": false,
+      "sleep_deprived": false,
+      "injured": true,
+      "exam_period": false,
+      "high_stress": false,
+      "caregiver_present": false,
+      "community_challenge_active": false,
+      "refund_safe_needed": false,
+      "streak_focus": false,
+      "goal_pivot": false,
+      "vegan_preference": false,
+      "caregiver_ids": []
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "I want morning runs, 5km, three times a week. Mornings are my best time for everything."
+      },
+      {
+        "speaker": "user",
+        "text": "I've been getting maybe 4 hours of sleep this week. My mood is in the gutter. What did we agree on for exercise?"
+      },
+      {
+        "speaker": "user",
+        "text": "Yeah but I really don't want to skip mornings entirely. What should I do?"
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_energy_budget",
+        "safe_for_state",
+        "schedule_coherent",
+        "contraindication_clean"
+      ],
+      "soft_tags": [
+        "low_intensity",
+        "sleep_promoting",
+        "somatic",
+        "grounding"
+      ],
+      "acceptable_exercises": [
+        "EX_stretching_10min"
+      ],
+      "acceptable_meditations": [],
+      "good_nutrition": [],
+      "good_habits": [
+        "HAB_consistent_wake_time"
+      ],
+      "required_docs": [
+        "domain_guidelines:RECOVERY_MODE",
+        "profile:user_athlete_injured",
+        "technique:injury_recovery",
+        "guideline:WHO-PA-2020-A2",
+        "guideline:ACSM-FITT-DEP",
+        "constraint:injury_contraindication_clean"
+      ],
+      "stale_docs_to_retire": [
+        "stale:morning_run_5km_v1"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:original_unmodified_plan",
+        "distractor:athlete_full_gym_plan"
+      ],
+      "should_retrieve": [
+        "prefer_morning_routine",
+        "current_sleep_deficit",
+        "injury_active"
+      ],
+      "should_retire": [
+        "old_5km_assumption"
+      ],
+      "should_remember_rejected": [
+        "rejected_5km_run_for_injury"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "user_prefers_mornings"
+        ],
+        "forbidden": [
+          "5km_run_recommendation",
+          "any_weight_bearing_lower_limb"
+        ],
+        "one_off_only": [
+          "today_low_sleep"
+        ],
+        "retire": [
+          "old_5km_assumption"
+        ],
+        "do_not_reconsider": [
+          "5km_run_for_injury_period"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_modality": "injury_adapted_morning",
+      "avoid_modality": "weight_bearing_lower_limb",
+      "episodic_exceptions": [
+        "sleep_deficit_relaxes_intensity_floor"
+      ]
+    }
+  },
+  {
+    "trip_id": "evl7_public_medium_004",
+    "difficulty_tier": "medium",
+    "benchmark_family": "stale_preference_retirement",
+    "family": "sleep_disrupted",
+    "context": "RECOVERY_MODE",
+    "user_id": "user_student_anxious",
+    "budget_total": 6,
+    "schedule_anchor": "lecture_9am",
+    "spoken_rule_density": "moderate",
+    "scenario_hooks": {
+      "caregivers": [],
+      "streak_status": "inactive",
+      "schedule_volatility": "high",
+      "community_watch": false,
+      "energy_crash_risk": true,
+      "state_sensitive": true
+    },
+    "scenario_state": {
+      "low_energy": true,
+      "sleep_deprived": true,
+      "injured": false,
+      "exam_period": false,
+      "high_stress": false,
+      "caregiver_present": false,
+      "community_challenge_active": false,
+      "refund_safe_needed": false,
+      "streak_focus": false,
+      "goal_pivot": false,
+      "vegan_preference": false,
+      "caregiver_ids": []
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "I want to build a morning routine that helps with my anxiety and gives me energy for my 9am lectures."
+      },
+      {
+        "speaker": "user",
+        "text": "I forgot to mention \u2014 I have a knee injury so no running or long walks right now."
+      },
+      {
+        "speaker": "user",
+        "text": "For this week only, I need the routine to be under 30 minutes total \u2014 finals are killing me."
+      },
+      {
+        "speaker": "user",
+        "text": "Actually my lecture got moved to 11am starting next week. And I'm feeling much better about my anxiety \u2014 I want to focus on productivity instead."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_energy_budget",
+        "safe_for_state",
+        "schedule_coherent",
+        "contraindication_clean"
+      ],
+      "soft_tags": [
+        "low_intensity",
+        "grounding",
+        "accessible",
+        "evidence_based"
+      ],
+      "acceptable_exercises": [
+        "EX_walk_5min"
+      ],
+      "acceptable_meditations": [],
+      "good_nutrition": [
+        "NUT_anti_inflammatory_meal"
+      ],
+      "good_habits": [
+        "HAB_consistent_wake_time"
+      ],
+      "required_docs": [
+        "domain_guidelines:RECOVERY_MODE",
+        "profile:user_student_anxious",
+        "technique:goal_pivot_productivity",
+        "constraint:injury_contraindication_clean",
+        "constraint:exam_time_compression",
+        "event:student_lecture_moved_to_9am",
+        "heuristic:temporary_override_scope"
+      ],
+      "stale_docs_to_retire": [
+        "stale:morning_run_5km_v1"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:original_unmodified_plan"
+      ],
+      "should_retrieve": [
+        "prefer_morning_routine",
+        "anxiety_primary_goal_stale",
+        "lecture_time_updated"
+      ],
+      "should_retire": [
+        "old_9am_deadline",
+        "anxiety_focused_goal",
+        "walk_plan_during_injury"
+      ],
+      "should_remember_rejected": [
+        "rejected_walk_for_knee_injury"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "new_lecture_time_11am",
+          "goal_shifted_to_productivity"
+        ],
+        "forbidden": [
+          "running_or_long_walks",
+          "anxiety_framing_after_goal_pivot"
+        ],
+        "one_off_only": [
+          "under_30min_this_week_only"
+        ],
+        "retire": [
+          "old_9am_deadline",
+          "anxiety_focused_goal"
+        ],
+        "do_not_reconsider": [
+          "rejected_walk_for_knee"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_modality": "injury_adapted_productivity_focus",
+      "avoid_modality": "weight_bearing_lower_limb",
+      "episodic_exceptions": [
+        "lecture_moved_relaxes_schedule_coherence",
+        "injury_relaxes_intensity_floor"
+      ]
+    }
+  },
+  {
+    "trip_id": "evl7_public_medium_005",
+    "difficulty_tier": "medium",
+    "benchmark_family": "time_constraint_replanning",
+    "family": "exam_crunch",
+    "context": "WEEKDAY_EXAM",
+    "user_id": "user_student_anxious",
+    "budget_total": 6,
+    "schedule_anchor": "lecture_9am",
+    "spoken_rule_density": "moderate",
+    "scenario_hooks": {
+      "caregivers": [],
+      "streak_status": "inactive",
+      "schedule_volatility": "high",
+      "community_watch": false,
+      "energy_crash_risk": true,
+      "state_sensitive": true
+    },
+    "scenario_state": {
+      "low_energy": false,
+      "sleep_deprived": true,
+      "injured": false,
+      "exam_period": true,
+      "high_stress": true,
+      "caregiver_present": false,
+      "community_challenge_active": false,
+      "refund_safe_needed": false,
+      "streak_focus": false,
+      "goal_pivot": false,
+      "vegan_preference": false,
+      "caregiver_ids": []
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "I read on Reddit that 8-minute HIIT once a week is enough to fix depression. So that's my plan."
+      },
+      {
+        "speaker": "user",
+        "text": "Are you sure? My friend's therapist literally said that's enough."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "safe_for_state",
+        "contraindication_clean"
+      ],
+      "soft_tags": [
+        "evidence_based",
+        "dose_responsive"
+      ],
+      "acceptable_exercises": [
+        "EX_standard_30min_aerobic"
+      ],
+      "acceptable_meditations": [],
+      "good_nutrition": [],
+      "good_habits": [
+        "HAB_consistent_wake_time"
+      ],
+      "required_docs": [
+        "domain_guidelines:ALL_CONTEXTS",
+        "domain_guidelines:WEEKDAY_EXAM",
+        "profile:user_student_anxious",
+        "guideline:WHO-PA-2020-A1",
+        "guideline:ACSM-FITT-DEP"
+      ],
+      "stale_docs_to_retire": [],
+      "distractor_docs_to_avoid": [
+        "distractor:reddit_HIIT_claim"
+      ],
+      "should_retrieve": [
+        "evidence_based_only"
+      ],
+      "should_retire": [],
+      "should_remember_rejected": [],
+      "required_spoken_rules": {
+        "must_remember": [
+          "evidence_grounding_required"
+        ],
+        "forbidden": [
+          "agree_with_unsupported_claim",
+          "lecture_without_acknowledgment"
+        ],
+        "one_off_only": [],
+        "retire": [],
+        "do_not_reconsider": [],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_modality": "evidence_based_exercise",
+      "avoid_modality": "unsupported_high_intensity",
+      "episodic_exceptions": []
+    }
+  },
+  {
+    "trip_id": "evl7_public_medium_006",
+    "difficulty_tier": "medium",
+    "benchmark_family": "goal_pivot_replanning",
+    "family": "goal_pivot_productivity",
+    "context": "WEEKDAY_NORMAL",
+    "user_id": "user_student_anxious",
+    "budget_total": 8,
+    "schedule_anchor": "lecture_9am",
+    "spoken_rule_density": "moderate",
+    "scenario_hooks": {
+      "caregivers": [],
+      "streak_status": "inactive",
+      "schedule_volatility": "normal",
+      "community_watch": false,
+      "energy_crash_risk": false,
+      "state_sensitive": false
+    },
+    "scenario_state": {
+      "low_energy": false,
+      "sleep_deprived": false,
+      "injured": false,
+      "exam_period": false,
+      "high_stress": false,
+      "caregiver_present": false,
+      "community_challenge_active": false,
+      "refund_safe_needed": false,
+      "streak_focus": false,
+      "goal_pivot": true,
+      "vegan_preference": false,
+      "caregiver_ids": []
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "I've been building a morning routine to help with my anxiety for the past 3 weeks. I want to keep it but shift the focus \u2014 exams are over and now I want the routine to help me focus and be more productive."
+      },
+      {
+        "speaker": "user",
+        "text": "Keep the morning time slot. Drop anything that was specifically for calming. Add things that will sharpen my focus."
+      },
+      {
+        "speaker": "user",
+        "text": "Please don't keep bringing up anxiety framing \u2014 that was the old goal."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_energy_budget",
+        "safe_for_state",
+        "schedule_coherent"
+      ],
+      "soft_tags": [
+        "energy_boosting",
+        "structured",
+        "evidence_based",
+        "cbt_aligned"
+      ],
+      "acceptable_exercises": [
+        "EX_walk_30min",
+        "EX_standard_30min_aerobic"
+      ],
+      "acceptable_meditations": [
+        "MED_mindfulness_10min",
+        "MED_structured_mbsr_30min"
+      ],
+      "good_nutrition": [
+        "NUT_balanced_breakfast",
+        "NUT_energy_boosting_snack"
+      ],
+      "good_habits": [
+        "HAB_journal_morning"
+      ],
+      "required_docs": [
+        "domain_guidelines:WEEKDAY_NORMAL",
+        "profile:user_student_anxious",
+        "technique:goal_pivot_productivity",
+        "guideline:WHO-PA-2020-A1",
+        "heuristic:lean_context_policy"
+      ],
+      "stale_docs_to_retire": [],
+      "distractor_docs_to_avoid": [],
+      "should_retrieve": [
+        "prefer_morning_routine",
+        "new_goal_productivity"
+      ],
+      "should_retire": [
+        "anxiety_primary_goal",
+        "calming_activity_framing"
+      ],
+      "should_remember_rejected": [],
+      "required_spoken_rules": {
+        "must_remember": [
+          "morning_slot_retained",
+          "goal_is_now_productivity"
+        ],
+        "forbidden": [
+          "anxiety_framing",
+          "calming_activity_prescription"
+        ],
+        "one_off_only": [],
+        "retire": [
+          "anxiety_primary_goal"
+        ],
+        "do_not_reconsider": [],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_modality": "structured_aerobic_plus_focus_meditation",
+      "avoid_modality": "pure_calming_low_energy",
+      "episodic_exceptions": []
+    }
+  },
+  {
+    "trip_id": "evl7_public_medium_007",
+    "difficulty_tier": "medium",
+    "benchmark_family": "caregiver_context_replanning",
+    "family": "burnout_recovery",
+    "context": "WEEKDAY_HIGH_STRESS",
+    "user_id": "user_professional_burnout",
+    "budget_total": 6,
+    "schedule_anchor": "work_9am",
+    "spoken_rule_density": "moderate",
+    "scenario_hooks": {
+      "caregivers": [
+        "caregiver:partner_supportive"
+      ],
+      "streak_status": "inactive",
+      "schedule_volatility": "normal",
+      "community_watch": false,
+      "energy_crash_risk": false,
+      "state_sensitive": true
+    },
+    "scenario_state": {
+      "low_energy": false,
+      "sleep_deprived": false,
+      "injured": false,
+      "exam_period": false,
+      "high_stress": true,
+      "caregiver_present": true,
+      "community_challenge_active": false,
+      "refund_safe_needed": false,
+      "streak_focus": false,
+      "goal_pivot": false,
+      "vegan_preference": false,
+      "caregiver_ids": [
+        "caregiver:partner_supportive"
+      ]
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "I want to start rebuilding my morning routine. I've been off for three weeks. Partner says they can take the kids on Saturday mornings so I'd have 30 minutes to myself."
+      },
+      {
+        "speaker": "user",
+        "text": "But only on Saturdays \u2014 don't assume that time is available every day."
+      },
+      {
+        "speaker": "user",
+        "text": "I used to do 30-min morning runs. Can we get back to that?"
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_energy_budget",
+        "safe_for_state",
+        "schedule_coherent"
+      ],
+      "soft_tags": [
+        "low_intensity",
+        "structured",
+        "accessible"
+      ],
+      "acceptable_exercises": [
+        "EX_walk_15min",
+        "EX_walk_30min"
+      ],
+      "acceptable_meditations": [],
+      "good_nutrition": [],
+      "good_habits": [
+        "HAB_journal_morning"
+      ],
+      "required_docs": [
+        "domain_guidelines:WEEKDAY_HIGH_STRESS",
+        "profile:user_professional_burnout",
+        "technique:burnout_recovery",
+        "caregiver:partner_supportive",
+        "constraint:energy_budget_burnout_cap"
+      ],
+      "stale_docs_to_retire": [
+        "stale:30min_run_plan_v1"
+      ],
+      "distractor_docs_to_avoid": [
+        "distractor:old_evening_routine"
+      ],
+      "should_retrieve": [
+        "prefer_morning_routine",
+        "burnout_signal",
+        "partner_support_available"
+      ],
+      "should_retire": [
+        "overcommitted_run_plan"
+      ],
+      "should_remember_rejected": [
+        "rejected_run_plan_for_burnout"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "saturday_only_extended_window"
+        ],
+        "forbidden": [
+          "assume_extended_window_every_day",
+          "30min_run_immediately"
+        ],
+        "one_off_only": [
+          "saturday_30min_window"
+        ],
+        "retire": [
+          "overcommitted_30min_run_plan"
+        ],
+        "do_not_reconsider": [
+          "rejected_run_plan_during_burnout"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_modality": "short_structured_morning_routine",
+      "avoid_modality": "high_intensity_or_long_duration",
+      "episodic_exceptions": [
+        "partner_saturday_creates_extended_window"
+      ]
+    }
+  },
+  {
+    "trip_id": "evl7_public_medium_008",
+    "difficulty_tier": "medium",
+    "benchmark_family": "rejected_activity_memory",
+    "family": "lifestyle_baseline",
+    "context": "WEEKDAY_NORMAL",
+    "user_id": "user_remote_worker_sedentary",
+    "budget_total": 10,
+    "schedule_anchor": "flexible_remote",
+    "spoken_rule_density": "moderate",
+    "scenario_hooks": {
+      "caregivers": [],
+      "streak_status": "active",
+      "schedule_volatility": "low",
+      "community_watch": true,
+      "energy_crash_risk": false,
+      "state_sensitive": false
+    },
+    "scenario_state": {
+      "low_energy": false,
+      "sleep_deprived": false,
+      "injured": false,
+      "exam_period": false,
+      "high_stress": false,
+      "caregiver_present": false,
+      "community_challenge_active": true,
+      "refund_safe_needed": false,
+      "streak_focus": true,
+      "goal_pivot": false,
+      "vegan_preference": false,
+      "caregiver_ids": []
+    },
+    "turns": [
+      {
+        "speaker": "user",
+        "text": "I just finished my 7-day walking streak! The challenge is ending. What should I do next? I want to keep the momentum going."
+      },
+      {
+        "speaker": "user",
+        "text": "I tried resistance training at a gym a few months ago and really hated it \u2014 don't suggest that again."
+      },
+      {
+        "speaker": "user",
+        "text": "No caffeine after 2pm, by the way \u2014 that's a firm rule for me going forward."
+      }
+    ],
+    "gold": {
+      "required_hard": [
+        "under_energy_budget",
+        "safe_for_state",
+        "schedule_coherent"
+      ],
+      "soft_tags": [
+        "accessible",
+        "energy_boosting",
+        "streak_active",
+        "low_demand"
+      ],
+      "acceptable_exercises": [
+        "EX_walk_30min",
+        "EX_cycling_moderate_30min"
+      ],
+      "acceptable_meditations": [],
+      "good_nutrition": [
+        "NUT_balanced_breakfast"
+      ],
+      "good_habits": [
+        "HAB_social_check_in"
+      ],
+      "required_docs": [
+        "domain_guidelines:WEEKDAY_NORMAL",
+        "profile:user_remote_worker_sedentary",
+        "technique:lifestyle_baseline_weekday",
+        "community:10min_daily_walk",
+        "streak:user_remote_worker_sedentary",
+        "heuristic:rejected_option_memory"
+      ],
+      "stale_docs_to_retire": [
+        "stale:no_exercise_assumption"
+      ],
+      "distractor_docs_to_avoid": [],
+      "should_retrieve": [
+        "prefer_habit_streaks",
+        "prefer_community_accountability",
+        "streak_active"
+      ],
+      "should_retire": [
+        "sedentary_baseline"
+      ],
+      "should_remember_rejected": [
+        "rejected_gym_resistance_training"
+      ],
+      "required_spoken_rules": {
+        "must_remember": [
+          "no_caffeine_after_2pm"
+        ],
+        "forbidden": [
+          "gym_resistance_training_recommendation",
+          "caffeine_after_2pm"
+        ],
+        "one_off_only": [],
+        "retire": [
+          "sedentary_baseline_assumption"
+        ],
+        "do_not_reconsider": [
+          "gym_resistance_training"
+        ],
+        "keep_context_lean": [
+          "relevant_only"
+        ]
+      },
+      "preferred_modality": "progressive_walking_or_cycling",
+      "avoid_modality": "requires_equipment",
+      "episodic_exceptions": []
+    }
+  }
+]

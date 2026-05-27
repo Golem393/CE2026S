@@ -11,6 +11,9 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
     Requirements:
     - Route every model call through runtime.runner so usage/cost is measured by
       the official wrapper.
+    - Route every tool session through runtime.new_session(...), not
+      runtime.toolbox.new_session(...), so official retrieval/tool traces are
+      captured for memory and context-grounding credit.
     - Return a dict with at least:
         {
           "submission": {...},

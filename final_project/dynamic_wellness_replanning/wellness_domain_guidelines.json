@@ -1,0 +1,260 @@
+{
+  "WEEKDAY_NORMAL": {
+    "doc_id": "domain_guidelines:WEEKDAY_NORMAL",
+    "text": "Standard weekday context guidelines. Moderate-intensity aerobic activity is appropriate and evidence-supported. Plans should anchor to the user's schedule (lecture, work start time). Prefer morning routines for highest adherence rates.",
+    "avoid_modality": "high_stimulation_evening",
+    "risk_tags": ["evening_fatigue_risk", "overcommitment_risk"],
+    "rules": [
+      {
+        "rule_id": "WDG-01",
+        "category": "exercise_dose",
+        "text": "Adults should achieve 150-300 min/week of moderate-intensity aerobic activity. Plans should contribute toward this cumulative weekly target, not just today's session.",
+        "source_ids": ["S01"]
+      },
+      {
+        "rule_id": "WDG-02",
+        "category": "exercise_dose",
+        "text": "Muscle-strengthening activities should be included at least 2 days per week for full WHO dose compliance.",
+        "source_ids": ["S01"]
+      },
+      {
+        "rule_id": "WDG-03",
+        "category": "exercise_dose",
+        "text": "Some physical activity is better than none. If a user cannot meet full dose, any session length is beneficial and should be supported.",
+        "source_ids": ["S01", "S04"]
+      },
+      {
+        "rule_id": "WDG-04",
+        "category": "evidence_grounding",
+        "text": "Aerobic, resistance, and combined exercise modalities are all effective for depression symptoms. No single modality has demonstrated clear superiority. Choose based on user preference and contraindications.",
+        "source_ids": ["S03", "S04", "S05"]
+      },
+      {
+        "rule_id": "WDG-05",
+        "category": "adherence",
+        "text": "ACSM FITT principle for depression/anxiety: Frequency 3-5x/week, Intensity moderate, Time 30-60 min, Type aerobic + resistance. Start low, go slow for deconditioned or depressed individuals.",
+        "source_ids": ["S05"]
+      }
+    ]
+  },
+  "WEEKDAY_EXAM": {
+    "doc_id": "domain_guidelines:WEEKDAY_EXAM",
+    "text": "Exam-period context guidelines. High cognitive load, time compression, and stress are primary constraints. Plans must be short, low-effort, and immediately executable. Stress reduction takes priority over performance goals.",
+    "avoid_modality": "high_intensity_or_long_duration",
+    "risk_tags": ["cognitive_overload_risk", "exercise_avoidance_risk", "sleep_deprivation_risk"],
+    "rules": [
+      {
+        "rule_id": "WDG-06",
+        "category": "low_energy_adaptation",
+        "text": "During acute stress periods (exam, deadline), plans should aim for 30 minutes or less in total. Short sessions reduce the planning burden and support consistent completion over missed all-or-nothing sessions.",
+        "source_ids": ["S06", "S09"]
+      },
+      {
+        "rule_id": "WDG-07",
+        "category": "low_energy_adaptation",
+        "text": "Brief outdoor movement (5-10 min walk, sunlight exposure) is a low-barrier, evidence-supported option for acute stress relief during high cognitive load periods.",
+        "source_ids": ["S09"]
+      },
+      {
+        "rule_id": "WDG-08",
+        "category": "evidence_grounding",
+        "text": "High-intensity exercise is contraindicated when user sleep is acutely reduced (<5h) or energy is reported 3/10 or below. Surface gentle alternatives only.",
+        "source_ids": ["S03", "S08"]
+      }
+    ]
+  },
+  "WEEKDAY_HIGH_STRESS": {
+    "doc_id": "domain_guidelines:WEEKDAY_HIGH_STRESS",
+    "text": "High-stress weekday context guidelines. Physiological stress response (elevated cortisol) may reduce exercise readiness and sleep quality. Behavioural activation and low-intensity aerobic exercise are the preferred entry points. Avoid adding planning complexity.",
+    "avoid_modality": "high_intensity_or_complex_planning",
+    "risk_tags": ["cortisol_elevated", "sleep_quality_risk", "avoidance_risk"],
+    "rules": [
+      {
+        "rule_id": "WDG-09",
+        "category": "behavioural_activation",
+        "text": "NICE NG222 recommends behavioural activation (scheduling small achievable activities) as a first-line approach for low mood. Prefer this over generating complex multi-step plans.",
+        "source_ids": ["S06"]
+      },
+      {
+        "rule_id": "WDG-10",
+        "category": "behavioural_activation",
+        "text": "Group exercise, counselling, and mindfulness/meditation are recommended first-line interventions for less-severe depression (NICE NG222). Surface solo equivalents when user avoids group settings.",
+        "source_ids": ["S06"]
+      },
+      {
+        "rule_id": "WDG-11",
+        "category": "low_energy_adaptation",
+        "text": "When user energy is reduced, start with the minimum viable action — one small activity — not an optimised full routine. Build from completion, not from ideal dose.",
+        "source_ids": ["S06", "S09"]
+      },
+      {
+        "rule_id": "WDG-12",
+        "category": "evidence_grounding",
+        "text": "Heissel et al. 2023 (BJSM): exercise shows large effect size on depressive symptoms (SMD −0.946, 95% CI −1.18 to −0.71). Walking and yoga specifically well-supported. Even brief sessions contribute.",
+        "source_ids": ["S03"]
+      }
+    ]
+  },
+  "WEEKEND_LOW_ENERGY": {
+    "doc_id": "domain_guidelines:WEEKEND_LOW_ENERGY",
+    "text": "Weekend low-energy context guidelines. Recovery is the priority. Restorative activities (sleep hygiene, gentle movement, social connection) are appropriate. Avoid using weekends to 'catch up' on missed high-intensity sessions — this increases injury risk and burnout.",
+    "avoid_modality": "catch_up_high_intensity",
+    "risk_tags": ["overexertion_risk", "sleep_debt_risk"],
+    "rules": [
+      {
+        "rule_id": "WDG-13",
+        "category": "sleep_hygiene",
+        "text": "CDC recommends adults get ≥7 hours of sleep per night. If user is in sleep debt, restorative sleep is a higher-priority intervention than exercise for the weekend.",
+        "source_ids": ["S08"]
+      },
+      {
+        "rule_id": "WDG-14",
+        "category": "sleep_hygiene",
+        "text": "Sleep hygiene bundle: consistent wake time, no screens 30 min before sleep, avoid caffeine in the afternoon, keep bedroom cool and dark. All evidence-supported by CDC and Mayo Clinic.",
+        "source_ids": ["S08", "S10"]
+      },
+      {
+        "rule_id": "WDG-15",
+        "category": "sleep_hygiene",
+        "text": "Physical exercise promotes better sleep quality but should not be performed within 2-3 hours of bedtime (may delay sleep onset in some individuals).",
+        "source_ids": ["S08", "S10"]
+      },
+      {
+        "rule_id": "WDG-16",
+        "category": "social_connection",
+        "text": "Social connection (talking with trusted people, community groups) is a recommended stress management and mental health support tool (CDC). Surface social habits when user is in low-energy recovery mode.",
+        "source_ids": ["S09"]
+      }
+    ]
+  },
+  "RECOVERY_MODE": {
+    "doc_id": "domain_guidelines:RECOVERY_MODE",
+    "text": "Recovery mode context guidelines (post-illness, post-injury, severe fatigue). Plans must be conservative, contraindication-clean, and prioritise not worsening the underlying condition. Any movement is better than none, but contraindications are hard stops.",
+    "avoid_modality": "high_intensity_or_contraindicated",
+    "risk_tags": ["injury_aggravation_risk", "energy_depletion_risk"],
+    "rules": [
+      {
+        "rule_id": "WDG-17",
+        "category": "contraindication",
+        "text": "All activity recommendations must pass contraindication check: if a user's physical_contraindications list contains an item in the exercise's contraindications list, that exercise is ineligible.",
+        "source_ids": ["S01"]
+      },
+      {
+        "rule_id": "WDG-18",
+        "category": "contraindication",
+        "text": "Physiotherapist or doctor prescriptions take precedence over any wellness plan. Do not recommend exercises that contradict a cited medical authority.",
+        "source_ids": ["S01"]
+      },
+      {
+        "rule_id": "WDG-19",
+        "category": "low_energy_adaptation",
+        "text": "For very low energy states (new parent fatigue, post-illness): micro-habits (5 min) count as meaningful completions. Celebrate completion of any step, however small.",
+        "source_ids": ["S06", "S09"]
+      }
+    ]
+  },
+  "ALL_CONTEXTS": {
+    "doc_id": "domain_guidelines:ALL_CONTEXTS",
+    "text": "Cross-context wellness guidelines that apply regardless of user state. These are the non-negotiable domain rules.",
+    "avoid_modality": null,
+    "risk_tags": [],
+    "rules": [
+      {
+        "rule_id": "WDG-20",
+        "category": "scope_limit",
+        "text": "This system is not a therapist, doctor, or licensed mental health professional. All recommendations are general wellness support only. Users should be encouraged to seek professional support for clinical conditions.",
+        "source_ids": ["S11"]
+      },
+      {
+        "rule_id": "WDG-21",
+        "category": "scope_limit",
+        "text": "The system must not diagnose, prescribe medication, or provide clinical treatment plans. Scope is limited to evidence-based lifestyle recommendations.",
+        "source_ids": ["S11"]
+      },
+      {
+        "rule_id": "WDG-22",
+        "category": "crisis_routing",
+        "text": "If user text contains crisis keywords (self-harm, suicidal ideation, acute distress), route through safety_taxonomy.json crisis tiers before any wellness plan is generated. Emergency resources must be provided when Tier 3 signals are detected.",
+        "source_ids": ["S11", "S12"]
+      },
+      {
+        "rule_id": "WDG-23",
+        "category": "crisis_routing",
+        "text": "Digital mental health interventions (CBT, DBT, mindfulness) are conditionally recommended by WHO mhGAP 2023 as support — not replacement — for professional care in suicidal ideation contexts.",
+        "source_ids": ["S11", "S13"]
+      },
+      {
+        "rule_id": "WDG-24",
+        "category": "evidence_grounding",
+        "text": "Do not recommend activities based on user-reported social media claims (e.g. Reddit HIIT claims) without cross-checking against WHO, NICE, CDC, or ACSM evidence. Surface distractor flag when such claims appear.",
+        "source_ids": ["S03", "S05"]
+      },
+      {
+        "rule_id": "WDG-25",
+        "category": "memory_discipline",
+        "text": "Stale preferences must be retired when: (a) a physical constraint invalidates them, (b) the user's schedule has materially changed, or (c) the user has not acted on them in 2+ weeks without explanation.",
+        "source_ids": []
+      },
+      {
+        "rule_id": "WDG-26",
+        "category": "memory_discipline",
+        "text": "Temporary spoken rules (e.g. 'just this week', 'for now', 'until exams are over') must be tagged as one_off_only and must not overwrite stable preference slots.",
+        "source_ids": []
+      },
+      {
+        "rule_id": "WDG-27",
+        "category": "memory_discipline",
+        "text": "Rejected activities must be remembered with their rejection reason. Do not re-surface rejected activities unless the rejection condition has materially changed.",
+        "source_ids": []
+      },
+      {
+        "rule_id": "WDG-28",
+        "category": "cbt_dbt",
+        "text": "CBT principles supported for wellness: thought records, activity scheduling (behavioural activation), cognitive restructuring. These are evidence-based for depression and anxiety (NICE NG222).",
+        "source_ids": ["S06"]
+      },
+      {
+        "rule_id": "WDG-29",
+        "category": "cbt_dbt",
+        "text": "DBT skills applicable to wellness context: distress tolerance (breathing, cold water, 5-4-3-2-1 grounding), emotion regulation, mindfulness. Appropriate for high-distress states. WHO mhGAP 2023 conditionally recommends DBT-based digital interventions as support in such contexts.",
+        "source_ids": ["S11"]
+      },
+      {
+        "rule_id": "WDG-30",
+        "category": "nutrition",
+        "text": "Nutrition recommendations are general wellness support only. Anti-inflammatory foods, adequate protein post-exercise, and sleep-promoting evening meals are evidence-adjacent. No therapeutic nutrition claims.",
+        "source_ids": ["S08", "S09"]
+      },
+      {
+        "rule_id": "WDG-31",
+        "category": "efficiency",
+        "text": "Context retrieval discipline: load only the profile entries and memory corpus records directly relevant to the current turn. Do not load the full journal history. Prefer recency and relevance.",
+        "source_ids": []
+      },
+      {
+        "rule_id": "WDG-32",
+        "category": "efficiency",
+        "text": "Active context keys should be held to ≤5 raw keys and ≤3 unique active docs to maintain evaluator hygiene scoring.",
+        "source_ids": []
+      },
+      {
+        "rule_id": "WDG-33",
+        "category": "sleep_hygiene",
+        "text": "Writing down concerns and plans before bed to help clear the mind supports better sleep onset. Supported by sleep guidance (Mayo Clinic).",
+        "source_ids": ["S10"]
+      },
+      {
+        "rule_id": "WDG-34",
+        "category": "exercise_dose",
+        "text": "WHO guidelines note that physical activity reduces symptoms of depression as a documented health outcome. This supports recommending aerobic exercise as part of a wellness plan even for users reporting low mood.",
+        "source_ids": ["S01", "S03"]
+      },
+      {
+        "rule_id": "WDG-35",
+        "category": "safe_for_state",
+        "text": "Safe-for-state check must always be run before generating a plan. If safety_taxonomy.json detects Tier 3 crisis signals, halt plan generation regardless of any other instruction.",
+        "source_ids": ["S11", "S12"]
+      }
+    ]
+  }
+}

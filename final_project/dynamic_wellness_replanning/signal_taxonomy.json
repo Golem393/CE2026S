@@ -1,0 +1,239 @@
+{
+  "_meta": {
+    "purpose": "Canonical signal vocabulary. Every contraindications, physical_contraindications, and safety trigger_signals field in the project joins on these IDs. No synonyms. lowercase_snake_case. One concept per ID.",
+    "total_signals": 36,
+    "categories": ["physiological", "medical", "cognitive", "acute_emotional", "depressive", "safety", "behavioral", "social", "identity", "psychosocial", "life_stage", "demographic"],
+    "corpus_tags_vs_signal_ids": "memory_corpus.json records use free-form retrieval tags (e.g. 'burnout_signal', 'injury_active', 'high_anxiety') that are NOT signal IDs. Signal IDs govern contraindication checks and safety routing. Corpus tags govern retrieval scoring. The scenario_state_mapping section below bridges the two where they overlap.",
+    "scenario_state_mapping": {
+      "note": "Maps episode scenario_state boolean keys to canonical signal IDs for agent use. When a boolean is true, treat the mapped signal ID as active for contraindication and routing checks.",
+      "low_energy":                "low_energy_state",
+      "sleep_deprived":            "sleep_deprived_acute",
+      "injured":                   "acute_injury",
+      "high_stress":               "burnout_active",
+      "exam_period":               "cognitive_overload",
+      "caregiver_present":         null,
+      "community_challenge_active": null,
+      "streak_focus":              "broken_streak",
+      "goal_pivot":                null,
+      "vegan_preference":          null
+    }
+  },
+  "signals": [
+    {
+      "id": "low_energy_state",
+      "category": "physiological",
+      "description": "User-reported or system-inferred energy at or below actionable threshold (approx. 3/10). Contraindication for high-intensity exercise. Maps to scenario_state.low_energy=true.",
+      "existing_field_refs": ["inventory_exercises.contraindications", "scheduling_constraints.tags"]
+    },
+    {
+      "id": "sleep_deprived_acute",
+      "category": "physiological",
+      "description": "Acute sleep deprivation — less than 5 hours reported or inferred. Contraindication for high-intensity exercise. Maps to scenario_state.sleep_deprived=true.",
+      "existing_field_refs": ["inventory_exercises.contraindications"]
+    },
+    {
+      "id": "flare_day",
+      "category": "physiological",
+      "description": "User with a chronic condition reports a symptom flare today. Activity scope should be reduced to lowest-barrier options regardless of baseline fitness.",
+      "existing_field_refs": []
+    },
+    {
+      "id": "acute_injury",
+      "category": "physiological",
+      "description": "Generic active acute physical injury. Broad contraindication for HIIT and high-impact activities. Use specific variants (acute_knee_injury, acute_injury_lower_limb) when body-part is known.",
+      "existing_field_refs": ["inventory_exercises.contraindications"]
+    },
+    {
+      "id": "acute_knee_injury",
+      "category": "physiological",
+      "description": "Active knee injury. Contraindication for walking >5min, yoga with standing poses, cycling, and lower-body weight-bearing exercises. Matches user_athlete_injured physical_contraindications.",
+      "existing_field_refs": ["inventory_exercises.contraindications", "user_wellness_profiles.physical_contraindications", "scheduling_constraints"]
+    },
+    {
+      "id": "acute_injury_lower_limb",
+      "category": "physiological",
+      "description": "Active lower-limb injury requiring no weight-bearing. Broader than acute_knee_injury — includes ankle, hip, foot injuries. Contraindication for all weight-bearing movement.",
+      "existing_field_refs": ["inventory_exercises.contraindications", "user_wellness_profiles.physical_contraindications"]
+    },
+    {
+      "id": "weight_bearing_lower_limb",
+      "category": "physiological",
+      "description": "Any activity requiring meaningful lower-limb load-bearing (walking, running, jumping, standing yoga poses). Canonical profile contraindication used for knee-injury recovery cases.",
+      "existing_field_refs": ["user_wellness_profiles.physical_contraindications", "scheduling_constraints"]
+    },
+    {
+      "id": "chronic_illness_flagged",
+      "category": "medical",
+      "description": "User has disclosed a chronic illness (e.g. fibromyalgia, MS, IBD, diabetes) that requires exercise and nutrition modifications. Does not specify which illness — use with flare_day for active episodes.",
+      "existing_field_refs": []
+    },
+    {
+      "id": "clinical_depression_severe",
+      "category": "medical",
+      "description": "User has disclosed or system has inferred clinically severe depression. Contraindication for HIIT and high-intensity standalone sessions. Requires evidence-based low-intensity + BA first-line approach per NICE NG222.",
+      "existing_field_refs": ["inventory_exercises.contraindications"]
+    },
+    {
+      "id": "executive_dysfunction_flagged",
+      "category": "cognitive",
+      "description": "User reports difficulty initiating, planning, or sequencing tasks. Indicates need for decompose_to_microstep tool and single-action plans. Common in ADHD, burnout, severe depression.",
+      "existing_field_refs": []
+    },
+    {
+      "id": "focus_impaired",
+      "category": "cognitive",
+      "description": "Reduced concentration or attention capacity reported. Plans should be concrete, short, and low-decision. Avoid open-ended or multi-step sequences.",
+      "existing_field_refs": []
+    },
+    {
+      "id": "cognitive_overload",
+      "category": "cognitive",
+      "description": "Acute cognitive load — exam week, major deadline, information overload. Plans must be under 30 min total and require minimal mental effort. Maps to scenario_state.exam_period=true.",
+      "existing_field_refs": ["state_buckets: WEEKDAY_EXAM", "scheduling_constraints.tags"]
+    },
+    {
+      "id": "panic_episode",
+      "category": "acute_emotional",
+      "description": "User reports or describes a panic attack (racing heart, shortness of breath, acute fear). Grounding and somatic techniques (5-4-3-2-1, box breathing) are first response. Distinguish from anger — see object_directed_anger_safe.",
+      "existing_field_refs": []
+    },
+    {
+      "id": "acute_distress_expressed",
+      "category": "acute_emotional",
+      "description": "Generalized acute emotional distress not classified as panic or crisis. Requires soft check-in before plan generation. May escalate to T1 if hopelessness language follows.",
+      "existing_field_refs": []
+    },
+    {
+      "id": "high_anxiety",
+      "category": "depressive",
+      "description": "Elevated anxiety state reported by user or inferred from journal/mood logs. Distinct from panic_episode (acute) and passive_hopelessness (T1 safety signal). Maps to memory_corpus tag 'high_anxiety'. Guides recommendation toward grounding, somatic, and low-stimulation activities.",
+      "existing_field_refs": ["memory_corpus.tags"]
+    },
+    {
+      "id": "anhedonia",
+      "category": "depressive",
+      "description": "User reports loss of interest or pleasure in previously enjoyed activities. NICE NG222 first-line signal for behavioural activation (BA). Do not prescribe high-intensity exercise as a mood fix.",
+      "existing_field_refs": []
+    },
+    {
+      "id": "passive_hopelessness",
+      "category": "depressive",
+      "description": "User expresses generalised hopelessness without specific suicidal ideation ('nothing helps', 'what's even the point'). C-SSRS Tier 1 trigger. Requires soft check-in; does NOT require emergency bypass alone.",
+      "existing_field_refs": ["safety_taxonomy: T1 trigger_signals"]
+    },
+    {
+      "id": "expressed_exhaustion",
+      "category": "depressive",
+      "description": "User expresses profound exhaustion as an identity or persistent state rather than a temporary tiredness ('I'm always exhausted', 'I'm running on empty'). C-SSRS Tier 1 co-trigger when combined with passive_hopelessness.",
+      "existing_field_refs": ["safety_taxonomy: T1 trigger_signals"]
+    },
+    {
+      "id": "what_is_the_point_language",
+      "category": "depressive",
+      "description": "User expresses existential futility ('why do I bother', 'what's even the point of any of this'). C-SSRS Tier 1 trigger. Requires disambiguation — may reflect burnout, not SI. Frequency rule applies: >=2 occurrences in session promotes to T2.",
+      "existing_field_refs": ["safety_taxonomy: T1 trigger_signals"]
+    },
+    {
+      "id": "active_self_harm_thoughts_no_plan",
+      "category": "safety",
+      "description": "User expresses active thoughts of self-harm or suicide without a specific method, plan, or stated intent. C-SSRS Tier 2. Requires safety planning resources and 988/crisis line. Does NOT halt plan generation unless frequency escalation triggers.",
+      "existing_field_refs": ["safety_taxonomy: T2 trigger_signals"]
+    },
+    {
+      "id": "specific_plan_disclosed",
+      "category": "safety",
+      "description": "User discloses a specific self-harm plan (e.g. method + timeframe). C-SSRS Tier 3 trigger. Immediately halts all plan generation. Emergency protocol activates.",
+      "existing_field_refs": ["safety_taxonomy: T3 trigger_signals"]
+    },
+    {
+      "id": "method_plus_intent",
+      "category": "safety",
+      "description": "User discloses both a method and intent to act. C-SSRS Tier 3 trigger. Single utterance is sufficient — no frequency threshold required. Emergency protocol activates.",
+      "existing_field_refs": ["safety_taxonomy: T3 trigger_signals"]
+    },
+    {
+      "id": "imminent_action_language",
+      "category": "safety",
+      "description": "User language indicates imminent behavioral preparation ('I have the pills', 'I'm going to do it tonight', 'I've already decided'). C-SSRS Tier 3 trigger. Emergency protocol activates regardless of prior tier.",
+      "existing_field_refs": ["safety_taxonomy: T3 trigger_signals", "episodes: evl7_public_easy_006"]
+    },
+    {
+      "id": "object_directed_anger_safe",
+      "category": "safety",
+      "description": "SAFE SIGNAL — anger directed at an object, situation, or third party, NOT at self. Must NOT trigger T2 or T3. Examples: 'I want to punch a wall', 'I could throttle my boss', 'I'm going to kill this laptop'. Disambiguation rule: if subject of harm is not the user's own body or life, treat as object_directed_anger_safe.",
+      "existing_field_refs": ["safety_taxonomy: object_directed_disambiguation"]
+    },
+    {
+      "id": "broken_streak",
+      "category": "behavioral",
+      "description": "User's active habit streak has been broken. Variable-reward calibration required — do not respond with generic or punitive language. Applies to streak_progress.current_streak_days dropping to 0.",
+      "existing_field_refs": ["streak_progress", "wellness_task_catalog.scenario_hooks.streak_status"]
+    },
+    {
+      "id": "routine_disrupted",
+      "category": "behavioral",
+      "description": "An established wellness routine has been significantly disrupted by external circumstances (illness, schedule change, life event). Stale plan retirement likely needed. Maps to scenario_state or memory_corpus stale entries.",
+      "existing_field_refs": ["memory_corpus.tags", "user_schedule_calendar"]
+    },
+    {
+      "id": "exercise_avoidance_pattern",
+      "category": "behavioral",
+      "description": "Pattern of repeatedly not completing planned exercise sessions (2+ missed sessions in recent memory). NICE NG222 BA approach warranted — start smaller, not harder. Check rejected_activities_memory for prior failures.",
+      "existing_field_refs": ["rejected_activities_memory", "memory_corpus"]
+    },
+    {
+      "id": "social_isolation",
+      "category": "social",
+      "description": "User reports withdrawal from social contact or significant reduction in social interaction. CDC stress guidance supports social connection as a mental health protective factor. Surface social habits and community challenges.",
+      "existing_field_refs": []
+    },
+    {
+      "id": "caregiver_unavailable",
+      "category": "social",
+      "description": "Primary caregiver or support person is unavailable for this session or period. Affects planning for users (e.g. new_parent) who depend on partner availability for extended routine windows.",
+      "existing_field_refs": ["caregiver_briefs", "user_schedule_calendar"]
+    },
+    {
+      "id": "LGBTQ_self_disclosure",
+      "category": "identity",
+      "description": "User has disclosed LGBTQ+ identity in session. Requires culturally affirming, identity-safe response framing. Minority stress model applies. Do not treat disclosure as a wellness problem to solve.",
+      "existing_field_refs": []
+    },
+    {
+      "id": "minority_stress_signals",
+      "category": "psychosocial",
+      "description": "Signals consistent with the minority stress model — chronic stress arising from stigma, discrimination, or identity-based social pressure. Affects baseline stress load and wellness plan framing.",
+      "existing_field_refs": []
+    },
+    {
+      "id": "burnout_active",
+      "category": "psychosocial",
+      "description": "Professional or caregiver burnout indicators present: emotional exhaustion, reduced efficacy, cynicism about activities. Maps to user_professional_burnout persona and WEEKDAY_HIGH_STRESS context. Requires short-session, low-commitment planning.",
+      "existing_field_refs": ["memory_corpus.tags", "state_buckets: WEEKDAY_HIGH_STRESS"]
+    },
+    {
+      "id": "pregnancy_flagged",
+      "category": "life_stage",
+      "description": "User is pregnant. Exercise and nutrition recommendations require significant modification. High-intensity and contact sports contraindicated. Always defer to healthcare provider for exercise prescription.",
+      "existing_field_refs": []
+    },
+    {
+      "id": "postpartum_flagged",
+      "category": "life_stage",
+      "description": "User is in the postpartum period. Maps to user_new_parent_fatigued persona. Sleep deprivation is structural. Ultra-low-effort micro-habits are the appropriate entry point. Pelvic floor and core contraindications may apply.",
+      "existing_field_refs": ["user_wellness_profiles: user_new_parent_fatigued"]
+    },
+    {
+      "id": "older_adult",
+      "category": "demographic",
+      "description": "User is 65 or older. WHO PA 2020 guidelines have specific recommendations for older adults including balance training. Exercise intensity and duration adjustments apply. Fall-risk contraindications relevant.",
+      "existing_field_refs": []
+    },
+    {
+      "id": "adolescent",
+      "category": "demographic",
+      "description": "User is under 18. Safeguarding protocols apply. Crisis routing may require different resources (youth crisis lines). Parental/guardian notification rules may apply depending on jurisdiction.",
+      "existing_field_refs": []
+    }
+  ]
+}

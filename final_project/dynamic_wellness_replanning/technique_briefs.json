@@ -1,0 +1,58 @@
+{
+  "lifestyle_baseline_WEEKDAY_NORMAL": {
+    "doc_id": "technique:lifestyle_baseline_weekday",
+    "text": "Standard weekday wellness brief: movement should be evidence-based and dose-appropriate. WHO guidelines recommend 150-300 min/week moderate aerobic activity. Start-of-day routines create the strongest adherence scaffolding. Pair aerobic with a brief mindfulness or journaling habit for compounding effect.",
+    "soft_tags": ["evidence_based", "structured", "energy_boosting", "dose_responsive"],
+    "preferred_modality": "morning_aerobic_plus_habit",
+    "source_ids": ["S01", "S05"]
+  },
+  "mood_dip_WEEKDAY_HIGH_STRESS": {
+    "doc_id": "technique:mood_dip_high_stress",
+    "text": "Mood-dip high-stress brief: when mood is below 5/10 and energy below 5/10, the most evidence-supported approach is low-intensity aerobic activity (walking, gentle yoga) rather than high-intensity training. Heissel et al. (2023) confirm a large effect size for any aerobic movement on depressive symptoms. CBT behavioural activation — scheduling a small, achievable activity — is the preferred entry point. Avoid activities with high cognitive or physical cost.",
+    "soft_tags": ["low_intensity", "cbt_aligned", "accessible", "evidence_based"],
+    "preferred_modality": "low_intensity_aerobic_or_behavioural_activation",
+    "source_ids": ["S03", "S06"]
+  },
+  "sleep_disrupted_RECOVERY_MODE": {
+    "doc_id": "technique:sleep_disrupted_recovery",
+    "text": "Sleep disruption brief: prioritise sleep hygiene habits first — consistent wake time, no screens 30 min before sleep, light evening meal (no caffeine after 2pm). CDC recommends adults get ≥7 hours. When sleep is acutely reduced (<5h), high-intensity exercise is contraindicated; focus on restorative activities. Progressive muscle relaxation and body scan meditation support sleep onset.",
+    "soft_tags": ["sleep_promoting", "grounding", "somatic", "low_demand"],
+    "preferred_modality": "sleep_hygiene_plus_restorative_movement",
+    "source_ids": ["S08", "S10"]
+  },
+  "injury_recovery_RECOVERY_MODE": {
+    "doc_id": "technique:injury_recovery",
+    "text": "Injury recovery brief: plans must respect physiotherapist or medical contraindications absolutely. For lower-limb injuries: swimming, seated yoga, upper-body resistance, and breathing practices are commonly viable alternatives. WHO guidelines support 'any movement is better than none' — the key constraint is contraindication-clean, not inactivity. Psychological frustration from reduced activity is common; acknowledge it and redirect to what IS possible.",
+    "soft_tags": ["somatic", "accessible", "low_intensity", "evidence_based"],
+    "preferred_modality": "injury_adapted_movement",
+    "source_ids": ["S01", "S04"]
+  },
+  "burnout_recovery_WEEKDAY_HIGH_STRESS": {
+    "doc_id": "technique:burnout_recovery",
+    "text": "Burnout recovery brief: consistent low-dose movement outperforms sporadic high-intensity sessions for burnout. NICE NG222 supports behavioural activation and group exercise as first-line approaches. For solo users, structured 15-20 min morning walks with a journaling anchor are the most adherence-robust combination. Avoid overcommitting — failed plans reinforce avoidance.",
+    "soft_tags": ["low_intensity", "structured", "cbt_aligned", "accessible"],
+    "preferred_modality": "short_structured_morning_routine",
+    "source_ids": ["S05", "S06"]
+  },
+  "exam_crunch_WEEKDAY_EXAM": {
+    "doc_id": "technique:exam_crunch",
+    "text": "Exam-crunch brief: time-compressed routines should max out at 20-30 minutes total. Micro-habits (5-min walks, 5-min breathing, gratitude note) have demonstrated stress reduction effect. CDC stress guidance supports brief outdoor movement as acute stress relief. Cognitive load is high — do NOT add complex planning tasks. Support what already works rather than introducing new activities.",
+    "soft_tags": ["low_demand", "accessible", "grounding", "low_intensity"],
+    "preferred_modality": "micro_habit_bundle",
+    "source_ids": ["S08", "S09"]
+  },
+  "new_parent_fatigue_RECOVERY_MODE": {
+    "doc_id": "technique:new_parent_fatigue",
+    "text": "New parent fatigue brief: sleep fragmentation is the primary constraint. All plans must fit in 10-15 minute windows unless a partner overnight shift creates an exception. Ultra-low-effort habits (5-min breathing, sunlight exposure) count — completion matters more than volume. Social support (partner involvement, community connection) significantly improves adherence in this population per NICE NG222.",
+    "soft_tags": ["low_demand", "accessible", "micro_habit_compatible", "connection"],
+    "preferred_modality": "micro_habit_solo_or_partner",
+    "source_ids": ["S06", "S08"]
+  },
+  "goal_pivot_productivity_WEEKDAY_NORMAL": {
+    "doc_id": "technique:goal_pivot_productivity",
+    "text": "Goal-pivot (anxiety→productivity) brief: when user shifts primary goal from anxiety management to productivity enhancement, the exercise and habit prescriptions change. For productivity: morning aerobic exercise (WHO PA guideline A1 dose) improves executive function and focus. Journaling shifts from emotional processing to task prioritisation. Meditation shifts from calming (body scan) to focused attention (mindfulness). Retire anxiety-specific framing but keep any useful anxiolytic habits if user wants.",
+    "soft_tags": ["energy_boosting", "structured", "evidence_based", "cbt_aligned"],
+    "preferred_modality": "structured_aerobic_plus_focus_meditation",
+    "source_ids": ["S01", "S06"]
+  }
+}

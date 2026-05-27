@@ -1,0 +1,72 @@
+[
+  {
+    "dependency_id": "dependency:yoga_then_meditation_bundle",
+    "doc_id": "dependency:yoga_then_meditation_bundle",
+    "context": "WEEKDAY_NORMAL",
+    "exercise_id": "EX_yoga_moderate_30min",
+    "meditation_id": "MED_body_scan_10min",
+    "habit_id": null,
+    "nutrition_id": null,
+    "condition_tags": ["post_movement_relaxation"],
+    "effect": "boost",
+    "score_bonus": 1.8,
+    "text": "Following yoga with a body scan meditation deepens the relaxation response and improves adherence to both activities.",
+    "tags": ["somatic", "sleep_promoting", "grounding"]
+  },
+  {
+    "dependency_id": "dependency:aerobic_then_protein_snack",
+    "doc_id": "dependency:aerobic_then_protein_snack",
+    "context": "WEEKDAY_NORMAL",
+    "exercise_id": "EX_standard_30min_aerobic",
+    "meditation_id": null,
+    "habit_id": null,
+    "nutrition_id": "NUT_energy_boosting_snack",
+    "condition_tags": ["post_exercise_recovery"],
+    "effect": "boost",
+    "score_bonus": 1.5,
+    "text": "A protein-rich snack within 30 minutes of aerobic exercise supports muscle recovery and sustains energy through the morning.",
+    "tags": ["energy_boosting", "structured", "dose_responsive"]
+  },
+  {
+    "dependency_id": "dependency:sleep_hygiene_bundle",
+    "doc_id": "dependency:sleep_hygiene_bundle",
+    "context": "WEEKEND_LOW_ENERGY",
+    "exercise_id": null,
+    "meditation_id": "MED_sleep_wind_down_20min",
+    "habit_id": "HAB_no_screen_30min_before_sleep",
+    "nutrition_id": "NUT_sleep_promoting_evening",
+    "condition_tags": ["sleep_deficit"],
+    "effect": "boost",
+    "score_bonus": 2.1,
+    "text": "Combining no-screen wind-down, a sleep meditation, and a light evening meal creates a strong sleep-onset bundle for disrupted sleep.",
+    "tags": ["sleep_promoting", "grounding", "low_demand"]
+  },
+  {
+    "dependency_id": "dependency:journal_then_activation",
+    "doc_id": "dependency:journal_then_activation",
+    "context": "WEEKDAY_HIGH_STRESS",
+    "exercise_id": null,
+    "meditation_id": null,
+    "habit_id": "HAB_journal_morning",
+    "nutrition_id": null,
+    "condition_tags": ["behavioural_activation_readiness"],
+    "effect": "boost",
+    "score_bonus": 1.6,
+    "text": "Morning journaling before a behavioural activation microstep reduces cognitive load and improves completion rate.",
+    "tags": ["cbt_aligned", "grounding", "structured"]
+  },
+  {
+    "dependency_id": "dependency:breathing_before_HIIT_prerequisite",
+    "doc_id": "dependency:breathing_before_HIIT_prerequisite",
+    "context": "WEEKDAY_NORMAL",
+    "exercise_id": "EX_HIIT_moderate_20min",
+    "meditation_id": "MED_breathing_5min",
+    "habit_id": null,
+    "nutrition_id": null,
+    "condition_tags": ["high_intensity_readiness"],
+    "effect": "prerequisite",
+    "score_bonus": 0,
+    "text": "A 5-min breathing exercise before HIIT helps reduce sympathetic overdrive; skipping it on a high-stress day increases injury risk.",
+    "tags": ["somatic", "structured", "low_demand"]
+  }
+]

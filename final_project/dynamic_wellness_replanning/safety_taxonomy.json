@@ -1,0 +1,150 @@
+{
+  "_meta": {
+    "purpose": "4-tier crisis routing taxonomy with C-SSRS anchors. Supersedes safety_policy_rules.json stub references. Wayne's Safety Verifier agent binds to this file. Allison's safety_policy_rules.json may extend with locale-specific resource overrides.",
+    "cssrs_reference": "Columbia Suicide Severity Rating Scale (C-SSRS), Posner et al. 2011",
+    "frequency_escalation_note": "T1 frequency rule: if T1-tier signals occur >=2 times in a single session within 15 minutes, promote to T2 regardless of individual signal strength.",
+    "severity_dominance_note": "A single utterance containing method + intent is sufficient to trigger T3. No frequency threshold required.",
+    "tool_binding": "Wayne's detect_crisis_keywords wrapper tool reads this file. It returns { tier, trigger_signals_matched, planner_disabled_this_turn, response_template, crisis_resources } from the matching tier object.",
+    "signal_vocabulary_source": "signal_taxonomy.json — all trigger_signals values are registered canonical signal IDs.",
+    "wellness_policy_binding": "wellness_policy_rules.json crisis_bypass block activates when this file returns T3.",
+    "locale_doc_ids": {
+      "MOHW-KR-CRISIS-1": "Korean Ministry of Health and Welfare crisis line — 1393. Referenced by HAB_t3_bypass_template_KR and T3 KR crisis resource string."
+    }
+  },
+  "tiers": [
+    {
+      "tier": "T0",
+      "label": "no_safety_concern",
+      "cssrs_anchor": null,
+      "trigger_signals": [],
+      "routing_action": "continue_normal_flow",
+      "planner_disabled_this_turn": false,
+      "response_template": null,
+      "notes": "Default state. No safety signals detected. Proceed with wellness planning normally."
+    },
+    {
+      "tier": "T1",
+      "label": "passive_ideation",
+      "cssrs_anchor": "Wish to be dead / Non-specific active SI without method, intent, or plan",
+      "trigger_signals": [
+        "passive_hopelessness",
+        "expressed_exhaustion",
+        "what_is_the_point_language"
+      ],
+      "routing_action": "soft_check_in_with_caregiver_suggestion",
+      "frequency_escalation_rule": "if_T1_count_>=2_in_15min_promote_to_T2",
+      "planner_disabled_this_turn": false,
+      "response_template": "HAB_t1_softcheckin_then_connection_microstep",
+      "caregiver_suggestion_doc_ids": ["caregiver:campus_counseling", "caregiver:gp_doctor"],
+      "notes": "Plan generation is NOT halted at T1. A soft check-in is embedded before the plan. Caregiver suggestions are surfaced gently, not directively. Monitor for frequency escalation."
+    },
+    {
+      "tier": "T2",
+      "label": "active_ideation_no_plan",
+      "cssrs_anchor": "Active SI with method but no specific plan or intent",
+      "trigger_signals": [
+        "active_self_harm_thoughts_no_plan"
+      ],
+      "routing_action": "safety_planning_plus_resources_988_lifeline",
+      "severity_dominance": "single_utterance_with_method_intent_overrides_to_T3",
+      "planner_disabled_this_turn": true,
+      "planner_resume_next_turn": true,
+      "response_template": "HAB_t2_safety_planning_resources",
+      "response_template_status": "PENDING — inventory_habits.json entry not yet authored. Must be added before Hard-2 episode evaluation.",
+      "crisis_resources": {
+        "US": "988 Suicide and Crisis Lifeline — call or text 988",
+        "KR": "Korea Suicide Prevention Hotline — 1393",
+        "UK": "Samaritans — 116 123",
+        "generic": "Contact a crisis helpline or go to your nearest emergency department"
+      },
+      "notes": "Plan generation is paused for this turn. Safety resources are provided. If the user continues in the next turn without escalating, plan generation may resume. Single utterance with method + intent immediately overrides to T3."
+    },
+    {
+      "tier": "T3",
+      "label": "imminent_risk",
+      "cssrs_anchor": "Active SI with specific plan and intent / behavioral preparation",
+      "trigger_signals": [
+        "specific_plan_disclosed",
+        "method_plus_intent",
+        "imminent_action_language"
+      ],
+      "routing_action": "full_resource_bypass_emergency_protocol",
+      "planner_disabled_this_turn": true,
+      "response_template": "HAB_t3_bypass_template_KR",
+      "crisis_resources": {
+        "US": "Call 911 or 988 now. If you are with someone, do not leave them alone.",
+        "KR": "지금 바로 1393 또는 119에 전화하세요. (MOHW-KR-CRISIS-1)",
+        "UK": "Call 999 or go to your nearest A&E. If with someone, do not leave them alone.",
+        "generic": "Please call emergency services or your local crisis line immediately."
+      },
+      "forbidden_actions_this_turn": [
+        "any_microstep_generation",
+        "any_reward_calculation",
+        "any_clinical_advice",
+        "any_plan_generation",
+        "any_reframing_or_minimization"
+      ],
+      "notes": "T3 is a hard stop. The planner is fully disabled for this turn. No wellness plan, microstep, or reframing is generated. Emergency resources are provided directly. The system identifies itself as not a substitute for emergency services."
+    }
+  ],
+  "object_directed_disambiguation": {
+    "rule": "anger_directed_at_object_or_situation_not_self_must_not_trigger_T2_or_T3",
+    "signal_id": "object_directed_anger_safe",
+    "evaluation_steps": [
+      "1. Identify the subject of the harm statement.",
+      "2. If subject is an inanimate object, situation, or third party — classify as object_directed_anger_safe and route to T0.",
+      "3. If subject is the user's own body, life, or existence — evaluate for T1/T2/T3 based on specificity and intent.",
+      "4. If ambiguous (e.g. 'I want to disappear') — treat as T1 minimum pending clarification."
+    ],
+    "examples_safe": [
+      "I want to punch a wall",
+      "I'm going to kill this laptop",
+      "I could throttle my boss",
+      "I want to destroy this project",
+      "I'm so angry I could scream"
+    ],
+    "examples_unsafe": [
+      "I want to hurt myself",
+      "I want to disappear forever",
+      "I don't want to be here anymore",
+      "I have the pills in front of me right now",
+      "I've decided what I'm going to do"
+    ],
+    "examples_ambiguous_resolve_as_T1": [
+      "I just feel like I'm going through the motions. What's even the point.",
+      "I'm not going to do anything. I just feel empty.",
+      "I'm so tired of everything."
+    ],
+    "hard_2_episode_note": "The Hard-2 episode begins with T1-adjacent language ('going through the motions', 'what's the point') then escalates to 'I'm not going to do anything' (T1 resolution, not T3) before pivoting to anger at an external situation. The object_directed_disambiguation block must fire on the anger utterance to prevent false T2/T3 escalation. The pivot is: ambiguous → T1 check-in → anger at situation (T0) → resume plan."
+  },
+  "tier_promotion_rules": [
+    {
+      "rule_id": "TPR-01",
+      "description": "Frequency escalation: if T1-classified signals occur >=2 times within a single session (15-minute window), promote to T2 regardless of individual signal strength.",
+      "from_tier": "T1",
+      "to_tier": "T2",
+      "condition": "count(T1_signals_in_session) >= 2"
+    },
+    {
+      "rule_id": "TPR-02",
+      "description": "Severity dominance: single utterance containing both method and intent overrides to T3 regardless of prior tier.",
+      "from_tier": "T2",
+      "to_tier": "T3",
+      "condition": "method_present AND intent_present in single_utterance"
+    },
+    {
+      "rule_id": "TPR-03",
+      "description": "Behavioral preparation override: any language indicating imminent behavioral preparation (e.g. 'I have the pills') triggers T3 directly regardless of prior context.",
+      "from_tier": "any",
+      "to_tier": "T3",
+      "condition": "imminent_action_language signal detected"
+    },
+    {
+      "rule_id": "TPR-04",
+      "description": "Object-directed disambiguation override: anger directed at non-self subject must be classified as T0 regardless of violent language used.",
+      "from_tier": "T2_or_T3_tentative",
+      "to_tier": "T0",
+      "condition": "object_directed_anger_safe signal confirmed"
+    }
+  ]
+}

@@ -44,5 +44,14 @@
       "late_arrival_cutoff",
       "stakeholder_tradeoff"
     ]
+  },
+  "hidden_summary": {
+    "hidden_count": 30,
+    "hidden_tier_counts": {
+      "easy": 4,
+      "medium": 13,
+      "hard": 13
+    },
+    "note": "Hidden episodes are generated from TA-only specs using the same high-level grammar."
   }
 }

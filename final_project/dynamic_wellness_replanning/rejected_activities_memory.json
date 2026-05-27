@@ -1,0 +1,82 @@
+[
+  {
+    "memory_id": "reject:user_student_anxious:exercise:EX_HIIT_moderate_20min",
+    "user_id": "user_student_anxious",
+    "context": "WEEKDAY_EXAM",
+    "family": "exam_crunch",
+    "kind": "exercise",
+    "activity_ref_id": "EX_HIIT_moderate_20min",
+    "reason_key": "rejected_exercise_for_high_intensity_during_low_state",
+    "text": "EX_HIIT_moderate_20min was rejected for user_student_anxious during exam period because energy state 3/10 and sleep deprivation make high-intensity exercise unsafe and contraindicated."
+  },
+  {
+    "memory_id": "reject:user_student_anxious:habit:HAB_yoga_group_class",
+    "user_id": "user_student_anxious",
+    "context": null,
+    "family": null,
+    "kind": "habit",
+    "activity_ref_id": "HAB_yoga_group_class",
+    "reason_key": "rejected_activity_for_user_preference",
+    "text": "User tried group yoga class one month ago and quit after two sessions. Finds group dynamics anxiety-provoking. Do not re-suggest unless explicitly requested."
+  },
+  {
+    "memory_id": "reject:user_athlete_injured:exercise:EX_walk_30min",
+    "user_id": "user_athlete_injured",
+    "context": "RECOVERY_MODE",
+    "family": "injury_recovery",
+    "kind": "exercise",
+    "activity_ref_id": "EX_walk_30min",
+    "reason_key": "rejected_exercise_for_physical_contraindication",
+    "text": "EX_walk_30min was rejected for user_athlete_injured because walking caused knee pain after 5 minutes. Do not surface until medical clearance is confirmed."
+  },
+  {
+    "memory_id": "reject:user_athlete_injured:exercise:EX_HIIT_moderate_20min",
+    "user_id": "user_athlete_injured",
+    "context": "RECOVERY_MODE",
+    "family": "injury_recovery",
+    "kind": "exercise",
+    "activity_ref_id": "EX_HIIT_moderate_20min",
+    "reason_key": "rejected_exercise_for_physical_contraindication",
+    "text": "HIIT is contraindicated during active knee injury recovery. Do not suggest until full medical clearance."
+  },
+  {
+    "memory_id": "reject:user_professional_burnout:exercise:EX_combination_aerobic_resistance_45min",
+    "user_id": "user_professional_burnout",
+    "context": "WEEKDAY_HIGH_STRESS",
+    "family": "burnout_recovery",
+    "kind": "exercise",
+    "activity_ref_id": "EX_combination_aerobic_resistance_45min",
+    "reason_key": "rejected_exercise_for_time_and_energy_constraint",
+    "text": "45-min combined session was rejected during peak burnout period — user cannot commit to sessions over 20 minutes in current state. Revisit when energy score improves above 6/10."
+  },
+  {
+    "memory_id": "reject:user_remote_worker_sedentary:exercise:EX_resistance_training_30min",
+    "user_id": "user_remote_worker_sedentary",
+    "context": "WEEKDAY_NORMAL",
+    "family": "lifestyle_baseline",
+    "kind": "exercise",
+    "activity_ref_id": "EX_resistance_training_30min",
+    "reason_key": "rejected_exercise_for_equipment_barrier",
+    "text": "Resistance training rejected because user does not own equipment and finds gym registration overwhelming at this stage. Do not suggest equipment-dependent sessions until user explicitly requests them."
+  },
+  {
+    "memory_id": "reject:user_new_parent_fatigued:exercise:EX_yoga_moderate_30min",
+    "user_id": "user_new_parent_fatigued",
+    "context": "RECOVERY_MODE",
+    "family": "new_parent_fatigue",
+    "kind": "exercise",
+    "activity_ref_id": "EX_yoga_moderate_30min",
+    "reason_key": "rejected_exercise_for_time_constraint",
+    "text": "30-min yoga session is too long for user's current 10-15 minute maximum window. Replace with EX_yoga_gentle_15min or EX_stretching_10min."
+  },
+  {
+    "memory_id": "reject:user_professional_burnout:habit:HAB_evening_gym_routine",
+    "user_id": "user_professional_burnout",
+    "context": null,
+    "family": null,
+    "kind": "habit",
+    "activity_ref_id": "HAB_evening_gym_routine",
+    "reason_key": "rejected_activity_for_energy_constraint",
+    "text": "Evening gym routine rejected — user has no energy by 6pm during burnout. Mornings only are viable. Do not suggest evening structured exercise."
+  }
+]

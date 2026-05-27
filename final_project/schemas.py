@@ -1,7 +1,45 @@
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
+
+
+class FlexibleCompatModel(BaseModel):
+    """Backward-compatible base for older student helper schemas.
+
+    Some early submissions imported extra typed containers from schemas.py
+    (for example TripDetails or WorkingMemoryBoard).  The official evaluator
+    only requires TravelDecision/MemoryReport, but keeping these permissive
+    containers lets those submissions import and run without allowing students
+    to override framework files such as llm_tools.py.
+    """
+
+    model_config = ConfigDict(extra="allow")
+
+
+class TripDetails(FlexibleCompatModel):
+    trip_id: Optional[str] = None
+    city: Optional[str] = None
+    origin: Optional[str] = None
+    traveler_id: Optional[str] = None
+    nights: Optional[int] = None
+    budget_total: Optional[float] = None
+    meeting_zone: Optional[str] = None
+    weather: Optional[str] = None
+    difficulty_tier: Optional[str] = None
+    benchmark_family: Optional[str] = None
+
+
+class WorkingMemoryBoard(FlexibleCompatModel):
+    retrieved: List[str] = Field(default_factory=list)
+    retired: List[str] = Field(default_factory=list)
+    retired_docs: List[str] = Field(default_factory=list)
+    active_context_keys: List[str] = Field(default_factory=list)
+    active_docs: List[str] = Field(default_factory=list)
+    docs_retrieved: List[str] = Field(default_factory=list)
+    ignored_distractors: List[str] = Field(default_factory=list)
+    rejected_option_notes: List[str] = Field(default_factory=list)
+    notes: str = ""
 
 
 class SpokenRuleHits(BaseModel):

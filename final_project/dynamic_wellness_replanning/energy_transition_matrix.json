@@ -1,0 +1,42 @@
+{
+  "WEEKDAY_NORMAL": {
+    "aerobic_to_meditation": 5,
+    "aerobic_to_nutrition": 10,
+    "meditation_to_aerobic": 8,
+    "nutrition_to_aerobic": 20,
+    "habit_to_aerobic": 10,
+    "aerobic_to_habit": 5
+  },
+  "WEEKDAY_EXAM": {
+    "aerobic_to_meditation": 3,
+    "aerobic_to_nutrition": 5,
+    "meditation_to_aerobic": 10,
+    "nutrition_to_aerobic": 15,
+    "habit_to_aerobic": 8,
+    "aerobic_to_habit": 3
+  },
+  "WEEKDAY_HIGH_STRESS": {
+    "aerobic_to_meditation": 3,
+    "aerobic_to_nutrition": 5,
+    "meditation_to_aerobic": 15,
+    "nutrition_to_aerobic": 20,
+    "habit_to_aerobic": 12,
+    "aerobic_to_habit": 5
+  },
+  "WEEKEND_LOW_ENERGY": {
+    "aerobic_to_meditation": 8,
+    "aerobic_to_nutrition": 15,
+    "meditation_to_aerobic": 20,
+    "nutrition_to_aerobic": 30,
+    "habit_to_aerobic": 20,
+    "aerobic_to_habit": 8
+  },
+  "RECOVERY_MODE": {
+    "aerobic_to_meditation": 10,
+    "aerobic_to_nutrition": 15,
+    "meditation_to_aerobic": 30,
+    "nutrition_to_aerobic": 45,
+    "habit_to_aerobic": 30,
+    "aerobic_to_habit": 10
+  }
+}

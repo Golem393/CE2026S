@@ -1,0 +1,80 @@
+[
+  {
+    "event_id": "event:student_exam_finals_week",
+    "doc_id": "event:student_exam_finals_week",
+    "user_id": "user_student_anxious",
+    "affected_context": "WEEKDAY_EXAM",
+    "effect_type": "high_cognitive_load",
+    "blocked_exercise_id": null,
+    "boosted_habit_id": "HAB_5min_outdoor_micro_break",
+    "start_date": "2026-05-06",
+    "end_date": "2026-05-12",
+    "text": "Finals week creates high cognitive load and compressed time windows. Plans that take more than 20 total minutes are unlikely to be completed. Micro-habits and stress-reduction activities take priority.",
+    "tags": ["high_stress", "time_compressed", "exam_pressure", "routine_disrupted"]
+  },
+  {
+    "event_id": "event:student_lecture_moved_to_9am",
+    "doc_id": "event:student_lecture_moved_to_9am",
+    "user_id": "user_student_anxious",
+    "affected_context": "WEEKDAY_NORMAL",
+    "effect_type": "schedule_anchor_shift",
+    "blocked_exercise_id": "EX_walk_30min",
+    "boosted_habit_id": null,
+    "start_date": "2026-04-14",
+    "end_date": null,
+    "text": "Lecture moved from 11am to 9am. Morning routine window reduced significantly. 30-min walk before lecture is no longer feasible. Plans must account for 6:45am start to remain schedule-coherent.",
+    "tags": ["schedule_changed", "morning_window_reduced", "time_constraint"]
+  },
+  {
+    "event_id": "event:professional_big_deadline",
+    "doc_id": "event:professional_big_deadline",
+    "user_id": "user_professional_burnout",
+    "affected_context": "WEEKDAY_HIGH_STRESS",
+    "effect_type": "energy_crash_risk",
+    "blocked_exercise_id": "EX_combination_aerobic_resistance_45min",
+    "boosted_habit_id": "HAB_5min_outdoor_micro_break",
+    "start_date": "2026-05-06",
+    "end_date": "2026-05-09",
+    "text": "High-stakes project deadline this week. Energy levels are depleted by mid-morning. Structured plans that require more than 15 minutes of prep or sustained effort are likely to fail. Compress and protect essentials.",
+    "tags": ["energy_crash_risk", "deadline_pressure", "burnout_risk"]
+  },
+  {
+    "event_id": "event:parent_partner_overnight_shift",
+    "doc_id": "event:parent_partner_overnight_shift",
+    "user_id": "user_new_parent_fatigued",
+    "affected_context": "RECOVERY_MODE",
+    "effect_type": "sleep_boost",
+    "blocked_exercise_id": null,
+    "boosted_habit_id": "HAB_sleep_hygiene_routine",
+    "start_date": "2026-05-07",
+    "end_date": "2026-05-07",
+    "text": "Partner taking overnight shift Wednesday — user gets uninterrupted sleep window. Unusual opportunity for slightly longer morning routine (up to 20 min). Do not assume this repeats.",
+    "tags": ["sleep_improved_one_off", "unusual_window", "one_off_exception"]
+  },
+  {
+    "event_id": "event:athlete_physiotherapy_appointment",
+    "doc_id": "event:athlete_physiotherapy_appointment",
+    "user_id": "user_athlete_injured",
+    "affected_context": "RECOVERY_MODE",
+    "effect_type": "clinical_assessment",
+    "blocked_exercise_id": null,
+    "boosted_habit_id": null,
+    "start_date": "2026-05-09",
+    "end_date": "2026-05-09",
+    "text": "Physiotherapy appointment Saturday. Exercise prescription may change after assessment. Do not lock in multi-week plans before this appointment.",
+    "tags": ["clinical_checkpoint", "plan_flexibility_needed"]
+  },
+  {
+    "event_id": "event:remote_worker_community_challenge_week",
+    "doc_id": "event:remote_worker_community_challenge_week",
+    "user_id": "user_remote_worker_sedentary",
+    "affected_context": "WEEKDAY_NORMAL",
+    "effect_type": "social_accountability_boost",
+    "blocked_exercise_id": null,
+    "boosted_habit_id": "HAB_social_check_in",
+    "start_date": "2026-04-30",
+    "end_date": "2026-05-06",
+    "text": "7-day community walking challenge. Daily completion posts visible to group. Accountability effect observed — user has completed 6 consecutive days. Streak ending Friday; plan to extend or transition to next phase.",
+    "tags": ["community_challenge_active", "streak_active", "accountability_boost"]
+  }
+]

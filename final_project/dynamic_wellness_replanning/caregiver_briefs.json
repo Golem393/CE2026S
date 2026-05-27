@@ -1,0 +1,26 @@
+{
+  "caregiver:partner_supportive": {
+    "caregiver_id": "caregiver:partner_supportive",
+    "doc_id": "caregiver:partner_supportive",
+    "text": "Supportive partner available on weekday evenings and occasional overnight shifts. Can take on childcare duties to free up 20-30 minute windows. Does not push specific wellness approaches but encourages consistency.",
+    "tags": ["social_support", "schedule_flexibility", "low_pressure"]
+  },
+  "caregiver:campus_counseling": {
+    "caregiver_id": "caregiver:campus_counseling",
+    "doc_id": "caregiver:campus_counseling",
+    "text": "University counseling service available to student users. Provides one-on-one sessions and crisis referral. Should be surfaced when mood signals suggest professional support would be beneficial. Not a substitute for emergency services.",
+    "tags": ["professional_support", "mental_health_referral", "crisis_adjacent"]
+  },
+  "caregiver:physiotherapist": {
+    "caregiver_id": "caregiver:physiotherapist",
+    "doc_id": "caregiver:physiotherapist",
+    "text": "Physiotherapist managing athlete user's knee injury recovery. Has prescribed no weight-bearing for 4 weeks. Plans must remain within physiotherapist's clearance bounds. Next appointment May 9, 2026.",
+    "tags": ["medical_authority", "contraindication_source", "clinical_checkpoint"]
+  },
+  "caregiver:gp_doctor": {
+    "caregiver_id": "caregiver:gp_doctor",
+    "doc_id": "caregiver:gp_doctor",
+    "text": "General practitioner. Should be referenced when user reports physical symptoms that fall outside the wellness-coaching scope (chest pain, severe breathlessness, acute injury). Not a substitute for emergency services.",
+    "tags": ["medical_referral", "scope_limit", "non_emergency_medical"]
+  }
+}

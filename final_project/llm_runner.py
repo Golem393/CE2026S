@@ -74,10 +74,18 @@ class LLMRunner:
         self.response_retry_backoff_base_seconds = float(config.get("response_retry_backoff_base_seconds", 2.0))
         self.response_retry_backoff_cap_seconds = float(config.get("response_retry_backoff_cap_seconds", 18.0))
         self.response_retry_jitter_seconds = float(config.get("response_retry_jitter_seconds", 1.25))
+        self._usage_ledger = self.empty_usage()
 
     def trace(self, event: str, **fields: Any) -> None:
         if self.trace_logger is not None:
             self.trace_logger.log(event, **fields)
+
+    def usage_summary(self) -> Dict[str, Any]:
+        return self.combine_usages(self._usage_ledger)
+
+    def _record_observed_usage(self, usage: Dict[str, Any]) -> Dict[str, Any]:
+        self._usage_ledger = self.combine_usages(self._usage_ledger, usage)
+        return usage
 
     def estimate_generation_cost(self, model: str, input_tokens: int, output_tokens: int) -> float:
         price = self.pricing[model]
@@ -164,7 +172,7 @@ class LLMRunner:
                 "by_model": {model: model_usage.to_dict()},
             }
         )
-        return payload
+        return self._record_observed_usage(payload)
 
     def _embedding_usage(self, model: str, prompt_tokens: int) -> Dict[str, Any]:
         model_usage = ModelUsage(
@@ -185,7 +193,7 @@ class LLMRunner:
                 "by_model": {model: model_usage.to_dict()},
             }
         )
-        return payload
+        return self._record_observed_usage(payload)
 
     def _base_kwargs(
         self,

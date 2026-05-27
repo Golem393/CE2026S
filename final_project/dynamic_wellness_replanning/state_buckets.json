@@ -1,0 +1,47 @@
+{
+  "user_student_anxious": {
+    "2026-05-06": "WEEKDAY_EXAM",
+    "2026-05-07": "WEEKDAY_EXAM",
+    "2026-05-08": "WEEKDAY_EXAM",
+    "2026-05-09": "WEEKEND_LOW_ENERGY",
+    "2026-05-10": "WEEKEND_LOW_ENERGY",
+    "2026-05-11": "WEEKDAY_NORMAL",
+    "2026-05-12": "WEEKDAY_NORMAL"
+  },
+  "user_professional_burnout": {
+    "2026-05-06": "WEEKDAY_HIGH_STRESS",
+    "2026-05-07": "WEEKDAY_HIGH_STRESS",
+    "2026-05-08": "WEEKDAY_HIGH_STRESS",
+    "2026-05-09": "WEEKEND_LOW_ENERGY",
+    "2026-05-10": "WEEKEND_LOW_ENERGY",
+    "2026-05-11": "WEEKDAY_NORMAL",
+    "2026-05-12": "WEEKDAY_NORMAL"
+  },
+  "user_new_parent_fatigued": {
+    "2026-05-06": "RECOVERY_MODE",
+    "2026-05-07": "RECOVERY_MODE",
+    "2026-05-08": "WEEKDAY_HIGH_STRESS",
+    "2026-05-09": "WEEKEND_LOW_ENERGY",
+    "2026-05-10": "WEEKEND_LOW_ENERGY",
+    "2026-05-11": "RECOVERY_MODE",
+    "2026-05-12": "WEEKDAY_NORMAL"
+  },
+  "user_athlete_injured": {
+    "2026-05-06": "RECOVERY_MODE",
+    "2026-05-07": "RECOVERY_MODE",
+    "2026-05-08": "RECOVERY_MODE",
+    "2026-05-09": "WEEKEND_LOW_ENERGY",
+    "2026-05-10": "WEEKEND_LOW_ENERGY",
+    "2026-05-11": "RECOVERY_MODE",
+    "2026-05-12": "WEEKDAY_NORMAL"
+  },
+  "user_remote_worker_sedentary": {
+    "2026-05-06": "WEEKDAY_NORMAL",
+    "2026-05-07": "WEEKDAY_NORMAL",
+    "2026-05-08": "WEEKDAY_HIGH_STRESS",
+    "2026-05-09": "WEEKEND_LOW_ENERGY",
+    "2026-05-10": "WEEKEND_LOW_ENERGY",
+    "2026-05-11": "WEEKDAY_NORMAL",
+    "2026-05-12": "WEEKDAY_NORMAL"
+  }
+}

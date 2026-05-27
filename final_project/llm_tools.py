@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextvars
 import json
 import os
 import time
@@ -59,6 +60,27 @@ _SOFT_TAG_TO_KEYS = {
     "client_ready": ["client_dinner_polished"],
     "conference_ready": ["conference_badge_access", "low_friction_transit"],
 }
+
+_ACTIVE_STUDENT_RUNTIME = contextvars.ContextVar("active_student_runtime", default=None)
+
+
+def set_active_student_runtime(runtime):
+    """Set the runtime that should receive toolbox-created session traces.
+
+    The official runner uses this while executing solve_episode(runtime).  It
+    allows legacy solvers that call runtime.toolbox.new_session(...) directly
+    to receive the same trace credit as solvers that call runtime.new_session(...).
+    """
+    return _ACTIVE_STUDENT_RUNTIME.set(runtime)
+
+
+def reset_active_student_runtime(token) -> None:
+    _ACTIVE_STUDENT_RUNTIME.reset(token)
+
+
+def get_active_student_runtime():
+    return _ACTIVE_STUDENT_RUNTIME.get()
+
 
 PRIMITIVE_TOOL_NAMES = [
     "search_memory",
@@ -148,7 +170,7 @@ class TravelToolbox:
         max_results: int,
         role: str,
     ) -> "TravelToolSession":
-        return TravelToolSession(
+        session = TravelToolSession(
             toolbox=self,
             episode=episode,
             retrieval_strategy=retrieval_strategy,
@@ -156,6 +178,12 @@ class TravelToolbox:
             max_results=max_results,
             role=role,
         )
+        runtime = get_active_student_runtime()
+        if runtime is not None and getattr(runtime, "toolbox", None) is self:
+            register = getattr(runtime, "_register_session", None)
+            if callable(register):
+                register(session)
+        return session
 
 
 class TravelToolSession:
