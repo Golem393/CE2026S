@@ -14,7 +14,7 @@
     "stakeholder_tradeoff",
     "weather_disruption"
   ],
-  "rich_hook_tasks": 42,
+  "rich_hook_tasks": 16,
   "public_family_counts": {
     "core_memory_replanning": 1,
     "client_ready_dinner": 2,
@@ -27,20 +27,7 @@
     "one_off_airport_override": 1,
     "event_sensitive_replanning": 1
   },
-  "hidden_family_counts": {
-    "core_memory_replanning": 1,
-    "client_ready_dinner": 2,
-    "loyalty_effective_value": 4,
-    "bundle_cutoff_reasoning": 4,
-    "weather_disruption": 2,
-    "stakeholder_tradeoff": 7,
-    "refund_volatility": 7,
-    "badge_unlocked_bundle": 1,
-    "one_off_airport_override": 1,
-    "event_sensitive_replanning": 1
-  },
-  "public_exact_duplicate_prompt_groups": [],
-  "hidden_exact_duplicate_prompt_groups": [],
+  "hidden_family_counts": "TA-only",
   "public_tier_counts": {
     "easy": 2,
     "medium": 7,
@@ -50,5 +37,7 @@
     "easy": 4,
     "medium": 13,
     "hard": 13
-  }
+  },
+  "public_gold_hard_feasibility": "repaired_against_student_evaluator",
+  "hidden_note": "Hidden validation is performed in the TA-only repository."
 }

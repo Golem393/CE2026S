@@ -20,6 +20,7 @@ from llm_agents import run_memory_single, run_single_baseline
 from llm_runner import LLMRunner
 from llm_tools import TravelToolbox
 from runtime_api import StudentRuntime
+from llm_tools import set_active_student_runtime, reset_active_student_runtime
 from trace_logger import TraceLogger
 
 
@@ -55,6 +56,74 @@ if _has_module("ta_only.student_solver2"):
     }
 
 
+_SOLVER_HIDDEN_DROP_KEYS = {
+    "gold",
+    "scenario_state",
+    "scenario_hooks",
+    "required_hard",
+    "soft_tags",
+    "acceptable_flights",
+    "acceptable_hotels",
+    "acceptable_restaurants",
+    "acceptable_activities",
+    "required_docs",
+    "distractor_docs",
+    "distractor_docs_to_avoid",
+    "stale_docs_to_retire",
+    "benchmark_family",
+    "private_blueprint_note",
+    "travel_analogue_family",
+    # Hidden-only: avoid exposing evaluator-only state flags while keeping
+    # released observable trip context fields (`budget_total`, `meeting_zone`,
+    # and `weather`) solver-visible for backward compatibility. The same
+    # context is also expressed below as natural language.
+}
+
+
+def _hidden_context_turn(episode: Dict[str, Any]) -> Dict[str, str]:
+    budget = episode.get("budget_total")
+    zone = episode.get("meeting_zone") or episode.get("preferred_zone")
+    weather = str(episode.get("weather") or "").lower()
+    parts = []
+    if budget:
+        parts.append(f"keep the full package within roughly {int(budget):,} KRW")
+    if zone:
+        parts.append(f"treat {zone} as the main work-anchor area")
+    if weather in {"rainy", "storm", "wet"}:
+        parts.append("assume the forecast now favors covered or indoor fallbacks")
+    elif weather in {"sunny", "clear", "dry"}:
+        parts.append("assume the forecast does not require avoiding outdoor options")
+    elif weather:
+        parts.append(f"account for the current forecast described as {weather}")
+    text = "For this hidden run, the latest user-provided context is to " + "; ".join(parts) + "." if parts else "For this hidden run, rely on the latest user turns and tool evidence."
+    return {"speaker": "user", "text": text}
+
+
+def sanitize_episode_for_solver(episode: Dict[str, Any], *, hidden: bool = False) -> Dict[str, Any]:
+    """Return the episode object exposed to student solvers.
+
+    Public episodes intentionally remain transparent so students can inspect the
+    benchmark design and debug against the public evaluator. Hidden evaluation,
+    however, should test whether solvers infer constraints from user turns and
+    tool-accessible evidence rather than reading evaluator-only state flags or
+    structured hard-clue fields. The full hidden episode is still passed to the
+    evaluator for scoring.
+    """
+    clean = deepcopy(episode)
+    if not hidden:
+        return clean
+    context_turn = _hidden_context_turn(episode)
+    for key in _SOLVER_HIDDEN_DROP_KEYS:
+        clean.pop(key, None)
+    turns = list(clean.get("turns") or [])
+    clean["turns"] = [context_turn] + turns
+    clean["solver_visible_note"] = (
+        "Hidden evaluation exposes user turns and tool-accessible trip data. "
+        "Evaluator-only state/hooks/gold metadata are withheld from the solver; observable trip context remains available for compatibility."
+    )
+    return clean
+
+
 def _load_solver_callable(module_name: str):
     module = importlib.import_module(module_name)
     solve = getattr(module, "solve_episode", None)
@@ -77,14 +146,22 @@ def _run_dynamic_solver(
         system_config=system_config,
         role=system_config.get("system_name", module_name),
     )
-    result = _load_solver_callable(module_name)(runtime)
+    token = set_active_student_runtime(runtime)
+    try:
+        result = _load_solver_callable(module_name)(runtime)
+    finally:
+        reset_active_student_runtime(token)
     if not isinstance(result, dict) or "submission" not in result or "usage" not in result:
         raise ValueError(
             f"{module_name}.solve_episode(runtime) must return a dict with at least 'submission' and 'usage'."
         )
     result.setdefault("response_ids", [])
-    result.setdefault("tool_trace", [])
+    runtime_trace = runtime.trace_summary()
+    # Official scoring uses harness-observed tool traces; solver-provided traces
+    # are kept only for debugging/backward-compatible result dumps.
+    result.setdefault("tool_trace", runtime_trace.get("tool_trace", []))
     result.setdefault("retrieval", {})
+    result["official_trace"] = runtime_trace
     result.setdefault("api_status", {"success": True})
     return result
 
@@ -164,6 +241,7 @@ def run_eval_set(
     episodes: List[Dict[str, Any]],
     gold_map: Dict[str, Dict[str, Any]] | None = None,
     max_concurrency: int = 1,
+    sanitize_solver_episodes: bool = False,
 ) -> Dict[str, Any]:
     out: Dict[str, Any] = {"systems": {}}
     max_workers = max(1, int(max_concurrency or 1))
@@ -188,16 +266,26 @@ def run_eval_set(
         )
         try:
             runner_key = system_config.get("runner_name", system_name)
+            solver_episode = sanitize_episode_for_solver(episode, hidden=sanitize_solver_episodes)
             if "solver_module" in system_config:
-                run_result = _run_dynamic_solver(worker_runner, toolbox, episode, system_config)
+                run_result = _run_dynamic_solver(worker_runner, toolbox, solver_episode, system_config)
             else:
-                run_result = SYSTEM_RUNNERS[runner_key](worker_runner, toolbox, episode, system_config)
+                run_result = SYSTEM_RUNNERS[runner_key](worker_runner, toolbox, solver_episode, system_config)
             payload = attach_debug(run_result["submission"], run_result)
-            payload["usage"] = run_result["usage"]
-            row = evaluate_episode(toolbox.env, episode, payload, gold=gold)
+            observed_usage = worker_runner.usage_summary()
+            # For dynamic submissions, ignore solver self-reported usage in
+            # official runner output. Built-in agents also have identical
+            # observed usage via the same ledger.
+            payload["usage"] = observed_usage
+            trace = run_result.get("official_trace")
+            if trace is None:
+                trace = run_result.get("retrieval", {})
+                trace.setdefault("tool_trace", run_result.get("tool_trace", []))
+                trace.setdefault("tool_call_count", len(run_result.get("tool_trace", [])))
+            row = evaluate_episode(toolbox.env, episode, payload, gold=gold, trace=trace)
             result = {
                 "trip_id": episode["trip_id"],
-                "observed_episode": {key: value for key, value in episode.items() if key != "gold"},
+                "observed_episode": {key: value for key, value in solver_episode.items() if key != "gold"},
                 "submission": payload,
                 "row": row,
                 "response_ids": run_result.get("response_ids", []),
@@ -221,7 +309,7 @@ def run_eval_set(
             failed_row = build_failed_row(episode, error_text)
             result = {
                 "trip_id": episode["trip_id"],
-                "observed_episode": {key: value for key, value in episode.items() if key != "gold"},
+                "observed_episode": {key: value for key, value in sanitize_episode_for_solver(episode, hidden=sanitize_solver_episodes).items() if key != "gold"},
                 "submission": None,
                 "row": failed_row,
                 "response_ids": [],
@@ -418,7 +506,7 @@ def render_summary_md(public_payload: Dict[str, Any], hidden_payload: Dict[str, 
     )
 
     lines = [
-        "# LLM Eval Summary V2",
+        "# LLM Eval Summary V4.7",
         "",
         "## Setup",
         f"- Generated at: {datetime.now(timezone.utc).isoformat()}",
@@ -426,11 +514,11 @@ def render_summary_md(public_payload: Dict[str, Any], hidden_payload: Dict[str, 
         f"- Hidden sample episodes: {hidden_payload['episode_count']}",
         f"- Hidden sample seed: {hidden_payload['sample_seed']}",
         f"- Hidden sample trip_ids: {', '.join(hidden_payload['sample_trip_ids'])}",
-        f"- Hidden leakage fix: runtime evaluation used `dynamic_travel_replanning/episodes_hidden_input.json` plus separate `dynamic_travel_replanning/episodes_hidden_gold.json`; hidden input carries no `gold` field.",
+        f"- Hidden solver visibility: hidden evaluation passes a sanitized episode to the solver (user turns + observable trip context) while the evaluator uses separate full metadata/gold; public episodes remain transparent for debugging.",
         f"- Student budget caps present: {'Yes' if public_payload.get('budget_policy_present') else 'No'}",
         "",
         "## Main Results",
-        "| system | raw_score | decision_quality | distributed_context | stale_doc_retirement | distractor_avoidance | spoken_rule | cost_usd | tool_calls |",
+        "| system | official_score_100 | decision_quality | distributed_context | stale_doc_retirement | distractor_avoidance | spoken_rule | cost_usd | tool_calls |",
         "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
     for system_name, payload in public_systems.items():
@@ -447,7 +535,7 @@ def render_summary_md(public_payload: Dict[str, Any], hidden_payload: Dict[str, 
             "",
             "## Ablations",
             f"- Ablation sample trip_ids: {', '.join(ablation_payload['sample_trip_ids'])}",
-            "| ablation | raw_score | decision_quality | stale_doc_retirement | spoken_rule | cost_usd |",
+            "| ablation | official_score_100 | decision_quality | stale_doc_retirement | spoken_rule | cost_usd |",
             "| --- | ---: | ---: | ---: | ---: | ---: |",
         ]
     )
@@ -459,7 +547,7 @@ def render_summary_md(public_payload: Dict[str, Any], hidden_payload: Dict[str, 
         )
 
     mas_analysis = (
-        f"On public episodes, compare the corrected raw scores directly: `llm_memory_single` {memory.get('raw_score_for_ranking', 0.0):.4f} vs `llm_anchor_mas` {mas.get('raw_score_for_ranking', 0.0):.4f}. "
+        f"On public episodes, compare the official /100 scores directly: `llm_memory_single` {memory.get('raw_score_for_ranking', 0.0):.4f} vs `llm_anchor_mas` {mas.get('raw_score_for_ranking', 0.0):.4f}. "
         f"These summaries now include failed episodes as zero-score rows, so the comparison reflects both quality and execution reliability."
     )
     if memory and mas:
@@ -470,12 +558,12 @@ def render_summary_md(public_payload: Dict[str, Any], hidden_payload: Dict[str, 
             )
         elif mas.get('raw_score_for_ranking', 0.0) < memory.get('raw_score_for_ranking', 0.0):
             mas_analysis = (
-                f"On public episodes, no: `llm_memory_single` remained ahead at {memory.get('raw_score_for_ranking', 0.0):.4f} raw score, while `llm_anchor_mas` reached {mas.get('raw_score_for_ranking', 0.0):.4f}. "
+                f"On public episodes, no: `llm_memory_single` remained ahead at {memory.get('raw_score_for_ranking', 0.0):.4f} official /100 score, while `llm_anchor_mas` reached {mas.get('raw_score_for_ranking', 0.0):.4f}. "
                 f"MAS may still show advantages in adaptation metrics, but they did not outweigh its reliability/cost tradeoff in this run."
             )
         else:
             mas_analysis = (
-                f"On public episodes, the two systems tied at {mas.get('raw_score_for_ranking', 0.0):.4f} raw score under the corrected failure-aware summary."
+                f"On public episodes, the two systems tied at {mas.get('raw_score_for_ranking', 0.0):.4f} official /100 score under the corrected failure-aware summary."
             )
     memory_in_run = "llm_memory_single" in public_systems
     mas_in_run = "llm_anchor_mas" in public_systems
@@ -485,7 +573,7 @@ def render_summary_md(public_payload: Dict[str, Any], hidden_payload: Dict[str, 
         mas_analysis = "Not evaluated in this run because `llm_anchor_mas` was not included in `--systems`."
     elif not memory_in_run:
         mas_analysis = (
-            f"Partially evaluated. `llm_anchor_mas` ran and reached {mas.get('raw_score_for_ranking', 0.0):.4f} raw score, but `llm_memory_single` was not included, so the main MAS-vs-memory comparison is unavailable for this run."
+            f"Partially evaluated. `llm_anchor_mas` ran and reached {mas.get('raw_score_for_ranking', 0.0):.4f} official /100 score, but `llm_memory_single` was not included, so the main MAS-vs-memory comparison is unavailable for this run."
         )
     elif not memory and not mas:
         mas_analysis = "The relevant systems were included, but neither completed a successful public episode in this run, so the MAS-vs-memory comparison is unavailable."
@@ -507,7 +595,7 @@ def render_summary_md(public_payload: Dict[str, Any], hidden_payload: Dict[str, 
     if baseline and memory and mas:
         cost_analysis = (
             f"Cost increased from `${baseline.get('total_cost_usd', 0.0):.6f}` for `llm_single_baseline` to `${memory.get('total_cost_usd', 0.0):.6f}` for `llm_memory_single`, "
-            f"then to `${mas.get('total_cost_usd', 0.0):.6f}` for `llm_anchor_mas`. Whether the extra spend was worth it should be judged against the corrected failure-aware raw scores above."
+            f"then to `${mas.get('total_cost_usd', 0.0):.6f}` for `llm_anchor_mas`. Whether the extra spend was worth it should be judged against the corrected failure-aware official /100 scores above."
         )
     elif len(public_systems) >= 2:
         ordered = [
@@ -538,7 +626,7 @@ def render_summary_md(public_payload: Dict[str, Any], hidden_payload: Dict[str, 
             "The benchmark is now stricter and more LLM-native, but the inventory is still relatively small, hidden gold still exists locally for TA-side grading, and the harness still relies on model-reported memory summaries rather than a fully independently derived semantic memory state.",
             "",
             "## Hidden Sample Results",
-            "| system | raw_score | decision_quality | stale_doc_retirement | distractor_avoidance | cost_usd |",
+            "| system | official_score_100 | decision_quality | stale_doc_retirement | distractor_avoidance | cost_usd |",
             "| --- | ---: | ---: | ---: | ---: | ---: |",
         ]
     )
@@ -551,7 +639,7 @@ def render_summary_md(public_payload: Dict[str, Any], hidden_payload: Dict[str, 
 
     best_public_line = "No public systems were executed."
     if best_public:
-        best_public_line = f"`{best_public}` with raw score {public_systems[best_public]['summary'].get('raw_score_for_ranking', 0.0):.4f}."
+        best_public_line = f"`{best_public}` with official /100 score {public_systems[best_public]['summary'].get('raw_score_for_ranking', 0.0):.4f}."
 
     lines.extend(
         [
@@ -695,6 +783,7 @@ def main() -> None:
                     episodes=hidden_sample,
                     gold_map=hidden_gold,
                     max_concurrency=args.max_concurrency,
+                    sanitize_solver_episodes=True,
                 )
                 hidden_payload["generated_at"] = datetime.now(timezone.utc).isoformat()
                 hidden_payload["budget_policy_present"] = bool(config.get("student_tunable_budgets"))

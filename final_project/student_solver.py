@@ -568,7 +568,7 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
 
     # ── 2. Initial Memory Agent ─────────────────────────────────────
     preloaded_context = _preload_all_static_context(runtime, episode)
-    
+
     board_before_mem = _board_summary(board)
     logger.log_board_state("memory", board_before_mem, stage="BEFORE")
     logger.phase_start("memory", iteration=1, input_summary={

@@ -39,3 +39,11 @@ final_project/ta_only/
 final_project/_build/
 final_project/dist/
 final_project/build/
+
+# TA grading artifacts / submissions
+final_project/submission*/
+final_project/grading_runs*/
+final_project/grading_workspace*/
+final_project/leaderboard*/
+
+final_project/dynamic_wellness_replanning/

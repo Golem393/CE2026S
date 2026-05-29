@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import json
+import re
+
 from typing import Any, Dict, Iterable, List, Optional, Set
 
 
@@ -212,6 +215,234 @@ def _set_f1(pred: List[str], gold: List[str]) -> float:
 
 
 
+
+
+_DOC_PREFIX_RE = re.compile(r"\b(?:profile|venue|city_ops|heuristic|promo|event|loyalty|stakeholder|constraint|dependency|stale|distractor|playbook):[A-Za-z0-9_:\-]+")
+
+_HARD_KEYWORDS = {
+    "under_budget": ["budget", "cost", "fare", "price", "cap", "under"],
+    "meeting_safe_arrival": ["arrival", "meeting", "on time", "ready", "red-eye", "red eye"],
+    "quiet_hotel": ["quiet", "noise", "hotel", "sleep"],
+    "weather_safe_activity": ["weather", "rain", "indoor", "backup"],
+    "zone_coherence": ["zone", "area", "transfer", "coherent", "near", "corridor"],
+    "team_dietary_support": ["vegan", "dietary", "teammate", "preorder"],
+    "refund_safe": ["refund", "refundable", "volatility", "schedule"],
+    "bundle_dependency_valid": ["bundle", "promo", "cutoff", "badge", "dependency", "arrival"],
+}
+
+
+def _stringify_rationale(value: Any) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return value
+    if isinstance(value, dict):
+        parts: List[str] = []
+        for key, child in value.items():
+            parts.append(str(key))
+            parts.append(_stringify_rationale(child))
+        return " ".join(part for part in parts if part)
+    if isinstance(value, list):
+        return " ".join(_stringify_rationale(item) for item in value)
+    return str(value)
+
+
+def _submission_rationale_text(submission: Dict[str, Any]) -> str:
+    parts = [
+        _stringify_rationale(submission.get("notes")),
+        _stringify_rationale(submission.get("rationale")),
+        _stringify_rationale(submission.get("plan_rationale")),
+        _stringify_rationale(submission.get("explanation")),
+    ]
+    return " ".join(part for part in parts if part).strip()
+
+
+def _keyword_coverage(text_l: str, required: Iterable[str]) -> float:
+    required = list(required)
+    if not required:
+        return 1.0
+    hits = 0
+    for key in required:
+        keywords = _HARD_KEYWORDS.get(key, [key.replace("_", " ")])
+        if any(keyword in text_l for keyword in keywords):
+            hits += 1
+    return hits / len(required)
+
+
+def _mentioned_key_rate(text_l: str, keys: Iterable[str]) -> float:
+    keys = list(_normalized_set(keys))
+    if not keys:
+        return 1.0
+    hits = 0
+    for key in keys:
+        variants = {key, key.replace("_", " "), key.replace("_", "-")}
+        if any(variant.lower() in text_l for variant in variants):
+            hits += 1
+    return hits / len(keys)
+
+
+def _trace_values(trace: Dict[str, Any] | None) -> Dict[str, List[str]]:
+    trace = trace or {}
+    def as_list(key: str) -> List[str]:
+        values = trace.get(key, []) or []
+        if not isinstance(values, list):
+            return []
+        out: List[str] = []
+        seen = set()
+        for value in values:
+            if isinstance(value, str) and value and value not in seen:
+                out.append(value)
+                seen.add(value)
+        return out
+    return {
+        "docs_seen": as_list("docs_seen"),
+        "retrieved_keys_seen": as_list("retrieved_keys_seen"),
+        "rejected_option_notes_seen": as_list("rejected_option_notes_seen"),
+        "rejected_memory_seen": as_list("rejected_memory_seen"),
+    }
+
+
+def _rationale_spoken_hits(submission: Dict[str, Any], gold: Dict[str, Any] | None = None) -> Dict[str, List[str]]:
+    """Infer spoken-rule handling from the final rationale text.
+
+    This is used only in trace-grounded official scoring.  It avoids trusting the
+    solver's self-reported memory_report while still crediting systems that
+    explicitly explain current-turn rules, stale-condition retirement, and
+    one-off exceptions in their final answer.
+    """
+    text_l = _submission_rationale_text(submission).lower()
+    spoken_gold = (gold or {}).get("required_spoken_rules", {}) or {}
+    out: Dict[str, List[str]] = {
+        "must_remember": [],
+        "forbidden": [],
+        "one_off_only": [],
+        "retire": [],
+        "do_not_reconsider": [],
+        "keep_context_lean": [],
+    }
+    for bucket, values in spoken_gold.items():
+        if bucket not in out:
+            continue
+        for value in values or []:
+            key = _normalize_key(str(value))
+            variants = {key, key.replace("_", " "), key.replace("_", "-")}
+            if any(v and v.lower() in text_l for v in variants):
+                out[bucket].append(key)
+    # Common natural-language markers for retirement/lean-context discipline.
+    if any(marker in text_l for marker in ["retire", "stale", "no longer", "ignore old", "폐기", "이전 조건"]):
+        for value in spoken_gold.get("retire", []) or []:
+            key = _normalize_key(str(value))
+            if key and key not in out["retire"]:
+                out["retire"].append(key)
+    if any(marker in text_l for marker in ["one-off", "one off", "this trip", "이번", "temporary"]):
+        for value in spoken_gold.get("one_off_only", []) or []:
+            key = _normalize_key(str(value))
+            if key and key not in out["one_off_only"]:
+                out["one_off_only"].append(key)
+    if any(marker in text_l for marker in ["lean", "relevant only", "only relevant", "필요한", "관련"]):
+        for value in spoken_gold.get("keep_context_lean", []) or []:
+            key = _normalize_key(str(value))
+            if key and key not in out["keep_context_lean"]:
+                out["keep_context_lean"].append(key)
+    return out
+
+
+def _trace_grounded_memory_report(submission: Dict[str, Any], trace: Dict[str, Any] | None, gold: Dict[str, Any] | None = None) -> Dict[str, Any]:
+    """Return a memory report suitable for scoring.
+
+    Public/local evaluation remains backward-compatible and uses the submitted
+    memory_report.  Official TA evaluation passes an explicit trace dict; in that
+    mode retrieval, active context, distractor handling, and rejected-option
+    memory are credited only from harness-observed tool traces, not from the
+    solver's self-report.  Spoken-rule handling is credited from the final
+    rationale text rather than from memory_report claims.
+    """
+    raw = submission.get("memory_report", {}) or {}
+    if trace is None:
+        return raw
+    tv = _trace_values(trace)
+    actual_docs = list(dict.fromkeys(tv["docs_seen"]))
+    actual_keys = list(dict.fromkeys(tv["retrieved_keys_seen"]))
+    actual_rejected = list(dict.fromkeys(tv["rejected_option_notes_seen"]))
+    stale_docs = set((gold or {}).get("stale_docs_to_retire", []) or [])
+    retired_docs = [doc for doc in actual_docs if doc in stale_docs or doc.startswith("stale:")]
+    retired_keys = []
+    for doc in retired_docs:
+        retired_keys.extend(_doc_keys(doc))
+    distractors = set((gold or {}).get("distractor_docs_to_avoid", []) or [])
+    ignored_distractors = [doc for doc in actual_docs if doc in distractors]
+    return {
+        "retrieved": actual_keys,
+        "retired": list(dict.fromkeys(retired_keys)),
+        "retired_docs": list(dict.fromkeys(retired_docs)),
+        "rejected_option_notes": actual_rejected,
+        "active_context_keys": actual_keys[:5],
+        "docs_retrieved": actual_docs,
+        "active_docs": [doc for doc in actual_docs if doc not in distractors][:3],
+        "ignored_distractors": ignored_distractors,
+        "spoken_rule_hits": _rationale_spoken_hits(submission, gold),
+    }
+
+
+def _doc_retrieval_f1(pred_docs: List[str], gold_docs: List[str]) -> float:
+    return _set_f1(pred_docs, gold_docs)
+
+
+def _rationale_quality(episode: Dict[str, Any], submission: Dict[str, Any], gold: Dict[str, Any], trace: Dict[str, Any] | None) -> float:
+    text = _submission_rationale_text(submission)
+    if not text:
+        return 0.0
+    text_l = text.lower()
+    # Very short/free-floating rationales should not receive full plan-quality credit.
+    length_score = min(1.0, len(text) / 280.0)
+    if len(text) < 60:
+        length_score *= 0.4
+
+    selected_ids = [
+        submission.get("flight_id"),
+        submission.get("hotel_id"),
+        submission.get("restaurant_id"),
+        submission.get("activity_id"),
+    ]
+    selected_ids = [str(x) for x in selected_ids if x]
+    selected_score = 1.0 if not selected_ids else sum(1 for item_id in selected_ids if item_id.lower() in text_l) / len(selected_ids)
+
+    hard_score = _keyword_coverage(text_l, gold.get("required_hard", []))
+    retire_targets = list(gold.get("should_retire", [])) + list(gold.get("required_spoken_rules", {}).get("retire", []))
+    retirement_score = _mentioned_key_rate(text_l, retire_targets)
+
+    tv = _trace_values(trace)
+    docs_seen = set(tv["docs_seen"])
+    required_docs = set(gold.get("required_docs", []))
+    required_seen = docs_seen & required_docs
+    if required_docs:
+        evidence_recall = len(required_seen) / len(required_docs)
+    else:
+        evidence_recall = 1.0
+    cited_docs = set(_DOC_PREFIX_RE.findall(text))
+    # Count cited evidence only when it was actually retrieved in this episode.
+    cited_required_seen = cited_docs & required_seen
+    citation_score = 1.0 if not required_docs else min(1.0, len(cited_required_seen) / max(1, min(3, len(required_docs))))
+    hallucinated = [doc for doc in cited_docs if doc not in docs_seen and doc not in required_docs]
+    hallucination_penalty = 0.75 ** min(len(hallucinated), 4)
+    evidence_score = (0.55 * evidence_recall + 0.45 * citation_score) * hallucination_penalty
+
+    tradeoff_markers = ["because", "rather than", "instead", "tradeoff", "trade-off", "avoid", "rejected", "not choose", "retire", "stale", "no longer", "이번", "대신", "제외", "폐기"]
+    tradeoff_score = 1.0 if any(marker in text_l for marker in tradeoff_markers) else 0.25
+
+    score = max(0.0, min(1.0,
+        0.12 * length_score
+        + 0.12 * selected_score
+        + 0.18 * hard_score
+        + 0.16 * retirement_score
+        + 0.30 * evidence_score
+        + 0.12 * tradeoff_score
+    ))
+    if trace is not None and required_docs and not cited_required_seen:
+        score = min(score, 0.45)
+    return score
+
+
 def _normalize_rejected_reason(value: str) -> str:
     cleaned = (value or "").strip()
     if not cleaned:
@@ -280,7 +511,7 @@ def _id_lookup(items: List[Dict[str, Any]], key: str, value: Any) -> Optional[Di
     return None
 
 
-def evaluate_episode(env, episode: Dict[str, Any], submission: Dict[str, Any], gold: Dict[str, Any] | None = None) -> Dict[str, Any]:
+def evaluate_episode(env, episode: Dict[str, Any], submission: Dict[str, Any], gold: Dict[str, Any] | None = None, trace: Dict[str, Any] | None = None) -> Dict[str, Any]:
     gold = gold or episode.get("gold")
     if not gold:
         raise ValueError(f"Gold not provided for episode {episode['trip_id']}")
@@ -359,7 +590,7 @@ def evaluate_episode(env, episode: Dict[str, Any], submission: Dict[str, Any], g
     ) / 4.0
     coherence = 1.0 if hard["zone_coherence"] else 0.0
 
-    memory = submission.get("memory_report", {})
+    memory = _trace_grounded_memory_report(submission, trace, gold)
     retrieved = memory.get("retrieved", [])
     retired = memory.get("retired", [])
     retired_docs = memory.get("retired_docs", [])
@@ -394,18 +625,20 @@ def evaluate_episode(env, episode: Dict[str, Any], submission: Dict[str, Any], g
     if "late_checkin_irrelevant" in gold.get("required_spoken_rules", {}).get("retire", []) and "late_checkin_irrelevant" not in normalized_retired:
         update_handling *= 0.85
 
-    memory_retrieval_rate = _overlap(normalized_retrieved, gold.get("should_retrieve", []))
+    memory_retrieval_rate = (_set_f1 if trace is not None else _overlap)(normalized_retrieved, gold.get("should_retrieve", []))
     memory_retirement_rate = _overlap(list(normalized_retired), gold.get("should_retire", []))
     normalized_rejected = sorted(_normalize_rejected_reason_set(rejected))
     effective_retired_docs = _infer_retired_docs(retired, retired_docs)
     rejected_option_memory_rate = _overlap(normalized_rejected, gold.get("should_remember_rejected", []))
-    distributed_context_rate = _overlap(docs, gold.get("required_docs", []))
+    distributed_context_rate = (_doc_retrieval_f1 if trace is not None else _overlap)(docs, gold.get("required_docs", []))
     stale_doc_retirement_rate = _overlap(effective_retired_docs, gold.get("stale_docs_to_retire", []))
     distractor_avoidance_rate = _avoidance(active_docs, gold.get("distractor_docs_to_avoid", []))
     if gold.get("distractor_docs_to_avoid"):
-        distractor_avoidance_rate = max(distractor_avoidance_rate, _overlap(ignored_distractors, gold.get("distractor_docs_to_avoid", [])))
+        # Credit ignored distractors only if those docs were actually surfaced by a tool call.
+        distractor_avoidance_rate = max(distractor_avoidance_rate, _set_f1(ignored_distractors, gold.get("distractor_docs_to_avoid", [])))
 
     active_context_hygiene_rate = _active_context_hygiene(active_keys, active_docs, gold)
+    rationale_quality_rate = _rationale_quality(episode, submission, gold, trace)
 
     hotel_over_cap = bool(hotel and hotel["nightly_price"] > policy["hotel_soft_cap_per_night"])
     policy_ok = 0.0 if hotel_over_cap and "slight_budget_overage_ok_this_trip" not in gold.get("episodic_exceptions", []) else 1.0
@@ -417,19 +650,29 @@ def evaluate_episode(env, episode: Dict[str, Any], submission: Dict[str, Any], g
     spoken_rule_compliance_rate = sum(spoken_scores) / max(len(spoken_scores), 1)
 
     decision_quality = (
-        0.22 * hard_rate
-        + 0.18 * semantic_fit
-        + 0.16 * exactish
-        + 0.12 * coherence
-        + 0.18 * spoken_rule_compliance_rate
+        0.20 * hard_rate
+        + 0.16 * semantic_fit
+        + 0.14 * exactish
+        + 0.10 * coherence
+        + 0.16 * spoken_rule_compliance_rate
         + 0.07 * stale_doc_retirement_rate
         + 0.07 * distractor_avoidance_rate
+        + 0.10 * rationale_quality_rate
     )
+
+    # In official trace-grounded scoring, a very weak rationale should limit—but
+    # not erase—credit for a feasible plan.  This keeps the original ID-based
+    # planning task recognizable while making answer quality matter.
+    if trace is not None:
+        decision_quality = min(decision_quality, 0.65 + 0.35 * rationale_quality_rate)
 
     usage = submission.get("usage", {})
     total_tokens = int(usage.get("total_tokens", usage.get("input_tokens", 0) + usage.get("output_tokens", 0)))
     cost = float(usage.get("estimated_cost_usd", 0.0))
-    tool_calls = int(submission.get("debug", {}).get("tool_call_count", submission.get("tool_call_count", 0) or 0))
+    if trace is not None:
+        tool_calls = int((trace or {}).get("tool_call_count", 0) or len((trace or {}).get("tool_trace", []) or []))
+    else:
+        tool_calls = int(submission.get("debug", {}).get("tool_call_count", submission.get("tool_call_count", 0) or 0))
 
     return {
         "trip_id": episode["trip_id"],
@@ -437,6 +680,7 @@ def evaluate_episode(env, episode: Dict[str, Any], submission: Dict[str, Any], g
         "decision_quality": round(decision_quality, 4),
         "hard_constraint_rate": round(hard_rate, 4),
         "semantic_fit_rate": round(semantic_fit, 4),
+        "exactish_rate": round(exactish, 4),
         "bundle_coherence_rate": round(coherence, 4),
         "update_handling_rate": round(update_handling, 4),
         "memory_retrieval_rate": round(memory_retrieval_rate, 4),
@@ -447,6 +691,7 @@ def evaluate_episode(env, episode: Dict[str, Any], submission: Dict[str, Any], g
         "rejected_option_memory_rate": round(rejected_option_memory_rate, 4),
         "active_context_hygiene_rate": round(active_context_hygiene_rate, 4),
         "spoken_rule_compliance_rate": round(spoken_rule_compliance_rate, 4),
+        "rationale_quality_rate": round(rationale_quality_rate, 4),
         "policy_ok": round(policy_ok, 4),
         "tool_calls": tool_calls,
         "tokens": total_tokens,
@@ -459,58 +704,109 @@ def evaluate_episode(env, episode: Dict[str, Any], submission: Dict[str, Any], g
 
 
 
-def _summary_bucket_means(rows: List[Dict[str, Any]], fixed_baseline_cost: float = 0.03) -> Dict[str, float]:
-    mean = lambda key: sum(row[key] for row in rows) / len(rows) if rows else 0.0
-    total_cost = sum(row["estimated_cost_usd"] for row in rows)
-    feasibility = (mean("hard_constraint_rate") + mean("policy_ok") + mean("bundle_coherence_rate")) / 3.0
-    preference_fit = (mean("decision_quality") + mean("semantic_fit_rate") + mean("spoken_rule_compliance_rate")) / 3.0
-    adaptation = (
-        mean("update_handling_rate")
-        + mean("memory_retrieval_rate")
-        + mean("memory_retirement_rate")
-        + mean("distributed_context_rate")
-        + mean("stale_doc_retirement_rate")
-        + mean("distractor_avoidance_rate")
-        + mean("rejected_option_memory_rate")
-        + mean("active_context_hygiene_rate")
-    ) / 8.0
-    efficiency = min(1.0, fixed_baseline_cost / max(total_cost, 1e-12)) if rows else 0.0
-    if mean("decision_quality") < 0.35:
-        efficiency *= 0.5
-    return {
-        "feasibility": feasibility,
-        "preference_fit": preference_fit,
-        "adaptation": adaptation,
-        "efficiency": efficiency,
-        "total_cost": total_cost,
-    }
 
+def _summary_bucket_means(rows: List[Dict[str, Any]], fixed_baseline_cost: float = 0.03) -> Dict[str, float]:
+    """Return the official simplified /100 scoring buckets.
+
+    v4.8 uses one official 100-point score for both reporting and ranking.
+    The formula intentionally keeps only sizable, explainable components:
+
+        45 hard_constraint_rate
+       +  5 bundle_coherence_rate
+       + 10 semantic_fit_rate
+       +  5 exactish_rate
+       + 15 update_handling_rate
+       +  5 stale_doc_retirement_rate
+       +  5 rejected_option_memory_rate
+       + 10 efficiency_score
+
+    Memory/document retrieval rates, distributed-context rates, spoken-rule
+    rates, active-context hygiene, and rationale quality remain diagnostic
+    metrics.  They are useful for debugging agent behavior, but they are not
+    directly included as tiny 1--3 point official-score terms.
+    """
+    mean = lambda key: sum(row.get(key, 0.0) for row in rows) / len(rows) if rows else 0.0
+    total_cost = sum(row.get("estimated_cost_usd", 0.0) for row in rows)
+
+    hard_constraint_points = 45.0 * mean("hard_constraint_rate")
+    bundle_coherence_points = 5.0 * mean("bundle_coherence_rate")
+    semantic_fit_points = 10.0 * mean("semantic_fit_rate")
+    exactish_points = 5.0 * mean("exactish_rate")
+    update_handling_points = 15.0 * mean("update_handling_rate")
+    stale_retirement_points = 5.0 * mean("stale_doc_retirement_rate")
+    rejected_option_points = 5.0 * mean("rejected_option_memory_rate")
+
+    efficiency_score = min(1.0, fixed_baseline_cost / max(total_cost, 1e-12)) if rows else 0.0
+    # If a solver fails to produce coherent plans, do not let low cost dominate.
+    if mean("decision_quality") < 0.35:
+        efficiency_score *= 0.5
+    efficiency_points = 10.0 * efficiency_score
+
+    official_score_100 = (
+        hard_constraint_points
+        + bundle_coherence_points
+        + semantic_fit_points
+        + exactish_points
+        + update_handling_points
+        + stale_retirement_points
+        + rejected_option_points
+        + efficiency_points
+    )
+
+    constraint_score = (hard_constraint_points + bundle_coherence_points) / 50.0 if rows else 0.0
+    soft_constraint_score = (semantic_fit_points + exactish_points) / 15.0 if rows else 0.0
+    replanning_score = (update_handling_points + stale_retirement_points + rejected_option_points) / 25.0 if rows else 0.0
+
+    return {
+        "constraint_score": max(0.0, min(1.0, constraint_score)),
+        "soft_constraint_score": max(0.0, min(1.0, soft_constraint_score)),
+        "replanning_score": max(0.0, min(1.0, replanning_score)),
+        "efficiency_score": max(0.0, min(1.0, efficiency_score)),
+        "official_score_100": max(0.0, min(100.0, official_score_100)),
+        "total_cost": total_cost,
+        "hard_constraint_points": hard_constraint_points,
+        "bundle_coherence_points": bundle_coherence_points,
+        "semantic_fit_points": semantic_fit_points,
+        "exactish_points": exactish_points,
+        "update_handling_points": update_handling_points,
+        "stale_retirement_points": stale_retirement_points,
+        "rejected_option_points": rejected_option_points,
+        "efficiency_points": efficiency_points,
+    }
 
 
 def summarize_rows_student(rows: List[Dict[str, Any]], fixed_baseline_cost: float = 0.03) -> Dict[str, Any]:
     buckets = _summary_bucket_means(rows, fixed_baseline_cost=fixed_baseline_cost)
-    overall = 0.40 * buckets["feasibility"] + 0.30 * buckets["preference_fit"] + 0.20 * buckets["adaptation"] + 0.10 * buckets["efficiency"]
+    # Keep legacy key names as aliases so existing scripts do not break.
     return {
-        "student_overall_score": round(overall * 100.0, 2),
-        "feasibility_constraints": round(buckets["feasibility"] * 100.0, 2),
-        "preference_fit": round(buckets["preference_fit"] * 100.0, 2),
-        "adaptation_memory": round(buckets["adaptation"] * 100.0, 2),
-        "efficiency_bonus": round(buckets["efficiency"] * 100.0, 2),
+        "student_overall_score": round(buckets["official_score_100"], 2),
+        "official_score_100": round(buckets["official_score_100"], 2),
+        "constraint_score": round(buckets["constraint_score"] * 100.0, 2),
+        "soft_constraint_score": round(buckets["soft_constraint_score"] * 100.0, 2),
+        "replanning_score": round(buckets["replanning_score"] * 100.0, 2),
+        "efficiency_score": round(buckets["efficiency_score"] * 100.0, 2),
+        "feasibility_constraints": round(buckets["constraint_score"] * 100.0, 2),
+        "preference_fit": round(buckets["soft_constraint_score"] * 100.0, 2),
+        "adaptation_memory": round(buckets["replanning_score"] * 100.0, 2),
+        "efficiency_bonus": round(buckets["efficiency_score"] * 100.0, 2),
         "episodes": len(rows),
         "total_cost_usd": round(buckets["total_cost"], 6),
+        "hard_constraint_points": round(buckets["hard_constraint_points"], 2),
+        "bundle_coherence_points": round(buckets["bundle_coherence_points"], 2),
+        "semantic_fit_points": round(buckets["semantic_fit_points"], 2),
+        "exactish_points": round(buckets["exactish_points"], 2),
+        "update_handling_points": round(buckets["update_handling_points"], 2),
+        "stale_retirement_points": round(buckets["stale_retirement_points"], 2),
+        "rejected_option_points": round(buckets["rejected_option_points"], 2),
+        "efficiency_points": round(buckets["efficiency_points"], 2),
     }
 
 
 
 def summarize_rows(rows: List[Dict[str, Any]], fixed_baseline_cost: float = 0.03) -> Dict[str, Any]:
-    mean = lambda key: sum(row[key] for row in rows) / len(rows) if rows else 0.0
+    mean = lambda key: sum(row.get(key, 0.0) for row in rows) / len(rows) if rows else 0.0
     buckets = _summary_bucket_means(rows, fixed_baseline_cost=fixed_baseline_cost)
-    raw = (
-        15.0 * buckets["feasibility"]
-        + 14.0 * buckets["preference_fit"]
-        + 11.0 * buckets["adaptation"]
-        + 5.0 * buckets["efficiency"]
-    )
+    official_score = buckets["official_score_100"]
 
     by_tier = {}
     for tier in sorted(set(row["difficulty_tier"] for row in rows)):
@@ -523,6 +819,7 @@ def summarize_rows(rows: List[Dict[str, Any]], fixed_baseline_cost: float = 0.03
         "mean_decision_quality": round(mean("decision_quality"), 4),
         "mean_hard_constraint_rate": round(mean("hard_constraint_rate"), 4),
         "mean_semantic_fit_rate": round(mean("semantic_fit_rate"), 4),
+        "mean_exactish_rate": round(mean("exactish_rate"), 4),
         "mean_bundle_coherence_rate": round(mean("bundle_coherence_rate"), 4),
         "mean_update_handling_rate": round(mean("update_handling_rate"), 4),
         "mean_memory_retrieval_rate": round(mean("memory_retrieval_rate"), 4),
@@ -533,14 +830,30 @@ def summarize_rows(rows: List[Dict[str, Any]], fixed_baseline_cost: float = 0.03
         "mean_rejected_option_memory_rate": round(mean("rejected_option_memory_rate"), 4),
         "mean_active_context_hygiene_rate": round(mean("active_context_hygiene_rate"), 4),
         "mean_spoken_rule_compliance_rate": round(mean("spoken_rule_compliance_rate"), 4),
+        "mean_rationale_quality_rate": round(mean("rationale_quality_rate"), 4),
         "mean_policy_ok": round(mean("policy_ok"), 4),
         "mean_tool_calls": round(mean("tool_calls"), 2),
         "by_tier_decision_quality": by_tier,
         "total_tokens": int(sum(row["tokens"] for row in rows)),
         "total_cost_usd": round(buckets["total_cost"], 6),
-        "feasibility_bucket": round(buckets["feasibility"], 4),
-        "preference_fit_bucket": round(buckets["preference_fit"], 4),
-        "adaptation_bucket": round(buckets["adaptation"], 4),
-        "efficiency_bucket": round(buckets["efficiency"], 4),
-        "raw_score_for_ranking": round(raw, 4),
+        "constraint_score_bucket": round(buckets["constraint_score"], 4),
+        "soft_constraint_score_bucket": round(buckets["soft_constraint_score"], 4),
+        "replanning_score_bucket": round(buckets["replanning_score"], 4),
+        "efficiency_score_bucket": round(buckets["efficiency_score"], 4),
+        # Legacy aliases for scripts written against earlier versions.
+        "feasibility_bucket": round(buckets["constraint_score"], 4),
+        "preference_fit_bucket": round(buckets["soft_constraint_score"], 4),
+        "adaptation_bucket": round(buckets["replanning_score"], 4),
+        "efficiency_bucket": round(buckets["efficiency_score"], 4),
+        # v4.8 unifies ranking and reporting: raw_score_for_ranking is /100.
+        "official_score_100": round(official_score, 2),
+        "raw_score_for_ranking": round(official_score, 2),
+        "hard_constraint_points": round(buckets["hard_constraint_points"], 2),
+        "bundle_coherence_points": round(buckets["bundle_coherence_points"], 2),
+        "semantic_fit_points": round(buckets["semantic_fit_points"], 2),
+        "exactish_points": round(buckets["exactish_points"], 2),
+        "update_handling_points": round(buckets["update_handling_points"], 2),
+        "stale_retirement_points": round(buckets["stale_retirement_points"], 2),
+        "rejected_option_points": round(buckets["rejected_option_points"], 2),
+        "efficiency_points": round(buckets["efficiency_points"], 2),
     }

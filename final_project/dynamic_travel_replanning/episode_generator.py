@@ -1179,23 +1179,159 @@ PUBLIC_SPECS: List[Dict[str, Any]] = [
 ]
 
 
-HIDDEN_VARIANT_PLAN: List[Dict[str, Any]] = [
-    {"public_spec_index": 1, "mutation": {"partner_bundle": True, "refund_risk": True, "late_arrival_risk": True, "hidden_followup": "This hidden instance now has both schedule volatility and a late-arrival risk, so only count bundle value if it survives the cutoff and remains refundable enough."}},
-    {"public_spec_index": 2, "mutation": {"teammate_vegan": True, "refund_risk": True, "hidden_followup": "A teammate may join in this hidden instance and may need vegan-capable dinner options, while timing is still volatile enough that refundability matters too."}},
-    {"public_spec_index": 3, "mutation": {"rainy": True, "event_disruption": True, "hidden_followup": "This hidden case also picked up rain plus an evening city event, so dry-weather transfer assumptions should be retired."}},
-    {"public_spec_index": 4, "mutation": {"refund_risk": True, "hidden_followup": "Scheduling looks less settled on this hidden case, so refundable options now deserve real weight."}},
-    {"public_spec_index": 5, "mutation": {"partner_bundle": True, "late_arrival_risk": True, "hidden_followup": "A partner bundle exists in this hidden case, but do not assume it survives a late arrival."}},
-    {"public_spec_index": 6, "mutation": {"refund_risk": True, "hidden_followup": "This summit variant has more timing volatility, so refundability matters in addition to the teammate/client tradeoff."}},
-    {"public_spec_index": 7, "mutation": {"teammate_vegan": False, "loyalty_focus": True, "hidden_followup": "For this hidden variant, loyalty perks may matter more than the default dinner framing, but only if they improve the actual bundle value without adding clutter."}},
-    {"public_spec_index": 8, "mutation": {"rainy": True, "event_disruption": True, "hidden_followup": "The city event is also affecting transfer times in this hidden case, so do not trust dry-weather assumptions."}},
-    {"public_spec_index": 10, "mutation": {"rainy": True, "hidden_followup": "Weather is worse than in the public version, which adds another reason to avoid brittle transfers."}},
-    {"public_spec_index": 11, "mutation": {"badge_available": True, "loyalty_focus": False, "hidden_followup": "A venue badge is available on this hidden roadshow, so badge-only options may become relevant for this trip only — but do not let that override quiet, timing, and bundle viability."}},
-]
-
+# Hidden split construction is TA-only.  The public generator intentionally
+# exposes the benchmark grammar, scenario axes, and public episode generation
+# philosophy, but not hidden episode-level specs or gold-label generation.
 
 ROUTE_LOOKUP_BY_CITY_FAMILY = {(cfg["city"], cfg["family"]): route_name for route_name, cfg in ROUTE_CONFIGS.items()}
 
 
+
+
+
+def _time_to_minutes(value: str | None) -> int | None:
+    if not value or ":" not in value:
+        return None
+    try:
+        hh, mm = value.split(":", 1)
+        return int(hh) * 60 + int(mm)
+    except Exception:
+        return None
+
+
+def _bundle_valid_for_candidate(env: RTLSemanticEnv, episode: Dict[str, Any], flight: Dict[str, Any] | None, hotel: Dict[str, Any] | None, restaurant: Dict[str, Any] | None, activity: Dict[str, Any] | None) -> bool:
+    scenario_state = episode.get("scenario_state", {}) or {}
+    if not scenario_state.get("partner_bundle"):
+        return True
+    matched_promos = env.get_partner_promotions(
+        city=episode.get("city"),
+        hotel_id=(hotel or {}).get("hotel_id"),
+        restaurant_id=(restaurant or {}).get("restaurant_id"),
+        activity_id=(activity or {}).get("activity_id"),
+        family=episode.get("family"),
+    )
+    arrival_minutes = _time_to_minutes((flight or {}).get("arrival_time"))
+    for promo in matched_promos:
+        cutoff_minutes = _time_to_minutes(promo.get("arrival_before"))
+        badge_ok = (not promo.get("badge_required")) or bool(scenario_state.get("badge_available"))
+        arrival_ok = cutoff_minutes is None or arrival_minutes is None or arrival_minutes <= cutoff_minutes
+        if badge_ok and arrival_ok:
+            return True
+    return False
+
+
+def _candidate_total_cost(episode: Dict[str, Any], flight: Dict[str, Any] | None, hotel: Dict[str, Any] | None, restaurant: Dict[str, Any] | None, activity: Dict[str, Any] | None) -> int:
+    total = 0
+    if flight:
+        total += int(flight["fare_total"])
+    if hotel:
+        total += int(hotel["nightly_price"]) * int(episode.get("nights", 1))
+    if restaurant:
+        total += int(restaurant["price_level"]) * 25000
+    if activity:
+        total += int(activity["price"])
+    return total
+
+
+def _candidate_hard_map(env: RTLSemanticEnv, episode: Dict[str, Any], gold: Dict[str, Any], flight: Dict[str, Any] | None, hotel: Dict[str, Any] | None, restaurant: Dict[str, Any] | None, activity: Dict[str, Any] | None, *, budget_override: int | None = None) -> Dict[str, bool]:
+    scenario_state = episode.get("scenario_state", {}) or {}
+    budget_total = int(budget_override if budget_override is not None else episode.get("budget_total", 0))
+    hard = {key: False for key in ["under_budget", "meeting_safe_arrival", "quiet_hotel", "weather_safe_activity", "zone_coherence", "team_dietary_support", "refund_safe", "bundle_dependency_valid"]}
+
+    if flight:
+        hard["meeting_safe_arrival"] = ("meeting_safe" in flight.get("semantic_tags", [])) or ("airport_access_more_important_now" in gold.get("episodic_exceptions", []))
+        hard["refund_safe"] = (not scenario_state.get("refund_risk")) or bool(flight.get("refundable"))
+    else:
+        hard["refund_safe"] = not scenario_state.get("refund_risk")
+    if hotel:
+        hard["quiet_hotel"] = "quiet" in hotel.get("semantic_tags", [])
+    if restaurant:
+        hard["team_dietary_support"] = (not scenario_state.get("teammate_vegan")) or any(flag in restaurant.get("dietary_flags", []) for flag in ["vegan", "vegan_preorder"])
+    else:
+        hard["team_dietary_support"] = not scenario_state.get("teammate_vegan")
+    if activity:
+        hard["weather_safe_activity"] = (episode.get("weather") != "rainy") or ("weather_safe" in activity.get("semantic_tags", []))
+
+    hard["bundle_dependency_valid"] = _bundle_valid_for_candidate(env, episode, flight, hotel, restaurant, activity)
+    hard["under_budget"] = _candidate_total_cost(episode, flight, hotel, restaurant, activity) <= budget_total
+    zones = [item.get("zone") for item in [hotel] if item] + [item.get("area") for item in [restaurant] if item] + [item.get("location_zone") for item in [activity] if item]
+    hard["zone_coherence"] = bool(zones) and all(zone != gold.get("avoid_zone") for zone in zones) and sum(zone == gold.get("preferred_zone") for zone in zones) >= 2
+    return hard
+
+
+def _public_candidate_score(env: RTLSemanticEnv, episode: Dict[str, Any], gold: Dict[str, Any], flight: Dict[str, Any], hotel: Dict[str, Any], restaurant: Dict[str, Any], activity: Dict[str, Any]) -> float:
+    chosen_tags = set()
+    for item in [flight, hotel, restaurant, activity]:
+        chosen_tags.update(item.get("semantic_tags", []))
+    for promo in env.get_partner_promotions(city=episode.get("city"), hotel_id=hotel.get("hotel_id"), restaurant_id=restaurant.get("restaurant_id"), activity_id=activity.get("activity_id"), family=episode.get("family")):
+        chosen_tags.update(promo.get("benefit_tags", []))
+    loyalty = env.get_loyalty_profile(episode.get("traveler_id")) or {}
+    if hotel.get("hotel_id") in loyalty.get("hotel_partner_ids", []):
+        chosen_tags.update(loyalty.get("bonus_tags", []))
+    soft_tags = set(gold.get("soft_tags", []))
+    semantic = len(chosen_tags & soft_tags) / max(len(soft_tags), 1)
+    zone_bonus = sum(zone == gold.get("preferred_zone") for zone in [hotel.get("zone"), restaurant.get("area"), activity.get("location_zone")]) / 3.0
+    cost = _candidate_total_cost(episode, flight, hotel, restaurant, activity)
+    # Prefer semantically faithful and coherent plans; use lower cost only as a tie-breaker.
+    return 10.0 * semantic + 1.5 * zone_bonus - (cost / 1_000_000.0)
+
+
+def repair_public_episode_for_feasibility(env: RTLSemanticEnv, episode: Dict[str, Any]) -> None:
+    """Keep the public task philosophy but ensure public gold is evaluator-feasible.
+
+    Students are expected to run the public evaluator while iterating.  Therefore
+    public labels must satisfy the same hard-feasibility contract as hidden
+    labels: at least one gold-listed combination should achieve a full hard rate
+    under the episode's current hard constraints.  This repair is intentionally
+    conservative: it only raises impossible budgets, selects a feasible gold
+    bundle, and drops bundle_dependency_valid from required_hard when no valid
+    partner promo exists for any candidate under the current scenario state.
+    """
+    gold = episode.get("gold") or {}
+    flights = env.search_flights(episode["origin"], episode["city"])
+    hotels = env.search_hotels(episode["city"])
+    restaurants = env.search_restaurants(episode["city"])
+    activities = env.search_activities(episode["city"])
+    original_required = list(gold.get("required_hard", []))
+
+    def feasible_candidates(required: List[str]):
+        out = []
+        for flight in flights:
+            for hotel in hotels:
+                for restaurant in restaurants:
+                    for activity in activities:
+                        hard = _candidate_hard_map(env, episode, gold, flight, hotel, restaurant, activity, budget_override=10**9)
+                        if all(hard.get(key, False) for key in required if key != "under_budget"):
+                            out.append((flight, hotel, restaurant, activity))
+        return out
+
+    required = list(original_required)
+    candidates = feasible_candidates(required)
+    if not candidates and "bundle_dependency_valid" in required:
+        required = [key for key in required if key != "bundle_dependency_valid"]
+        candidates = feasible_candidates(required)
+    if not candidates:
+        # Last-resort safety valve for future public-spec edits: preserve the
+        # task instead of emitting an impossible public answer key.
+        candidates = feasible_candidates([key for key in required if key not in {"zone_coherence"}])
+        if "zone_coherence" in required and candidates:
+            required = [key for key in required if key != "zone_coherence"]
+    if not candidates:
+        raise RuntimeError(f"Could not repair public episode {episode.get('trip_id')} to a feasible gold bundle")
+
+    best = max(candidates, key=lambda items: _public_candidate_score(env, episode, gold, *items))
+    flight, hotel, restaurant, activity = best
+    cost = _candidate_total_cost(episode, flight, hotel, restaurant, activity)
+    if "under_budget" in required and cost > int(episode.get("budget_total", 0)):
+        # Keep the budget meaningful but feasible; round to a clean 5,000 KRW.
+        episode["budget_total"] = int(((cost + 14_999) // 5_000) * 5_000)
+
+    gold["required_hard"] = required
+    gold["acceptable_flights"] = [flight["flight_id"]]
+    gold["acceptable_hotels"] = [hotel["hotel_id"]]
+    gold["good_restaurants"] = [restaurant["restaurant_id"]]
+    gold["good_activities"] = [activity["activity_id"]]
+    episode["gold"] = gold
 
 def materialize_episode(env: RTLSemanticEnv, spec: Dict[str, Any], trip_id: str, *, extra_turns: List[str] | None = None) -> Dict[str, Any]:
     cfg = ROUTE_CONFIGS[spec["route"]]
@@ -1252,6 +1388,7 @@ def materialize_episode(env: RTLSemanticEnv, spec: Dict[str, Any], trip_id: str,
         turns = turns + extra_turns
     episode["turns"] = [{"speaker": "user", "text": text} for text in turns]
     episode["gold"] = build_gold(env, episode, scenario)
+    repair_public_episode_for_feasibility(env, episode)
     return episode
 
 
@@ -1271,99 +1408,96 @@ def _spec_from_public_episode(episode: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def build_hidden_split(public_eps: List[Dict[str, Any]], seed: int = 17) -> Tuple[List[Dict[str, Any]], Dict[str, Dict[str, Any]]]:
-    rng = random.Random(seed)
-    hidden_inputs: List[Dict[str, Any]] = []
-    hidden_gold: Dict[str, Dict[str, Any]] = {}
+    """Hidden split generation is TA-only.
 
-    def push_hidden(spec: Dict[str, Any], trip_id: str, *, extra_turns: List[str]) -> None:
-        episode = materialize_episode(env, spec, trip_id, extra_turns=extra_turns)
-        gold = episode.pop("gold")
-        hidden_inputs.append(episode)
-        hidden_gold[trip_id] = gold
-
-    env = RTLSemanticEnv(HERE)
-    counter = 1
-    for episode in public_eps:
-        spec = _spec_from_public_episode(episode)
-        push_hidden(
-            spec,
-            f"rtl7_hidden_{counter:03d}",
-            extra_turns=[
-                RULE_TEMPLATES["no_recycling"],
-                "Treat this as a fresh hidden instance of the same benchmark family, so do not rely on stale choices from earlier public examples.",
-            ],
-        )
-        counter += 1
-
-    for variant in HIDDEN_VARIANT_PLAN:
-        base_spec = dict(PUBLIC_SPECS[variant["public_spec_index"] - 1])
-        mutation = dict(variant["mutation"])
-        hidden_followup = mutation.pop("hidden_followup")
-        base_spec.update(mutation)
-        if "budget_total_override" not in base_spec and base_spec["tier"] != "easy":
-            base_spec["budget_total_override"] = max(430000, ROUTE_CONFIGS[base_spec["route"]]["base_budget"] - (40000 if base_spec["tier"] == "medium" else 80000) - rng.randint(12000, 42000))
-        push_hidden(
-            base_spec,
-            f"rtl7_hidden_{counter:03d}",
-            extra_turns=[RULE_TEMPLATES["no_recycling"], hidden_followup],
-        )
-        counter += 1
-
-    hidden_inputs = hidden_inputs[:30]
-    hidden_gold = {episode["trip_id"]: hidden_gold[episode["trip_id"]] for episode in hidden_inputs}
-    return hidden_inputs, hidden_gold
-
+    Hidden episodes follow the same high-level benchmark families and are
+    validated for hard feasibility and contrastive replanning, but exact hidden
+    specs, mutations, and gold labels are not part of the student-facing repo.
+    """
+    raise RuntimeError(
+        "Hidden split generation is TA-only. Use final_project/ta_only/"
+        "dynamic_travel_replanning/hidden_episode_generator.py in the staff repo."
+    )
 
 
 def build_and_write(seed: int = 17) -> None:
+    """Regenerate student-facing public travel assets only.
+
+    This preserves transparency about the public data generation philosophy while
+    keeping TA-only hidden specs/gold separate.
+    """
     write_support_assets()
     env = RTLSemanticEnv(HERE)
     public_eps = build_public_dataset(env)
-    hidden_inputs, hidden_gold = build_hidden_split(public_eps, seed=seed)
-    validation = validate_episode_bank(env, public_eps, hidden_inputs, hidden_gold)
+    public_family_counts: Dict[str, int] = {}
+    for episode in public_eps:
+        public_family_counts[episode["benchmark_family"]] = public_family_counts.get(episode["benchmark_family"], 0) + 1
+    validation = {
+        "public_count": len(public_eps),
+        "hidden_count": 30,
+        "family_count": len(public_family_counts),
+        "benchmark_families": sorted(public_family_counts),
+        "rich_hook_tasks": sum(1 for e in public_eps if e.get("scenario_hooks", {}).get("event_sensitive") or e.get("scenario_hooks", {}).get("bundle_watch") or e.get("scenario_hooks", {}).get("schedule_volatility") == "high"),
+        "public_family_counts": public_family_counts,
+        "hidden_family_counts": "TA-only",
+        "public_tier_counts": {tier: sum(1 for e in public_eps if e["difficulty_tier"] == tier) for tier in ["easy", "medium", "hard"]},
+        "hidden_tier_counts": {"easy": 4, "medium": 13, "hard": 13},
+        "public_gold_hard_feasibility": "repaired_against_student_evaluator",
+    }
     write_json("episodes_public_example.json", public_eps)
-    write_json("episodes_hidden_input.json", hidden_inputs)
-    write_json("episodes_hidden_gold.json", hidden_gold)
-    write_json("episodes_hidden_generated.json", hidden_inputs)
-    write_json(
-        "tier_manifest.json",
-        {
+    public_tier_counts = {tier: sum(1 for e in public_eps if e["difficulty_tier"] == tier) for tier in ["easy", "medium", "hard"]}
+    write_json("tier_manifest.json", {
+        "public_easy": [e["trip_id"] for e in public_eps if e["difficulty_tier"] == "easy"],
+        "public_medium": [e["trip_id"] for e in public_eps if e["difficulty_tier"] == "medium"],
+        "public_hard": [e["trip_id"] for e in public_eps if e["difficulty_tier"] == "hard"],
+        "public_all": [e["trip_id"] for e in public_eps],
+        "public_count": len(public_eps),
+        "public_tier_counts": public_tier_counts,
+        "hidden_count": 30,
+        "hidden_tier_counts": {"easy": 4, "medium": 13, "hard": 13},
+        "hidden_note": "Hidden episodes use the same high-level benchmark families, but exact hidden specs and gold labels are TA-only.",
+    })
+    write_json("task_catalog.json", build_task_catalog(public_eps, []))
+    write_json("task_bank_validation.json", {
+        **validation,
+        "hidden_note": "Hidden validation is performed in the TA-only repository.",
+        "hidden_count": 30,
+        "hidden_tier_counts": {"easy": 4, "medium": 13, "hard": 13},
+    })
+    write_json("evaluation_tracks.json", {
+        "tracks": {
+            "public_full": [e["trip_id"] for e in public_eps],
             "public_easy": [e["trip_id"] for e in public_eps if e["difficulty_tier"] == "easy"],
             "public_medium": [e["trip_id"] for e in public_eps if e["difficulty_tier"] == "medium"],
             "public_hard": [e["trip_id"] for e in public_eps if e["difficulty_tier"] == "hard"],
-            "hidden_easy": [e["trip_id"] for e in hidden_inputs if e["difficulty_tier"] == "easy"],
-            "hidden_medium": [e["trip_id"] for e in hidden_inputs if e["difficulty_tier"] == "medium"],
-            "hidden_hard": [e["trip_id"] for e in hidden_inputs if e["difficulty_tier"] == "hard"],
-            "hidden_all": [e["trip_id"] for e in hidden_inputs],
-            "public_count": len(public_eps),
-            "hidden_count": len(hidden_inputs),
-            "public_tier_counts": {tier: sum(1 for e in public_eps if e["difficulty_tier"] == tier) for tier in ["easy", "medium", "hard"]},
-            "hidden_tier_counts": {tier: sum(1 for e in hidden_inputs if e["difficulty_tier"] == tier) for tier in ["easy", "medium", "hard"]},
-            "retiered_trip_ids": [],
         },
-    )
-    write_json("task_catalog.json", build_task_catalog(public_eps, hidden_inputs))
-    write_json("task_bank_validation.json", validation)
-    write_json(
-        "scenario_grammar.json",
-        {
-            "spoken_rule_categories": {
-                "must_remember": {"description": "Long-lived rule or preference the system should explicitly keep available."},
-                "one_off_exception": {"description": "A temporary override that must not overwrite the stable profile."},
-                "forbidden_filter": {"description": "A natural-language ban or filter to apply to candidate options."},
-                "retire_instruction": {"description": "An instruction that stale assumptions must be removed from active context."},
-                "rejected_option_memory": {"description": "The system should remember why an option was rejected and avoid reconsidering it."},
-                "retrieval_discipline": {"description": "Only relevant memory should be activated; irrelevant memory should remain retrievable but inactive."},
-                "dependency_reasoning": {"description": "Some options materially change the value or feasibility of others, such as partner bundles, badge gates, or late-arrival cutoffs."},
-            },
-            "episode_axes": {
-                "family": sorted({cfg["family"] for cfg in ROUTE_CONFIGS.values()}),
-                "difficulty": ["easy", "medium", "hard"],
-                "dependency_layers": ["partner_bundle", "badge_unlock", "event_disruption", "refund_risk", "loyalty_value", "late_arrival_cutoff", "stakeholder_tradeoff"],
-            },
+        "hidden_summary": {
+            "hidden_count": 30,
+            "hidden_tier_counts": {"easy": 4, "medium": 13, "hard": 13},
+            "note": "Hidden tracks are held in final_project/ta_only and are not student-facing.",
         },
-    )
-
+    })
+    write_json("scenario_grammar.json", {
+        "spoken_rule_categories": {
+            "must_remember": {"description": "Long-lived rule or preference the system should explicitly keep available."},
+            "one_off_exception": {"description": "A temporary override that must not overwrite the stable profile."},
+            "forbidden_filter": {"description": "A natural-language ban or filter to apply to candidate options."},
+            "retire_instruction": {"description": "An instruction that stale assumptions must be removed from active context."},
+            "rejected_option_memory": {"description": "The system should remember why an option was rejected and avoid reconsidering it."},
+            "retrieval_discipline": {"description": "Only relevant memory should be activated; irrelevant memory should remain retrievable but inactive."},
+            "dependency_reasoning": {"description": "Some options materially change the value or feasibility of others, such as partner bundles, badge gates, or late-arrival cutoffs."},
+        },
+        "episode_axes": {
+            "family": sorted({cfg["family"] for cfg in ROUTE_CONFIGS.values()}),
+            "difficulty": ["easy", "medium", "hard"],
+            "dependency_layers": ["partner_bundle", "badge_unlock", "event_disruption", "refund_risk", "loyalty_value", "late_arrival_cutoff", "stakeholder_tradeoff"],
+        },
+        "hidden_summary": {
+            "hidden_count": 30,
+            "hidden_tier_counts": {"easy": 4, "medium": 13, "hard": 13},
+            "note": "Hidden episodes are generated from TA-only specs using the same high-level grammar.",
+        },
+    })
 
 if __name__ == "__main__":
     build_and_write()

@@ -699,15 +699,29 @@ def run_single_tool_agent(
     instructions: str,
     active_doc_cap: int,
     active_key_cap: int,
+    session_factory=None,
 ) -> Dict[str, Any]:
-    session = toolbox.new_session(
-        episode=episode,
-        retrieval_strategy=config["retrieval_strategy"],
-        embedding_model=config.get("embedding_model"),
-        max_results=config["max_tool_results"],
-        role=role,
-    )
-    session.bind_runner(runner)
+    # Built-in baselines can create toolbox sessions directly because
+    # run_llm_baselines.py consumes their returned retrieval trace. Dynamic
+    # student solvers may use either runtime.new_session(...) or
+    # runtime.toolbox.new_session(...) during solve_episode(runtime); the
+    # official runner registers toolbox-created sessions via the active runtime.
+    if session_factory is None:
+        session = toolbox.new_session(
+            episode=episode,
+            retrieval_strategy=config["retrieval_strategy"],
+            embedding_model=config.get("embedding_model"),
+            max_results=config["max_tool_results"],
+            role=role,
+        )
+        session.bind_runner(runner)
+    else:
+        session = session_factory(
+            retrieval_strategy=config["retrieval_strategy"],
+            embedding_model=config.get("embedding_model"),
+            max_results=config["max_tool_results"],
+            role=role,
+        )
     result = runner.run_tool_agent_json(
         model=model,
         instructions=instructions,
@@ -736,6 +750,8 @@ def run_single_baseline(
     toolbox: TravelToolbox,
     episode: Dict[str, Any],
     config: Dict[str, Any],
+    *,
+    session_factory=None,
 ) -> Dict[str, Any]:
     instructions = (
         "You are a single travel-planning agent. Use tools selectively; do not pull every inventory list broadly. "
@@ -756,6 +772,7 @@ def run_single_baseline(
         instructions=instructions,
         active_doc_cap=4,
         active_key_cap=6,
+        session_factory=session_factory,
     )
 
 
@@ -764,6 +781,8 @@ def run_memory_single(
     toolbox: TravelToolbox,
     episode: Dict[str, Any],
     config: Dict[str, Any],
+    *,
+    session_factory=None,
 ) -> Dict[str, Any]:
     if config.get("retirement_policy", True):
         instructions = (
