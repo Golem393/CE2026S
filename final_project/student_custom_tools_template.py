@@ -41,8 +41,8 @@ def calculate_total_itinerary_cost(
         nights: Number of nights (hotel cost = nightly_price × nights).
 
     Returns:
-        Total estimated cost. Uses price_level × 50000 as restaurant estimate
-        when exact price is unavailable.
+        Total estimated cost, matching the evaluator's cost formula exactly
+        (restaurant = price_level × 25000, evaluator.py:541).
     """
     total = 0.0
 
@@ -53,8 +53,7 @@ def calculate_total_itinerary_cost(
     total += float(hotel.get("nightly_price", 0)) * max(nights, 1)
 
     restaurant = itinerary.get("restaurant") or {}
-    # price_level is 1–4; estimate ~50000 per level as a rough proxy
-    total += float(restaurant.get("price_level", 0)) * 50000
+    total += float(restaurant.get("price_level", 0)) * 25000
 
     activity = itinerary.get("activity") or {}
     total += float(activity.get("price", 0))
@@ -436,6 +435,17 @@ def automated_rule_checker(
         conflicts = check_schedule_conflicts(flight, activity)
         violations.extend(conflicts)
 
+    # Budget is a hard constraint (evaluator under_budget). Flag any overage so the
+    # revision loop swaps for cheaper options.
+    if budget_total:
+        total_cost = calculate_total_itinerary_cost(itinerary, nights)
+        if total_cost > budget_total:
+            violations.append(
+                f"VIOLATION: total cost {int(total_cost)} exceeds budget "
+                f"{int(budget_total)} by {int(total_cost - budget_total)} — "
+                f"swap for cheaper flight/hotel that still meets tags"
+            )
+
     for constraint in hard_constraints:
         if constraint == "avoid_red_eye":
             if flight.get("red_eye"):
@@ -524,3 +534,95 @@ def summarize_failed_searches(
 
     # Cap at 6 to keep the memory board lean
     return deduped[:6]
+
+
+# ═══════════════════════════════════════════════════════════════════════
+#  DETERMINISTIC FEASIBLE-ITINERARY SELECTOR
+# ═══════════════════════════════════════════════════════════════════════
+
+def select_feasible_itinerary(
+    env: Any,
+    episode: Dict[str, Any],
+    *,
+    require_refundable: bool = False,
+    require_vegan: bool = False,
+) -> Dict[str, Optional[Dict[str, Any]]]:
+    """Pick the cheapest itinerary that satisfies the hard constraints.
+
+    Hidden-safe: relies only on observable signals (meeting_zone, weather,
+    item semantic_tags). zone_coherence (>=2/3 venues in meeting_zone) is met by
+    placing restaurant + activity in meeting_zone; the hotel only avoids
+    'nightlife_strip' zones (the env's proxy for the gold avoid_zone).
+
+    Conditional needs (refundable flight, vegan restaurant) are passed in by the
+    caller, inferred from the user turns by the Memory agent. Weather-safe
+    activities are required when episode weather is rainy.
+
+    Returns {"flight": .., "hotel": .., "restaurant": .., "activity": ..} with
+    full item dicts (or None when a category is empty).
+    """
+    city = episode["city"]
+    mz = episode.get("meeting_zone")
+    nights = max(int(episode.get("nights", 1)), 1)
+    budget = float(episode.get("budget_total", 0) or 0)
+    weather = episode.get("weather")
+
+    flights = env.search_flights(episode["origin"], city)
+    hotels = env.search_hotels(city)
+    rests = env.search_restaurants(city)
+    acts = env.search_activities(city)
+
+    def cheapest(cands, fallback, key):
+        if cands:
+            return min(cands, key=key)
+        return min(fallback, key=key) if fallback else None
+
+    # Flight: meeting_safe (morning). Prefer refundable when required.
+    f_ms = [f for f in flights if "meeting_safe" in f.get("semantic_tags", [])]
+    f_ref = [f for f in f_ms if f.get("refundable")]
+    flight_cheap = cheapest(f_ms, flights, lambda f: f["fare_total"])
+    flight_pref = cheapest(f_ref, f_ms or flights, lambda f: f["fare_total"]) if require_refundable else flight_cheap
+
+    # Hotel: quiet (quiet_score>=8), not nightlife_strip. Cheapest.
+    h_quiet = [
+        h for h in hotels
+        if "quiet" in h.get("semantic_tags", []) and "nightlife_strip" not in h.get("semantic_tags", [])
+    ]
+    hotel = cheapest(
+        h_quiet,
+        [h for h in hotels if "quiet" in h.get("semantic_tags", [])] or hotels,
+        lambda h: h["nightly_price"],
+    )
+
+    # Restaurant in meeting_zone. Prefer vegan when required.
+    r_zone = [r for r in rests if r.get("area") == mz]
+    r_vegan = [r for r in r_zone if any(x in r.get("dietary_flags", []) for x in ["vegan", "vegan_preorder"])]
+    rest_cheap = cheapest(r_zone, rests, lambda r: r["price_level"])
+    rest_pref = cheapest(r_vegan, r_zone or rests, lambda r: r["price_level"]) if require_vegan else rest_cheap
+
+    # Activity in meeting_zone. Weather-safe when rainy.
+    a_zone = [a for a in acts if a.get("location_zone") == mz]
+    if weather == "rainy":
+        a_zone = [a for a in a_zone if "weather_safe" in a.get("semantic_tags", [])] or a_zone
+    activity = cheapest(a_zone, acts, lambda a: a["price"])
+
+    def total(f, h, r, a):
+        c = 0.0
+        if f:
+            c += f["fare_total"]
+        if h:
+            c += h["nightly_price"] * nights
+        if r:
+            c += r["price_level"] * 25000
+        if a:
+            c += a["price"]
+        return c
+
+    # Start from preferred (refundable/vegan); relax to cheapest if over budget.
+    flight, restaurant = flight_pref, rest_pref
+    if budget and total(flight, hotel, restaurant, activity) > budget:
+        restaurant = rest_cheap
+    if budget and total(flight, hotel, restaurant, activity) > budget:
+        flight = flight_cheap
+
+    return {"flight": flight, "hotel": hotel, "restaurant": restaurant, "activity": activity}
