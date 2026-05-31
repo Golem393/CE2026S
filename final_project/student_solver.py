@@ -203,7 +203,6 @@ def _call_agent(
     session = runtime.new_session(
         role=role,
         max_results=config.get("max_tool_results", 4),
-        board=board,
     )
     
     tools = [] if disable_tools else session.tool_specs(primitive_only=False)
