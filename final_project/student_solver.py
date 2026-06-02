@@ -44,7 +44,6 @@ def _memory_agent_instructions() -> str:
         + MEMORY_REPORT_GUIDANCE
     )
 
-
 def _memory_agent_input(
     episode: Dict[str, Any],
     board: WorkingMemoryBoard,
@@ -147,8 +146,41 @@ def _verifier_instructions() -> str:
         "If total cost > budget_total, set approve=false and report the overage as an issue. "
         "Set approve=true only if compliant. If ANY violation, set approve=false with specific issues."
     )
+def _flight_planner_instructions() -> str:
+    return (
+        "You are a specialist Flight Planner. "
+        "Your ONLY job is to find the best flight from origin to city. "
+        "Requirements: no red-eye, non-cancelled, refundable if schedule is volatile. "
+        "Use search_flights with filters. Propose the best flight_id only. "
+        "Never hallucinate IDs. If no valid flight found, return null."
+    )
 
+def _hotel_planner_instructions() -> str:
+    return (
+        "You are a specialist Hotel Planner. "
+        "Your ONLY job is to find the best hotel in the city. "
+        "Requirements: quiet_score >= 7.5, correct zone, within budget. "
+        "Use search_hotels with quiet_min filter. Propose the best hotel_id only. "
+        "Never hallucinate IDs. If no valid hotel found, return null."
+    )
 
+def _restaurant_planner_instructions() -> str:
+    return (
+        "You are a specialist Restaurant Planner. "
+        "Your ONLY job is to find the best restaurant in the city. "
+        "Requirements: quiet, correct area, dietary flexibility if teammate joins. "
+        "Use search_restaurants with filters. Propose the best restaurant_id only. "
+        "Never hallucinate IDs. If no valid restaurant found, return null."
+    )
+
+def _activity_planner_instructions() -> str:
+    return (
+        "You are a specialist Activity Planner. "
+        "Your ONLY job is to find the best activity in the city. "
+        "Requirements: weather-safe, indoor preferred, correct zone, low cost. "
+        "Use search_activities with filters. Propose the best activity_id only. "
+        "Never hallucinate IDs. If no valid activity found, return null."
+    )
 def _verifier_input(board: WorkingMemoryBoard) -> str:
     td = board.trip_details
     itin = board.current_itinerary
@@ -295,8 +327,115 @@ def _call_verifier_agent(
         max_tool_rounds=cfg.get("verifier_max_tool_rounds", 6),
         logger=logger,
     )
+def _call_flight_planner(
+    runtime: StudentRuntime,
+    board: WorkingMemoryBoard,
+    logger: SmartAgentLogger | None = None,
+) -> Dict[str, Any]:
+    cfg = runtime.system_config
+    td = board.trip_details
+    input_text = (
+        f"Find the best flight from {td.origin} to {td.city}.\n"
+        f"Budget remaining: {td.budget_total}\n"
+        f"Hard constraints: {json.dumps(board.hard_constraints)}\n"
+        f"Failed (don't repeat): {json.dumps(board.failed_searches)}\n"
+        f"Current flight: {json.dumps(board.current_itinerary.flight) if board.current_itinerary.flight else 'MISSING'}"
+    )
+    return _call_agent(
+        runtime,
+        role="mas_planner",
+        instructions=_flight_planner_instructions(),
+        input_text=input_text,
+        json_schema=planner_schema(),
+        schema_name="planner_proposal",
+        max_output_tokens=400,
+        max_tool_rounds=4,
+        logger=logger,
+        board=board,
+    )
 
+def _call_hotel_planner(
+    runtime: StudentRuntime,
+    board: WorkingMemoryBoard,
+    logger: SmartAgentLogger | None = None,
+) -> Dict[str, Any]:
+    cfg = runtime.system_config
+    td = board.trip_details
+    input_text = (
+        f"Find the best hotel in {td.city} for {td.nights} nights.\n"
+        f"Meeting zone: {td.meeting_zone}\n"
+        f"Budget remaining: {td.budget_total}\n"
+        f"Hard constraints: {json.dumps(board.hard_constraints)}\n"
+        f"Failed (don't repeat): {json.dumps(board.failed_searches)}\n"
+        f"Current hotel: {json.dumps(board.current_itinerary.hotel) if board.current_itinerary.hotel else 'MISSING'}"
+    )
+    return _call_agent(
+        runtime,
+        role="mas_planner",
+        instructions=_hotel_planner_instructions(),
+        input_text=input_text,
+        json_schema=planner_schema(),
+        schema_name="planner_proposal",
+        max_output_tokens=400,
+        max_tool_rounds=4,
+        logger=logger,
+        board=board,
+    )
 
+def _call_restaurant_planner(
+    runtime: StudentRuntime,
+    board: WorkingMemoryBoard,
+    logger: SmartAgentLogger | None = None,
+) -> Dict[str, Any]:
+    cfg = runtime.system_config
+    td = board.trip_details
+    input_text = (
+        f"Find the best restaurant in {td.city}.\n"
+        f"Meeting zone: {td.meeting_zone}\n"
+        f"Hard constraints: {json.dumps(board.hard_constraints)}\n"
+        f"Failed (don't repeat): {json.dumps(board.failed_searches)}\n"
+        f"Current restaurant: {json.dumps(board.current_itinerary.restaurant) if board.current_itinerary.restaurant else 'MISSING'}"
+    )
+    return _call_agent(
+        runtime,
+        role="mas_planner",
+        instructions=_restaurant_planner_instructions(),
+        input_text=input_text,
+        json_schema=planner_schema(),
+        schema_name="planner_proposal",
+        max_output_tokens=400,
+        max_tool_rounds=4,
+        logger=logger,
+        board=board,
+    )
+
+def _call_activity_planner(
+    runtime: StudentRuntime,
+    board: WorkingMemoryBoard,
+    logger: SmartAgentLogger | None = None,
+) -> Dict[str, Any]:
+    cfg = runtime.system_config
+    td = board.trip_details
+    input_text = (
+        f"Find the best activity in {td.city}.\n"
+        f"Meeting zone: {td.meeting_zone}\n"
+        f"Weather: {td.weather}\n"
+        f"Hard constraints: {json.dumps(board.hard_constraints)}\n"
+        f"Failed (don't repeat): {json.dumps(board.failed_searches)}\n"
+        f"Current activity: {json.dumps(board.current_itinerary.activity) if board.current_itinerary.activity else 'MISSING'}"
+    )
+    return _call_agent(
+        runtime,
+        role="mas_planner",
+        instructions=_activity_planner_instructions(),
+        input_text=input_text,
+        json_schema=planner_schema(),
+        schema_name="planner_proposal",
+        max_output_tokens=400,
+        max_tool_rounds=4,
+        logger=logger,
+        board=board,
+    )
 # ═══════════════════════════════════════════════════════════════════════
 #  MEMORY BOARD HELPERS
 # ═══════════════════════════════════════════════════════════════════════
@@ -442,7 +581,7 @@ def _preload_all_static_context(runtime: StudentRuntime, episode: Dict[str, Any]
     parts.append(f"\n3. City Ops Notes: {json.dumps(env.get_city_ops_notes(city))}")
     
     loyalty = env.get_loyalty_profile(traveler)
-    if loyalty:
+    if loyalty and episode.get("scenario_state", {}).get("loyalty_focus"):
         parts.append(f"\n4. Loyalty Profile: {json.dumps(loyalty)}")
     
     constraints = env.get_booking_constraints(city=city, family=family)
@@ -454,11 +593,11 @@ def _preload_all_static_context(runtime: StudentRuntime, episode: Dict[str, Any]
         parts.append(f"\n6. Option Dependencies: {json.dumps(deps)}")
         
     promos = env.get_partner_promotions(city=city, family=family)
-    if promos:
+    if promos and episode.get("scenario_state", {}).get("partner_bundle"):
         parts.append(f"\n7. Partner Promotions: {json.dumps(promos)}")
         
     events = env.get_event_calendar(city)
-    if events:
+    if events and episode.get("scenario_state", {}).get("event_disruption"):
         parts.append(f"\n8. Event Calendar: {json.dumps(events)}")
         
     rejected = [r for r in runtime.toolbox.rejected_options if r["city"] == city and r["family"] == family]
@@ -555,11 +694,6 @@ def _board_summary(board: WorkingMemoryBoard) -> Dict[str, Any]:
 
 
 def _infer_conditional_needs(episode: Dict[str, Any], board: WorkingMemoryBoard) -> Dict[str, bool]:
-    """Infer whether refundable / vegan are required, hidden-safe.
-
-    Uses the Memory agent's extracted board constraints plus a keyword scan of the
-    raw user turns (so it still works when scenario_state is absent in hidden eval).
-    """
     turns_text = " ".join(t.get("text", "") for t in episode.get("turns", [])).lower()
     hard = " ".join(board.hard_constraints).lower()
     refundable = any(k in turns_text for k in ["refund", "cancel", "reschedul", "schedule risk", "volatil"]) \
@@ -567,7 +701,6 @@ def _infer_conditional_needs(episode: Dict[str, Any], board: WorkingMemoryBoard)
     vegan = any(k in turns_text for k in ["vegan", "plant-based", "plant based", "dietary", "teammate"]) \
         or "dietary" in hard or "vegan" in hard
     return {"refundable": refundable, "vegan": vegan}
-
 
 def _seed_itinerary(runtime: StudentRuntime, board: WorkingMemoryBoard, episode: Dict[str, Any]) -> Dict[str, Any]:
     """Build a guaranteed-feasible baseline with the deterministic selector."""
@@ -656,7 +789,24 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
     # LLM planner cannot reliably juggle. The planner loop below then only refines.
     baseline = _seed_itinerary(runtime, board, episode)
     logger.log_board_state("planner", _board_summary(board), stage="SEED")
+    # ── 2c. Sub-agent refinement ─────────────────────────────────────
+    # Each specialist tries to find a better option than the seed
+    logger.phase_start("planner", iteration=0, input_summary={"phase": "sub_agent_refinement"})
 
+    for call_fn, label in [
+        (_call_flight_planner, "flight"),
+        (_call_hotel_planner, "hotel"),
+        (_call_restaurant_planner, "restaurant"),
+        (_call_activity_planner, "activity"),
+    ]:
+        try:
+            res = call_fn(runtime, board, logger=logger)
+            plan_out = res["parsed"]
+            total_usage = runtime.combine_usages(total_usage, res["usage"])
+            total_tool_calls += res["session"].summary()["tool_call_count"]
+            _save_planner_proposals(runtime, board, plan_out)
+        except Exception as exc:
+            logger.log_decision({"notes": f"sub_agent_{label}_error: {exc}"})
     # ── 3. Planner Loop (fallback only) ─────────────────────────────
     # The deterministic seed normally fills every slot, so this loop is skipped.
     # It only runs as a fallback when the seed could not fill a category.
