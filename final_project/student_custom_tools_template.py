@@ -626,3 +626,246 @@ def select_feasible_itinerary(
         flight = flight_cheap
 
     return {"flight": flight, "hotel": hotel, "restaurant": restaurant, "activity": activity}
+
+
+# ═══════════════════════════════════════════════════════════════════════
+#  DYNAMIC SESSION PATCHING
+# ═══════════════════════════════════════════════════════════════════════
+
+import types
+
+def patch_session_tools(session: Any) -> None:
+    """Monkey-patch the session object to use custom scoring and sorting logic."""
+    from llm_tools import compact_item
+
+    def _build_scoring_context(self) -> Dict[str, Any]:
+        ctx = {}
+        if not getattr(self, "board", None):
+            return ctx
+            
+        td = getattr(self.board, "trip_details", None)
+        if td:
+            ctx["budget_total"] = getattr(td, "budget_total", 0.0)
+            ctx["nights"] = getattr(td, "nights", 1)
+            ctx["city"] = getattr(td, "city", "")
+            ctx["target_zone"] = getattr(td, "meeting_zone", "")
+            
+        hc = getattr(self.board, "hard_constraints", [])
+        if "avoid_red_eye" in hc:
+            ctx["red_eye_ok"] = False
+            ctx["meeting_safe_bonus"] = 5.0
+        if "prefer_quiet_hotel" in hc:
+            ctx["quiet_weight"] = 5.0
+        if "team_dietary_flex" in hc:
+            ctx["dietary_vegan"] = True
+        if "budget_cap" in hc:
+            ctx["price_weight"] = 2.0
+            
+        rejected_ids = []
+        for r in self.toolbox.rejected_options:
+            if "hotel_id" in r: rejected_ids.append(r["hotel_id"])
+            if "flight_id" in r: rejected_ids.append(r["flight_id"])
+            if "restaurant_id" in r: rejected_ids.append(r["restaurant_id"])
+            if "activity_id" in r: rejected_ids.append(r["activity_id"])
+        ctx["rejected_ids"] = rejected_ids
+        
+        return ctx
+
+    def search_flights(
+        self,
+        origin: str,
+        destination: str,
+        flight_id: str | None = None,
+        max_fare: int | None = None,
+        time_window: str | None = None,
+        red_eye_allowed: bool = True,
+        refundable_only: bool = False,
+        nonstop_only: bool = False,
+        exclude_ids: List[str] | None = None,
+        sort_by: str | None = None,
+        max_results: int = 4,
+    ) -> Dict[str, Any]:
+        rows = self.toolbox.env.search_flights(origin, destination)
+        exclude_ids_set = set(exclude_ids or [])
+        out = []
+        for row in rows:
+            if flight_id and row["flight_id"] != flight_id:
+                continue
+            if row["flight_id"] in exclude_ids_set:
+                continue
+            if max_fare is not None and row["fare_total"] > max_fare:
+                continue
+            if time_window and row.get("time_window") != time_window:
+                continue
+            if not red_eye_allowed and row.get("red_eye"):
+                continue
+            if refundable_only and not row.get("refundable"):
+                continue
+            if nonstop_only and row.get("stops", 0) != 0:
+                continue
+            out.append(row)
+        
+        ctx = _build_scoring_context(self)
+        for row in out:
+            row["heuristic_score"] = round(_score_flight(row, ctx), 2)
+            
+        sort_key = {
+            "fare_total": lambda row: (row["fare_total"], row.get("red_eye", False)),
+            "meeting_safe": lambda row: (("meeting_safe" not in row.get("semantic_tags", [])), row["fare_total"]),
+            "change_friendly": lambda row: (("change_friendly" not in row.get("semantic_tags", [])), row["fare_total"]),
+            "heuristic_score": lambda row: -row.get("heuristic_score", 0),
+        }.get(sort_by or "heuristic_score", lambda row: -row.get("heuristic_score", 0))
+        out.sort(key=sort_key)
+        return {
+            "items": [compact_item(row, ["flight_id", "time_window", "fare_total", "depart_time", "arrival_time", "duration_minutes", "refundable", "stops", "red_eye", "semantic_tags", "description_snippet", "heuristic_score"]) for row in out[: min(max_results, self.max_results)]]
+        }
+
+    def search_hotels(
+        self,
+        city: str,
+        hotel_id: str | None = None,
+        preferred_zone: str | None = None,
+        exclude_zones: List[str] | None = None,
+        exclude_ids: List[str] | None = None,
+        quiet_min: float | None = None,
+        airport_access_min: float | None = None,
+        chain_ok: bool = True,
+        max_nightly_price: int | None = None,
+        sort_by: str | None = None,
+        max_results: int = 4,
+    ) -> Dict[str, Any]:
+        rows = self.toolbox.env.search_hotels(city)
+        exclude_zones_set = set(exclude_zones or [])
+        exclude_ids_set = set(exclude_ids or [])
+        out = []
+        for row in rows:
+            if hotel_id and row["hotel_id"] != hotel_id:
+                continue
+            if row["hotel_id"] in exclude_ids_set:
+                continue
+            if row.get("zone") in exclude_zones_set:
+                continue
+            if quiet_min is not None and row.get("quiet_score", 0) < quiet_min:
+                continue
+            if airport_access_min is not None and row.get("airport_access_score", 0) < airport_access_min:
+                continue
+            if not chain_ok and row.get("chain"):
+                continue
+            if max_nightly_price is not None and row["nightly_price"] > max_nightly_price:
+                continue
+            out.append(row)
+            
+        ctx = _build_scoring_context(self)
+        for row in out:
+            row["heuristic_score"] = round(_score_hotel(row, ctx), 2)
+            
+        sort_key = {
+            "quiet_score": lambda row: (-row.get("quiet_score", 0.0), row["nightly_price"]),
+            "airport_access": lambda row: (-row.get("airport_access_score", 0.0), row["nightly_price"]),
+            "price": lambda row: (row["nightly_price"], -row.get("quiet_score", 0.0)),
+            "zone_match": lambda row: (row.get("zone") != preferred_zone, row["nightly_price"]),
+            "heuristic_score": lambda row: -row.get("heuristic_score", 0),
+        }.get(sort_by or "heuristic_score", lambda row: -row.get("heuristic_score", 0))
+        out.sort(key=sort_key)
+        return {
+            "items": [compact_item(row, ["hotel_id", "nightly_price", "quiet_score", "zone", "chain", "airport_access_score", "late_checkout", "meeting_shuttle", "semantic_tags", "review_snippet", "heuristic_score"]) for row in out[: min(max_results, self.max_results)]]
+        }
+
+    def search_restaurants(
+        self,
+        city: str,
+        restaurant_id: str | None = None,
+        preferred_area: str | None = None,
+        exclude_areas: List[str] | None = None,
+        exclude_ids: List[str] | None = None,
+        dietary: str | None = None,
+        quiet_min: float | None = None,
+        client_ready_min: float | None = None,
+        max_price_level: int | None = None,
+        sort_by: str | None = None,
+        max_results: int = 4,
+    ) -> Dict[str, Any]:
+        rows = self.toolbox.env.search_restaurants(city)
+        exclude_areas_set = set(exclude_areas or [])
+        exclude_ids_set = set(exclude_ids or [])
+        out = []
+        for row in rows:
+            if restaurant_id and row["restaurant_id"] != restaurant_id:
+                continue
+            if row["restaurant_id"] in exclude_ids_set:
+                continue
+            if row.get("area") in exclude_areas_set:
+                continue
+            if dietary and dietary not in row.get("dietary_flags", []):
+                continue
+            if quiet_min is not None and row.get("quiet_score", 0) < quiet_min:
+                continue
+            if client_ready_min is not None and row.get("client_ready_score", 0) < client_ready_min:
+                continue
+            if max_price_level is not None and row["price_level"] > max_price_level:
+                continue
+            out.append(row)
+            
+        ctx = _build_scoring_context(self)
+        for row in out:
+            row["heuristic_score"] = round(_score_restaurant(row, ctx), 2)
+            
+        sort_key = {
+            "quiet_score": lambda row: (-row.get("quiet_score", 0.0), row["price_level"]),
+            "client_ready": lambda row: (-row.get("client_ready_score", 0.0), row["price_level"]),
+            "area_match": lambda row: (row.get("area") != preferred_area, row["price_level"]),
+            "price": lambda row: (row["price_level"], -row.get("quiet_score", 0.0)),
+            "heuristic_score": lambda row: -row.get("heuristic_score", 0),
+        }.get(sort_by or "heuristic_score", lambda row: -row.get("heuristic_score", 0))
+        out.sort(key=sort_key)
+        return {
+            "items": [compact_item(row, ["restaurant_id", "cuisine", "price_level", "dietary_flags", "area", "quiet_score", "client_ready_score", "private_room", "booking_cutoff", "badge_only", "semantic_tags", "review_snippet", "heuristic_score"]) for row in out[: min(max_results, self.max_results)]]
+        }
+
+    def search_activities(
+        self,
+        city: str,
+        activity_id: str | None = None,
+        preferred_zone: str | None = None,
+        exclude_ids: List[str] | None = None,
+        indoor_only: bool = False,
+        weather_safe_required: bool = False,
+        max_price: int | None = None,
+        sort_by: str | None = None,
+        max_results: int = 4,
+    ) -> Dict[str, Any]:
+        rows = self.toolbox.env.search_activities(city)
+        exclude_ids_set = set(exclude_ids or [])
+        out = []
+        for row in rows:
+            if activity_id and row["activity_id"] != activity_id:
+                continue
+            if row["activity_id"] in exclude_ids_set:
+                continue
+            if indoor_only and not row.get("indoor"):
+                continue
+            if weather_safe_required and "weather_safe" not in row.get("semantic_tags", []):
+                continue
+            if max_price is not None and row.get("price", 0) > max_price:
+                continue
+            out.append(row)
+            
+        ctx = _build_scoring_context(self)
+        for row in out:
+            row["heuristic_score"] = round(_score_activity(row, ctx), 2)
+            
+        sort_key = {
+            "zone_match": lambda row: (row.get("location_zone") != preferred_zone, row.get("price", 0)),
+            "price": lambda row: (row.get("price", 0), row.get("indoor") is False),
+            "weather_safe": lambda row: (("weather_safe" not in row.get("semantic_tags", [])), row.get("price", 0)),
+            "heuristic_score": lambda row: -row.get("heuristic_score", 0),
+        }.get(sort_by or "heuristic_score", lambda row: -row.get("heuristic_score", 0))
+        out.sort(key=sort_key)
+        return {
+            "items": [compact_item(row, ["activity_id", "category", "location_zone", "indoor", "price", "badge_only", "semantic_tags", "description_snippet", "heuristic_score"]) for row in out[: min(max_results, self.max_results)]]
+        }
+
+    session.search_flights = types.MethodType(search_flights, session)
+    session.search_hotels = types.MethodType(search_hotels, session)
+    session.search_restaurants = types.MethodType(search_restaurants, session)
+    session.search_activities = types.MethodType(search_activities, session)

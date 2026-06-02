@@ -26,6 +26,7 @@ from student_custom_tools_template import (
     summarize_failed_searches,
     select_feasible_itinerary,
     calculate_total_itinerary_cost,
+    patch_session_tools,
 )
 
 
@@ -204,6 +205,10 @@ def _call_agent(
         role=role,
         max_results=config.get("max_tool_results", 4),
     )
+    
+    if board:
+        session.board = board
+    patch_session_tools(session)
     
     tools = [] if disable_tools else session.tool_specs(primitive_only=False)
 
