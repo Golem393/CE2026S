@@ -413,9 +413,8 @@ def run_eval_set(
 
 def build_ablation_systems(config: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
     systems: Dict[str, Dict[str, Any]] = {}
-    if "ablations" not in config or "systems" not in config["ablations"]:
-        return systems
-    for ablation_name, ablation in config["ablations"]["systems"].items():
+    ablation_config = config.get("ablations") or {}
+    for ablation_name, ablation in (ablation_config.get("systems") or {}).items():
         base_system = ablation["base_system"]
         if base_system not in config["default_systems"]:
             raise ValueError(f"Ablation {ablation_name!r} references unknown base_system {base_system!r}.")
@@ -719,7 +718,7 @@ def main() -> None:
     if not trace_path.is_absolute():
         trace_path = output_dir / trace_path
     trace_path.parent.mkdir(parents=True, exist_ok=True)
-    trace_logger = TraceLogger(trace_path, console=False)
+    trace_logger = TraceLogger(trace_path, console=True)
     trace_logger.log(
         "run_start",
         config=args.config,
