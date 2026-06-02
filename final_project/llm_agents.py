@@ -736,6 +736,12 @@ def run_single_tool_agent(
         metadata={"system": config["system_name"], "trip_id": episode["trip_id"], "role": role},
         max_tool_rounds=config.get("max_tool_rounds", 8),
     )
+    result["parsed"] = ensure_grounded_submission(
+        session,
+        episode,
+        result.get("parsed", {}),
+        initial_report=(result.get("parsed", {}) or {}).get("memory_report", {}),
+    )
     return tool_result(
         runner,
         result,
