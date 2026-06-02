@@ -551,8 +551,12 @@ def select_feasible_itinerary(
 
     Hidden-safe: relies only on observable signals (meeting_zone, weather,
     item semantic_tags). zone_coherence (>=2/3 venues in meeting_zone) is met by
-    placing restaurant + activity in meeting_zone; the hotel only avoids
-    'nightlife_strip' zones (the env's proxy for the gold avoid_zone).
+    placing restaurant + activity in meeting_zone; the hotel also targets
+    meeting_zone when a quiet option exists there, maximising zone coherence.
+    Avoids 'nightlife_strip' zones (the env's proxy for the gold avoid_zone).
+
+    After initial selection, a bundle-aware pass checks partner promotions and
+    swaps items if a valid bundle is feasible under budget.
 
     Conditional needs (refundable flight, vegan restaurant) are passed in by the
     caller, inferred from the user turns by the Memory agent. Weather-safe
@@ -566,6 +570,7 @@ def select_feasible_itinerary(
     nights = max(int(episode.get("nights", 1)), 1)
     budget = float(episode.get("budget_total", 0) or 0)
     weather = episode.get("weather")
+    family = episode.get("family", "")
 
     flights = env.search_flights(episode["origin"], city)
     hotels = env.search_hotels(city)
@@ -583,14 +588,16 @@ def select_feasible_itinerary(
     flight_cheap = cheapest(f_ms, flights, lambda f: f["fare_total"])
     flight_pref = cheapest(f_ref, f_ms or flights, lambda f: f["fare_total"]) if require_refundable else flight_cheap
 
-    # Hotel: quiet (quiet_score>=8), not nightlife_strip. Cheapest.
+    # Hotel: quiet, not nightlife_strip. Prefer meeting_zone for zone coherence.
     h_quiet = [
         h for h in hotels
         if "quiet" in h.get("semantic_tags", []) and "nightlife_strip" not in h.get("semantic_tags", [])
     ]
+    # Try zone-matched quiet hotel first for 3/3 zone coherence
+    h_quiet_zone = [h for h in h_quiet if h.get("zone") == mz] if mz else []
     hotel = cheapest(
-        h_quiet,
-        [h for h in hotels if "quiet" in h.get("semantic_tags", [])] or hotels,
+        h_quiet_zone,
+        h_quiet or [h for h in hotels if "quiet" in h.get("semantic_tags", [])] or hotels,
         lambda h: h["nightly_price"],
     )
 
@@ -624,8 +631,121 @@ def select_feasible_itinerary(
         restaurant = rest_cheap
     if budget and total(flight, hotel, restaurant, activity) > budget:
         flight = flight_cheap
+    # If zone hotel pushed us over budget, fall back to any quiet hotel
+    if budget and total(flight, hotel, restaurant, activity) > budget and h_quiet_zone:
+        hotel = cheapest(
+            h_quiet or [h for h in hotels if "quiet" in h.get("semantic_tags", [])] or hotels,
+            hotels,
+            lambda h: h["nightly_price"],
+        )
 
-    return {"flight": flight, "hotel": hotel, "restaurant": restaurant, "activity": activity}
+    # ── Bundle-aware pass: check partner promotions ──────────────────
+    # Try to find a bundle combo that matches a partner promotion while
+    # staying under budget. Only swap if the new combo is still feasible.
+    result = {"flight": flight, "hotel": hotel, "restaurant": restaurant, "activity": activity}
+    try:
+        result = _try_bundle_upgrade(env, episode, result, nights, budget)
+    except Exception:
+        pass  # Bundle optimization is best-effort; never break the baseline
+
+    return result
+
+
+def _try_bundle_upgrade(
+    env: Any,
+    episode: Dict[str, Any],
+    current: Dict[str, Optional[Dict[str, Any]]],
+    nights: int,
+    budget: float,
+) -> Dict[str, Optional[Dict[str, Any]]]:
+    """Deterministic bundle optimization: check partner promotions and try
+    to swap items to form a valid bundle that's still under budget.
+
+    No LLM calls — uses env.get_partner_promotions() directly.
+    """
+    city = episode["city"]
+    family = episode.get("family", "")
+    mz = episode.get("meeting_zone")
+    weather = episode.get("weather")
+
+    promos = env.get_partner_promotions(city=city, family=family)
+    if not promos:
+        return current
+
+    hotels = env.search_hotels(city)
+    rests = env.search_restaurants(city)
+    acts = env.search_activities(city)
+
+    flight = current["flight"]
+    # Compute arrival_minutes for cutoff check
+    arrival_minutes = None
+    if flight and flight.get("arrival_time") and ":" in str(flight.get("arrival_time", "")):
+        parts = str(flight["arrival_time"]).split(":", 1)
+        try:
+            arrival_minutes = int(parts[0]) * 60 + int(parts[1])
+        except (ValueError, IndexError):
+            pass
+
+    h_index = {h["hotel_id"]: h for h in hotels}
+    r_index = {r["restaurant_id"]: r for r in rests}
+    a_index = {a["activity_id"]: a for a in acts}
+
+    def _total(f, h, r, a):
+        c = 0.0
+        if f: c += f.get("fare_total", 0)
+        if h: c += h.get("nightly_price", 0) * nights
+        if r: c += r.get("price_level", 0) * 25000
+        if a: c += a.get("price", 0)
+        return c
+
+    def _is_quiet(h):
+        return "quiet" in h.get("semantic_tags", [])
+
+    def _is_weather_safe(a):
+        return weather != "rainy" or "weather_safe" in a.get("semantic_tags", [])
+
+    best = dict(current)
+    best_cost = _total(flight, current.get("hotel"), current.get("restaurant"), current.get("activity"))
+
+    for promo in promos:
+        # Check arrival cutoff
+        cutoff = promo.get("arrival_before")
+        if cutoff and ":" in cutoff and arrival_minutes is not None:
+            hh, mm = cutoff.split(":", 1)
+            try:
+                cutoff_min = int(hh) * 60 + int(mm)
+                if arrival_minutes > cutoff_min:
+                    continue
+            except (ValueError, IndexError):
+                pass
+
+        # Determine which items the promotion links
+        p_hotel_ids = [pid for pid in (promo.get("hotel_ids") or []) if pid in h_index]
+        p_rest_ids = [pid for pid in (promo.get("restaurant_ids") or []) if pid in r_index]
+        p_act_ids = [pid for pid in (promo.get("activity_ids") or []) if pid in a_index]
+
+        # Try combinations: keep current items where promo doesn't specify alternatives
+        candidate_hotels = [h_index[hid] for hid in p_hotel_ids if _is_quiet(h_index[hid])] if p_hotel_ids else [current["hotel"]] if current["hotel"] else []
+        candidate_rests = [r_index[rid] for rid in p_rest_ids] if p_rest_ids else [current["restaurant"]] if current["restaurant"] else []
+        candidate_acts = [a_index[aid] for aid in p_act_ids if _is_weather_safe(a_index[aid])] if p_act_ids else [current["activity"]] if current["activity"] else []
+
+        for ch in candidate_hotels:
+            for cr in candidate_rests:
+                for ca in candidate_acts:
+                    cost = _total(flight, ch, cr, ca)
+                    if budget and cost > budget:
+                        continue
+                    # Check zone coherence: >=2 of 3 venues in meeting_zone
+                    zones = [ch.get("zone"), cr.get("area"), ca.get("location_zone")]
+                    zone_hits = sum(1 for z in zones if z == mz)
+                    if zone_hits < 2:
+                        continue
+                    # Prefer this bundle combo if it's cheaper
+                    if cost <= best_cost:
+                        best = {"flight": flight, "hotel": ch, "restaurant": cr, "activity": ca}
+                        best_cost = cost
+
+    return best
 
 
 # ═══════════════════════════════════════════════════════════════════════
