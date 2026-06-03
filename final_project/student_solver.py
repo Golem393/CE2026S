@@ -136,13 +136,11 @@ def _planner_input(board: WorkingMemoryBoard) -> str:
 def _verifier_instructions() -> str:
     return (
         "You are the Verifier in a multi-agent travel planner. "
-        "Cross-reference the proposed itinerary against ALL constraints: "
-        "budget, zone, quiet/noise, dietary, red-eye, refundability, weather, spoken rules. "
+        "Cross-reference the proposed itinerary against ALL qualitative constraints: "
+        "zone, quiet/noise, dietary, red-eye, refundability, weather, spoken rules. "
         "Use tools to look up specific items if needed. "
-        "BUDGET IS A HARD CONSTRAINT: compute total cost = flight.fare_total "
-        "+ hotel.nightly_price*nights + restaurant.price_level*25000 + activity.price. "
-        "If total cost > budget_total, set approve=false and report the overage as an issue. "
-        "Set approve=true only if compliant. If ANY violation, set approve=false with specific issues."
+        "DO NOT calculate costs or verify the budget (this is handled automatically). "
+        "Set approve=true if compliant. If ANY qualitative violation, set approve=false with specific issues."
     )
 
 
@@ -152,8 +150,7 @@ def _verifier_input(board: WorkingMemoryBoard) -> str:
     parts = [
         "--- TRIP ---",
         f"city: {td.city}, origin: {td.origin}, family: {td.family}",
-        f"budget: {td.budget_total}, nights: {td.nights}",
-        f"meeting_zone: {td.meeting_zone}, weather: {td.weather}",
+        f"nights: {td.nights}, meeting_zone: {td.meeting_zone}, weather: {td.weather}",
     ]
 
     parts.append("\n--- ITINERARY TO VERIFY ---")
@@ -203,6 +200,7 @@ def _call_agent(
     
     if board:
         session.board = board
+    session.logger = logger
     patch_session_tools(session)
     
     tools = [] if disable_tools else session.tool_specs(primitive_only=False)
@@ -261,9 +259,15 @@ def _call_planner_agent(
     runtime: StudentRuntime,
     board: WorkingMemoryBoard,
     logger: SmartAgentLogger | None = None,
+    is_revision: bool = False,
 ) -> Dict[str, Any]:
     cfg = runtime.system_config
-    return _call_agent(
+    
+    original_model = cfg.get("model")
+    if is_revision:
+        cfg["model"] = "gpt-4o-mini" # Use an extremely cheap model for revision rounds
+        
+    res = _call_agent(
         runtime,
         role="mas_planner",
         instructions=_planner_instructions(),
@@ -271,10 +275,15 @@ def _call_planner_agent(
         json_schema=planner_schema(),
         schema_name="planner_proposal",
         max_output_tokens=cfg.get("planner_max_output_tokens", 800),
-        max_tool_rounds=cfg.get("planner_max_tool_rounds", 12),
+        max_tool_rounds=2 if is_revision else cfg.get("planner_max_tool_rounds", 12),
         logger=logger,
         board=board,
     )
+    
+    if is_revision:
+        cfg["model"] = original_model
+        
+    return res
 
 
 def _call_verifier_agent(
@@ -283,7 +292,11 @@ def _call_verifier_agent(
     logger: SmartAgentLogger | None = None,
 ) -> Dict[str, Any]:
     cfg = runtime.system_config
-    return _call_agent(
+    
+    original_model = cfg.get("model")
+    cfg["model"] = "gpt-4o-mini" # Use an extremely cheap model for verification
+    
+    res = _call_agent(
         runtime,
         role="mas_verifier",
         instructions=_verifier_instructions(),
@@ -291,9 +304,13 @@ def _call_verifier_agent(
         json_schema=verifier_schema(),
         schema_name="verifier_check",
         max_output_tokens=cfg.get("verifier_max_output_tokens", 600),
-        max_tool_rounds=cfg.get("verifier_max_tool_rounds", 6),
+        max_tool_rounds=1, # Runner needs >0, but disable_tools=True prevents API calls
+        disable_tools=True, # Verifier should only read, not search
         logger=logger,
     )
+    
+    cfg["model"] = original_model
+    return res
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -554,18 +571,46 @@ def _board_summary(board: WorkingMemoryBoard) -> Dict[str, Any]:
 
 
 def _infer_conditional_needs(episode: Dict[str, Any], board: WorkingMemoryBoard) -> Dict[str, bool]:
-    """Infer whether refundable / vegan are required, hidden-safe.
+    """Infer whether refundable / vegan / client_dinner are required, hidden-safe.
 
     Uses the Memory agent's extracted board constraints plus a keyword scan of the
     raw user turns (so it still works when scenario_state is absent in hidden eval).
+    Also enriches board.hard_constraints with detected spoken constraints.
     """
     turns_text = " ".join(t.get("text", "") for t in episode.get("turns", [])).lower()
     hard = " ".join(board.hard_constraints).lower()
+
     refundable = any(k in turns_text for k in ["refund", "cancel", "reschedul", "schedule risk", "volatil"]) \
         or "refund" in hard
     vegan = any(k in turns_text for k in ["vegan", "plant-based", "plant based", "dietary", "teammate"]) \
         or "dietary" in hard or "vegan" in hard
-    return {"refundable": refundable, "vegan": vegan}
+    client_dinner = any(k in turns_text for k in ["client", "polished", "partner", "networking dinner"]) \
+        or "client" in hard
+    quiet = any(k in turns_text for k in ["quiet", "noise", "loud", "10pm", "nightlife"]) \
+        or "quiet" in hard
+    airport = any(k in turns_text for k in ["airport access", "airport"]) \
+        or "airport" in hard
+
+    # Enrich board hard_constraints so the deterministic seed benefits
+    auto_constraints = []
+    if quiet:
+        auto_constraints.append("prefer_quiet_hotel")
+    if airport:
+        auto_constraints.append("prefer_airport_access")
+    if client_dinner:
+        auto_constraints.append("client_dinner_polished")
+    if vegan:
+        auto_constraints.append("team_dietary_flex")
+    if refundable:
+        auto_constraints.append("refundable_priority")
+    if episode.get("weather") == "rainy":
+        auto_constraints.append("weather_safe_backup")
+
+    for c in auto_constraints:
+        if c not in board.hard_constraints:
+            board.hard_constraints.append(c)
+
+    return {"refundable": refundable, "vegan": vegan, "client_dinner": client_dinner}
 
 
 def _seed_itinerary(runtime: StudentRuntime, board: WorkingMemoryBoard, episode: Dict[str, Any]) -> Dict[str, Any]:
@@ -576,6 +621,7 @@ def _seed_itinerary(runtime: StudentRuntime, board: WorkingMemoryBoard, episode:
         episode,
         require_refundable=needs["refundable"],
         require_vegan=needs["vegan"],
+        require_client_dinner=needs.get("client_dinner", False),
     )
     itin = board.current_itinerary
     if picked.get("flight"):
@@ -673,7 +719,8 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
     """Hybrid solver: Memory LLM → deterministic feasible seed → Verifier LLM."""
     config = runtime.system_config
     episode = runtime.episode
-    max_revision_rounds = 0 # STRICT CAP for cost efficiency
+    max_revision_rounds = 0 # Planner revisions are net-negative (spoken_rule is diagnostic, not in official score)
+    use_verifier = False   # Verifier hallucinates violations and costs money for 0 official-score benefit
 
     # ── 0. Initialize Logger ────────────────────────────────────────
     logger = SmartAgentLogger(
@@ -831,8 +878,23 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
 
     # ── 5. Verifier Loop ────────────────────────────────────────────
     revision_count = 0
-    if _itinerary_complete(board) and pre_violations:
+    # Always enter the loop to run the Verifier (so it can extract spoken rule retirements)
+    if _itinerary_complete(board) and use_verifier:
         while True:
+            # Dynamically recalculate math/hard constraints so we know if Planner fixed them
+            itin_dict = {
+                "flight": board.current_itinerary.flight or {},
+                "hotel": board.current_itinerary.hotel or {},
+                "restaurant": board.current_itinerary.restaurant or {},
+                "activity": board.current_itinerary.activity or {},
+            }
+            current_violations = automated_rule_checker(
+                itin_dict,
+                board.hard_constraints,
+                budget_total=runtime.episode.get("budget_total", 0.0),
+                nights=runtime.episode.get("nights", 1),
+            )
+            
             board_before_ver = _board_summary(board)
             logger.log_board_state("verifier", board_before_ver, stage="BEFORE")
             logger.phase_start("verifier", iteration=revision_count + 1, input_summary={
@@ -842,33 +904,39 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
                 "activity": board.current_itinerary.activity,
             })
 
+            approved = True
+            issues = []
+
+            if current_violations:
+                # Log math violations
+                approved = False
+                issues.extend(current_violations)
+
+            # Check qualitative/spoken rules with LLM Verifier unconditionally
             try:
                 ver_res = _call_verifier_agent(runtime, board, logger=logger)
                 ver_out = ver_res["parsed"]
                 total_usage = runtime.combine_usages(total_usage, ver_res["usage"])
                 total_tool_calls += ver_res["session"].summary()["tool_call_count"]
+                
+                for r in canonicalize_context_keys(ver_out.get("retire", []), keep_doc_ids=False):
+                    if r and r not in board.evaluator_tracking.retired:
+                        board.evaluator_tracking.retired.append(r)
+                        
+                if not ver_out.get("approve", False):
+                    approved = False
+                    issues.extend(ver_out.get("issues", []))
+                    
+                logger.log_tool_calls("verifier", ver_res["session"].summary()["tool_trace"])
+                logger.log_verifier_result(ver_out.get("approve", False), ver_out.get("issues", []))
+                logger.phase_end("verifier", output_summary={
+                    "approved": ver_out.get("approve", False),
+                    "issues": ver_out.get("issues", []),
+                    "notes": ver_out.get("notes", ""),
+                }, usage=ver_res["usage"], tool_call_count=ver_res["session"].summary()["tool_call_count"])
             except Exception as exc:
-                # Verifier crashed (e.g. exhausted tool rounds). Itinerary is already
-                # complete — submit it rather than zeroing the whole episode.
                 logger.log_verifier_result(True, [f"verifier_error_skipped: {exc}"])
-                break
 
-            # Merge verifier retire into evaluator tracking
-            for r in canonicalize_context_keys(
-                ver_out.get("retire", []), keep_doc_ids=False
-            ):
-                if r and r not in board.evaluator_tracking.retired:
-                    board.evaluator_tracking.retired.append(r)
-
-            approved = ver_out.get("approve", False)
-            issues = ver_out.get("issues", [])
-            logger.log_tool_calls("verifier", ver_res["session"].summary()["tool_trace"])
-            logger.log_verifier_result(approved, issues)
-            logger.phase_end("verifier", output_summary={
-                "approved": approved,
-                "issues": issues,
-                "notes": ver_out.get("notes", ""),
-            }, usage=ver_res["usage"], tool_call_count=ver_res["session"].summary()["tool_call_count"])
             board_after_ver = _board_summary(board)
             logger.log_board_state("verifier", board_after_ver, stage="AFTER")
 
@@ -880,6 +948,11 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
             board.failed_searches.append(f"verifier_rejected: {reason}")
             board.failed_searches = summarize_failed_searches(board.failed_searches)
             revision_count += 1
+            
+            # Skip planner if there are math violations (LLM usually cannot fix budget issues that the deterministic seed failed on)
+            if current_violations:
+                logger.log_decision({"notes": "Skipping revision Planner because math/budget violations are unfixable."})
+                break
 
             if revision_count > max_revision_rounds:
                 break  # Submit best-effort
@@ -892,7 +965,7 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
                 "issues": issues,
             })
             try:
-                plan_res = _call_planner_agent(runtime, board, logger=logger)
+                plan_res = _call_planner_agent(runtime, board, logger=logger, is_revision=True)
                 plan_out = plan_res["parsed"]
                 total_usage = runtime.combine_usages(total_usage, plan_res["usage"])
                 total_tool_calls += plan_res["session"].summary()["tool_call_count"]

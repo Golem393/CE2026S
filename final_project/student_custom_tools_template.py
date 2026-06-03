@@ -546,6 +546,7 @@ def select_feasible_itinerary(
     *,
     require_refundable: bool = False,
     require_vegan: bool = False,
+    require_client_dinner: bool = False,
 ) -> Dict[str, Optional[Dict[str, Any]]]:
     """Pick the cheapest itinerary that satisfies the hard constraints.
 
@@ -601,11 +602,21 @@ def select_feasible_itinerary(
         lambda h: h["nightly_price"],
     )
 
-    # Restaurant in meeting_zone. Prefer vegan when required.
+    # Restaurant in meeting_zone. Prefer vegan when required, client-ready when needed.
     r_zone = [r for r in rests if r.get("area") == mz]
     r_vegan = [r for r in r_zone if any(x in r.get("dietary_flags", []) for x in ["vegan", "vegan_preorder"])]
+    r_client = [r for r in r_zone if float(r.get("client_ready_score", 0)) >= 7.5]
     rest_cheap = cheapest(r_zone, rests, lambda r: r["price_level"])
-    rest_pref = cheapest(r_vegan, r_zone or rests, lambda r: r["price_level"]) if require_vegan else rest_cheap
+    if require_vegan and require_client_dinner:
+        # Both vegan + client-ready: find overlap, fall back to vegan, then client, then zone
+        r_both = [r for r in r_vegan if float(r.get("client_ready_score", 0)) >= 7.5]
+        rest_pref = cheapest(r_both, r_vegan or r_client or r_zone or rests, lambda r: r["price_level"])
+    elif require_vegan:
+        rest_pref = cheapest(r_vegan, r_zone or rests, lambda r: r["price_level"])
+    elif require_client_dinner:
+        rest_pref = cheapest(r_client, r_zone or rests, lambda r: r["price_level"])
+    else:
+        rest_pref = rest_cheap
 
     # Activity in meeting_zone. Weather-safe when rainy.
     a_zone = [a for a in acts if a.get("location_zone") == mz]
@@ -638,6 +649,36 @@ def select_feasible_itinerary(
             hotels,
             lambda h: h["nightly_price"],
         )
+
+    # ── Exhaustive budget fallback ───────────────────────────────────
+    # If greedy relaxation still busts the budget, brute-force the cheapest
+    # flight × hotel combo that fits (keeping restaurant + activity fixed).
+    if budget and total(flight, hotel, restaurant, activity) > budget:
+        # Sort all flights and quiet hotels by cost
+        all_flights_sorted = sorted(
+            [f for f in flights if not f.get("red_eye")],
+            key=lambda f: f["fare_total"],
+        )
+        all_hotels_sorted = sorted(
+            h_quiet or hotels,
+            key=lambda h: h["nightly_price"],
+        )
+        # Also try cheapest restaurant if still over
+        r_all_sorted = sorted(rests, key=lambda r: r["price_level"])
+        r_candidates = [restaurant] + [r for r in r_all_sorted if r != restaurant]
+
+        found = False
+        for rc in r_candidates[:3]:
+            for fc in all_flights_sorted[:5]:
+                for hc in all_hotels_sorted[:5]:
+                    if total(fc, hc, rc, activity) <= budget:
+                        flight, hotel, restaurant = fc, hc, rc
+                        found = True
+                        break
+                if found:
+                    break
+            if found:
+                break
 
     # ── Bundle-aware pass: check partner promotions ──────────────────
     # Try to find a bundle combo that matches a partner promotion while
@@ -788,6 +829,16 @@ def patch_session_tools(session: Any) -> None:
             if "restaurant_id" in r: rejected_ids.append(r["restaurant_id"])
             if "activity_id" in r: rejected_ids.append(r["activity_id"])
         ctx["rejected_ids"] = rejected_ids
+        
+        if hasattr(self, "logger") and self.logger:
+            self.logger._print(f"   \033[38;5;180m🔧 Reranking Context:\033[0m {ctx}")
+            import datetime
+            self.logger._write_json({
+                "ts": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                "event": "rerank_context",
+                "trip_id": getattr(self.logger, "trip_id", ""),
+                "context": ctx
+            })
         
         return ctx
 

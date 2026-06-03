@@ -109,12 +109,6 @@ class MemoryAgentUpdate(BaseModel):
     evaluator_tracking: MemoryReport = Field(default_factory=MemoryReport)
 
 class WorkingMemoryBoard(BaseModel):
-    """
-    This is the internal 'Memory Board' that your Planner agent will read from.
-    It contains both the human-readable constraints needed by the Planner, 
-    and the 'evaluator_tracking' object which you will return at the end for grading.
-    """
-    
     # ==========================================
     # STATIC DATA: Parsed once at the beginning
     # Do NOT ask the LLM to output or update this.
