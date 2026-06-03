@@ -13,7 +13,7 @@
       "model": "gpt-5.4-nano",
       "embedding_model": "text-embedding-3-small",
       "use_embeddings_for_docs": true,
-      "use_verifier": false,
+      "use_verifier": true,
       "max_revision_rounds": 1,
       "max_output_tokens": 1200,
       "max_tool_results": 4,

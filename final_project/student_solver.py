@@ -41,7 +41,6 @@ def _memory_agent_instructions() -> str:
         "then output a structured context pack with compact benchmark keys. "
         "Retire stale assumptions the user says no longer apply. "
         "Avoid carrying distractor notes into active context. "
-        "CRITICAL RULE: An optimal itinerary will be provided to you. Do not over-explore. "
         "Use tools selectively — do not pull every doc. "
         + MEMORY_REPORT_GUIDANCE
     )
@@ -85,16 +84,24 @@ def _memory_agent_input(
     return "\n".join(parts)
 
 
+
 def _planner_instructions() -> str:
     return (
         "You are the Planner in a multi-agent travel planner. "
-        "Read constraints/next_steps from Memory Agent. "
-        "CRITICAL RULE: If `current_itinerary` already contains items (flight, hotel, restaurant, activity), "
-        "your search is complete. DO NOT call search_flights, search_hotels, search_restaurants, "
-        "or search_activities. Immediately finalize and output the JSON proposal. "
+        "Read constraints/next_steps from Memory Agent. Search databases with "
+        "filters to find flight, hotel, restaurant, activity that satisfy constraints. "
+        "CRITICAL: You MUST use filter arguments (e.g. quiet_min=8.0, dietary='vegan') "
+        "when calling search tools. Do not rely on post-search reading. "
         "Treat constraints like quiet_score and dietary as absolute strict requirements. "
-        "BUDGET IS A HARD CONSTRAINT. "
-        "Propose IDs from search results only — never hallucinate IDs."
+        "BUDGET IS A HARD CONSTRAINT. The total trip cost MUST be <= budget_total. "
+        "Total cost = flight.fare_total + hotel.nightly_price*nights "
+        "+ restaurant.price_level*25000 + activity.price. "
+        "Prefer the cheapest options that still satisfy the strict tag requirements "
+        "(quiet hotel, meeting_safe flight, weather_safe activity, correct zone). "
+        "Never exceed budget for a bundle perk — being under budget is worth far more. "
+        "Propose IDs from search results only — never hallucinate IDs. "
+        "Use null for items you cannot find. "
+        "If you hit a dead end on all remaining items, put 'give_up' in notes."
     )
 
 
