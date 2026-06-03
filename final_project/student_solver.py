@@ -673,7 +673,7 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
     """Hybrid solver: Memory LLM → deterministic feasible seed → Verifier LLM."""
     config = runtime.system_config
     episode = runtime.episode
-    max_revision_rounds = config.get("max_revision_rounds", 1)
+    max_revision_rounds = 0 # STRICT CAP for cost efficiency
 
     # ── 0. Initialize Logger ────────────────────────────────────────
     logger = SmartAgentLogger(
@@ -739,7 +739,7 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
     # ── 3. Planner Loop (fallback only) ─────────────────────────────
     # The deterministic seed normally fills every slot, so this loop is skipped.
     # It only runs as a fallback when the seed could not fill a category.
-    MAX_PLANNER_ITERS = 4
+    MAX_PLANNER_ITERS = 1 # STRICT CAP for cost efficiency
     for planner_iter in range(MAX_PLANNER_ITERS):
         if _itinerary_complete(board):
             break
@@ -805,6 +805,7 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
             logger.log_board_state("memory", board_after_mem, stage="AFTER")
 
     # ── 4. Pre-Verifier Rule Check (custom tool) ────────────────────
+    pre_violations = []
     if _itinerary_complete(board):
         itin_dict = {
             "flight": board.current_itinerary.flight or {},
@@ -830,7 +831,7 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
 
     # ── 5. Verifier Loop ────────────────────────────────────────────
     revision_count = 0
-    if _itinerary_complete(board):
+    if _itinerary_complete(board) and pre_violations:
         while True:
             board_before_ver = _board_summary(board)
             logger.log_board_state("verifier", board_before_ver, stage="BEFORE")
