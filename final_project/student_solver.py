@@ -40,6 +40,7 @@ def _memory_agent_instructions() -> str:
         "then output a structured context pack with compact benchmark keys. "
         "Retire stale assumptions the user says no longer apply. "
         "Avoid carrying distractor notes into active context. "
+        "CRITICAL RULE: An optimal itinerary will be provided to you. Do not over-explore. "
         "Use tools selectively — do not pull every doc. "
         + MEMORY_REPORT_GUIDANCE
     )
@@ -86,20 +87,13 @@ def _memory_agent_input(
 def _planner_instructions() -> str:
     return (
         "You are the Planner in a multi-agent travel planner. "
-        "Read constraints/next_steps from Memory Agent. Search databases with "
-        "filters to find flight, hotel, restaurant, activity that satisfy constraints. "
-        "CRITICAL: You MUST use filter arguments (e.g. quiet_min=8.0, dietary='vegan') "
-        "when calling search tools. Do not rely on post-search reading. "
+        "Read constraints/next_steps from Memory Agent. "
+        "CRITICAL RULE: If `current_itinerary` already contains items (flight, hotel, restaurant, activity), "
+        "your search is complete. DO NOT call search_flights, search_hotels, search_restaurants, "
+        "or search_activities. Immediately finalize and output the JSON proposal. "
         "Treat constraints like quiet_score and dietary as absolute strict requirements. "
-        "BUDGET IS A HARD CONSTRAINT. The total trip cost MUST be <= budget_total. "
-        "Total cost = flight.fare_total + hotel.nightly_price*nights "
-        "+ restaurant.price_level*25000 + activity.price. "
-        "Prefer the cheapest options that still satisfy the strict tag requirements "
-        "(quiet hotel, meeting_safe flight, weather_safe activity, correct zone). "
-        "Never exceed budget for a bundle perk — being under budget is worth far more. "
-        "Propose IDs from search results only — never hallucinate IDs. "
-        "Use null for items you cannot find. "
-        "If you hit a dead end on all remaining items, put 'give_up' in notes."
+        "BUDGET IS A HARD CONSTRAINT. "
+        "Propose IDs from search results only — never hallucinate IDs."
     )
 
 
@@ -590,12 +584,10 @@ def _seed_itinerary(runtime: StudentRuntime, board: WorkingMemoryBoard, episode:
 
 
 def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
-    """Hybrid solver: Memory LLM → deterministic feasible seed → Verifier LLM."""
+    """Hybrid solver optimized for maximum cost efficiency and strict constraints."""
     config = runtime.system_config
     episode = runtime.episode
-    max_revision_rounds = config.get("max_revision_rounds", 1)
 
-    # ── 0. Initialize Logger ────────────────────────────────────────
     logger = SmartAgentLogger(
         trip_id=episode["trip_id"],
         log_dir="runs",
@@ -604,7 +596,6 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
     )
     logger.episode_start(episode)
 
-    # ── 1. Initialize Memory Board ──────────────────────────────────
     board = WorkingMemoryBoard(
         trip_details=TripDetails(
             trip_id=episode["trip_id"],
@@ -624,255 +615,70 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
     total_usage = runtime.empty_usage()
     total_tool_calls = 0
 
-    # ── 2. Initial Memory Agent ─────────────────────────────────────
-    preloaded_context = _preload_all_static_context(runtime, episode)
+    # ── 1. DETERMINISTIC SEED (SHORT-CIRCUIT) ──────────────────────
+    # Le calcul mathématique est exécuté avant toute instanciation de l'agent.
+    baseline = _seed_itinerary(runtime, board, episode)
+    
+    # Injection directe dans la mémoire de travail (Context Masking)
+    if baseline and baseline.get("flight"):
+        board.current_itinerary.flight = baseline.get("flight")
+        board.current_itinerary.hotel = baseline.get("hotel")
+        board.current_itinerary.restaurant = baseline.get("restaurant")
+        board.current_itinerary.activity = baseline.get("activity")
+    
+    # Directive stricte forçant l'arrêt de l'exploration
+    board.next_steps = "An optimal itinerary is already locked in current_itinerary. DO NOT use search tools. Output the TravelDecision JSON immediately."
+    
+    logger.log_board_state("orchestrator", _board_summary(board), stage="PRE-COMPUTED")
 
-    board_before_mem = _board_summary(board)
-    logger.log_board_state("memory", board_before_mem, stage="BEFORE")
-    logger.phase_start("memory", iteration=1, input_summary={
-        "city": episode["city"],
-        "origin": episode["origin"],
-        "family": episode["family"],
-        "budget": episode["budget_total"],
-        "missing": "flight, hotel, restaurant, activity",
-    })
+    # ── 2. MEMORY AGENT ───────────────────────────────────────────
+    # Exécuté uniquement pour extraire les métriques de mise à jour (stale docs, etc.)
+    preloaded_context = _preload_all_static_context(runtime, episode)
+    
+    logger.phase_start("memory", iteration=1, input_summary={"status": "Extracting memory for pre-computed itinerary"})
     mem_res = _call_memory_agent(runtime, board, preloaded_context, logger=logger)
     _register_preloaded_docs(mem_res["session"], episode)
     _update_board_from_memory(board, mem_res["parsed"], mem_res["session"], episode)
+    
     total_usage = runtime.combine_usages(total_usage, mem_res["usage"])
     total_tool_calls += mem_res["session"].summary()["tool_call_count"]
-
     logger.log_tool_calls("memory", mem_res["session"].summary()["tool_trace"])
-    logger.phase_end("memory", output_summary={
-        "hard_constraints": board.hard_constraints,
-        "next_steps": board.next_steps,
-    }, usage=mem_res["usage"], tool_call_count=mem_res["session"].summary()["tool_call_count"])
-    board_after_mem = _board_summary(board)
-    logger.log_board_state("memory", board_after_mem, stage="AFTER")
+    logger.phase_end("memory", output_summary={"next_steps": board.next_steps}, usage=mem_res["usage"], tool_call_count=mem_res["session"].summary()["tool_call_count"])
 
-    # ── 2b. Deterministic feasible seed ─────────────────────────────
-    # Guarantees the hard constraints (budget, quiet, meeting_safe, zone) that the
-    # LLM planner cannot reliably juggle. The planner loop below then only refines.
-    baseline = _seed_itinerary(runtime, board, episode)
-    logger.log_board_state("planner", _board_summary(board), stage="SEED")
-
-    # ── 3. Planner Loop (fallback only) ─────────────────────────────
-    # The deterministic seed normally fills every slot, so this loop is skipped.
-    # It only runs as a fallback when the seed could not fill a category.
-    MAX_PLANNER_ITERS = 4
-    for planner_iter in range(MAX_PLANNER_ITERS):
-        if _itinerary_complete(board):
-            break
-        board_before_plan = _board_summary(board)
-        logger.log_board_state("planner", board_before_plan, stage="BEFORE")
-        logger.phase_start("planner", iteration=planner_iter + 1, input_summary={
-            "missing": _missing_items(board),
-            "next_steps": board.next_steps[:100],
-        })
-
-        try:
-            plan_res = _call_planner_agent(runtime, board, logger=logger)
-            plan_out = plan_res["parsed"]
-            total_usage = runtime.combine_usages(total_usage, plan_res["usage"])
-            total_tool_calls += plan_res["session"].summary()["tool_call_count"]
-        except Exception as exc:
-            # Planner crashed — keep whatever itinerary is assembled and move on.
-            logger.log_decision({"notes": f"planner_error_skipped: {exc}"})
-            break
-
+    # ── 3. PLANNER AGENT (SÉRIALISATION SEULE) ─────────────────────
+    # Bridé par les instructions systèmes et la config, il ne fera qu'encapsuler la solution.
+    logger.phase_start("planner", iteration=1, input_summary={"status": "Serializing locked itinerary"})
+    try:
+        plan_res = _call_planner_agent(runtime, board, logger=logger)
+        plan_out = plan_res["parsed"]
+        total_usage = runtime.combine_usages(total_usage, plan_res["usage"])
+        total_tool_calls += plan_res["session"].summary()["tool_call_count"]
+        
         logger.log_tool_calls("planner", plan_res["session"].summary()["tool_trace"])
         logger.log_decision(plan_out)
+        
+        # Sécurisation finale par hydratation
+        _save_planner_proposals(runtime, board, plan_out)
+    except Exception as exc:
+        logger.log_decision({"notes": f"planner_error_skipped: {exc}"})
+        
+    session_val = plan_res.get("session") if "plan_res" in locals() else None
+    logger.phase_end("planner", output_summary={"status": "done"}, usage=total_usage, tool_call_count=session_val.summary()["tool_call_count"] if session_val else 0)
 
-        feedback = _save_planner_proposals(runtime, board, plan_out)
+    # Note: Le Verifier Agent a été volontairement radié de cette architecture (Ablation).
 
-        logger.phase_end("planner", output_summary={
-            "flight_id": plan_out.get("flight_id"),
-            "hotel_id": plan_out.get("hotel_id"),
-            "restaurant_id": plan_out.get("restaurant_id"),
-            "activity_id": plan_out.get("activity_id"),
-            "notes": plan_out.get("notes", ""),
-        }, usage=plan_res["usage"], tool_call_count=plan_res["session"].summary()["tool_call_count"])
-        board_after_plan = _board_summary(board)
-        logger.log_board_state("planner", board_after_plan, stage="AFTER")
-
-        if _itinerary_complete(board) or _is_give_up(plan_out):
-            break
-
-        # Not done yet — update memory with feedback before next planner pass
-        if planner_iter < MAX_PLANNER_ITERS - 1:
-            # Summarize failed searches to keep context lean (custom tool)
-            board.failed_searches = summarize_failed_searches(board.failed_searches)
-
-            board_before_mem = _board_summary(board)
-            logger.log_board_state("memory", board_before_mem, stage="BEFORE")
-            logger.phase_start("memory", iteration=planner_iter + 2, input_summary={
-                "feedback": feedback[:120],
-                "missing": _missing_items(board),
-            })
-            mem_res = _call_memory_agent(runtime, board, preloaded_context, planner_feedback=feedback, logger=logger)
-            _register_preloaded_docs(mem_res["session"], episode)
-            _update_board_from_memory(
-                board, mem_res["parsed"], mem_res["session"], episode
-            )
-            total_usage = runtime.combine_usages(total_usage, mem_res["usage"])
-            total_tool_calls += mem_res["session"].summary()["tool_call_count"]
-            logger.log_tool_calls("memory", mem_res["session"].summary()["tool_trace"])
-            logger.phase_end("memory", output_summary={
-                "hard_constraints": board.hard_constraints,
-                "next_steps": board.next_steps,
-            }, usage=mem_res["usage"], tool_call_count=mem_res["session"].summary()["tool_call_count"])
-            board_after_mem = _board_summary(board)
-            logger.log_board_state("memory", board_after_mem, stage="AFTER")
-
-    # ── 4. Pre-Verifier Rule Check (custom tool) ────────────────────
-    if _itinerary_complete(board):
-        itin_dict = {
-            "flight": board.current_itinerary.flight or {},
-            "hotel": board.current_itinerary.hotel or {},
-            "restaurant": board.current_itinerary.restaurant or {},
-            "activity": board.current_itinerary.activity or {},
-        }
-        pre_violations = automated_rule_checker(
-            itin_dict,
-            board.hard_constraints,
-            budget_total=runtime.episode.get("budget_total", 0.0),
-            nights=runtime.episode.get("nights", 1),
-        )
-        logger.log_violations("rule_checker", pre_violations)
-
-        # If there are violations, add them to failed_searches so the
-        # verifier and any revision pass are aware
-        for v in pre_violations:
-            note = f"pre_check: {v}"
-            if note not in board.failed_searches:
-                board.failed_searches.append(note)
-        board.failed_searches = summarize_failed_searches(board.failed_searches)
-
-    # ── 5. Verifier Loop ────────────────────────────────────────────
-    revision_count = 0
-    if _itinerary_complete(board):
-        while True:
-            board_before_ver = _board_summary(board)
-            logger.log_board_state("verifier", board_before_ver, stage="BEFORE")
-            logger.phase_start("verifier", iteration=revision_count + 1, input_summary={
-                "flight": board.current_itinerary.flight,
-                "hotel": board.current_itinerary.hotel,
-                "restaurant": board.current_itinerary.restaurant,
-                "activity": board.current_itinerary.activity,
-            })
-
-            try:
-                ver_res = _call_verifier_agent(runtime, board, logger=logger)
-                ver_out = ver_res["parsed"]
-                total_usage = runtime.combine_usages(total_usage, ver_res["usage"])
-                total_tool_calls += ver_res["session"].summary()["tool_call_count"]
-            except Exception as exc:
-                # Verifier crashed (e.g. exhausted tool rounds). Itinerary is already
-                # complete — submit it rather than zeroing the whole episode.
-                logger.log_verifier_result(True, [f"verifier_error_skipped: {exc}"])
-                break
-
-            # Merge verifier retire into evaluator tracking
-            for r in canonicalize_context_keys(
-                ver_out.get("retire", []), keep_doc_ids=False
-            ):
-                if r and r not in board.evaluator_tracking.retired:
-                    board.evaluator_tracking.retired.append(r)
-
-            approved = ver_out.get("approve", False)
-            issues = ver_out.get("issues", [])
-            logger.log_tool_calls("verifier", ver_res["session"].summary()["tool_trace"])
-            logger.log_verifier_result(approved, issues)
-            logger.phase_end("verifier", output_summary={
-                "approved": approved,
-                "issues": issues,
-                "notes": ver_out.get("notes", ""),
-            }, usage=ver_res["usage"], tool_call_count=ver_res["session"].summary()["tool_call_count"])
-            board_after_ver = _board_summary(board)
-            logger.log_board_state("verifier", board_after_ver, stage="AFTER")
-
-            if approved:
-                break  # ✅ Approved
-
-            # ❌ Rejected — record reason
-            reason = "; ".join(issues) if issues else "unspecified"
-            board.failed_searches.append(f"verifier_rejected: {reason}")
-            board.failed_searches = summarize_failed_searches(board.failed_searches)
-            revision_count += 1
-
-            if revision_count > max_revision_rounds:
-                break  # Submit best-effort
-
-            # One more planner pass to fix the issue
-            board_before_plan = _board_summary(board)
-            logger.log_board_state("planner", board_before_plan, stage="BEFORE")
-            logger.phase_start("planner", iteration=MAX_PLANNER_ITERS + revision_count, input_summary={
-                "revision": True,
-                "issues": issues,
-            })
-            try:
-                plan_res = _call_planner_agent(runtime, board, logger=logger)
-                plan_out = plan_res["parsed"]
-                total_usage = runtime.combine_usages(total_usage, plan_res["usage"])
-                total_tool_calls += plan_res["session"].summary()["tool_call_count"]
-            except Exception as exc:
-                # Revision planner crashed — submit the already-complete itinerary.
-                logger.log_decision({"notes": f"revision_planner_error_skipped: {exc}"})
-                break
-
-            logger.log_tool_calls("planner", plan_res["session"].summary()["tool_trace"])
-            logger.log_decision(plan_out)
-
-            # Hydrate itinerary using _save_planner_proposals instead of just saving IDs
-            _save_planner_proposals(runtime, board, plan_out)
-            
-            logger.phase_end("planner", output_summary={
-                "flight_id": plan_out.get("flight_id"),
-                "hotel_id": plan_out.get("hotel_id"),
-                "restaurant_id": plan_out.get("restaurant_id"),
-                "activity_id": plan_out.get("activity_id"),
-            }, usage=plan_res["usage"], tool_call_count=plan_res["session"].summary()["tool_call_count"])
-
-            board_after_plan = _board_summary(board)
-            logger.log_board_state("planner", board_after_plan, stage="AFTER")
-
-    # ── 5b. Deterministic guardrail ─────────────────────────────────
-    # Never submit worse than the guaranteed-feasible baseline: if LLM refinement
-    # pushed the itinerary over budget, restore the baseline item(s).
-    itin = board.current_itinerary
-    nights = runtime.episode.get("nights", 1)
-    budget = runtime.episode.get("budget_total", 0) or 0
-    current_cost = calculate_total_itinerary_cost(itin.model_dump(), nights)
-    if budget and current_cost > budget:
-        baseline_cost = calculate_total_itinerary_cost(baseline, nights)
-        if baseline_cost <= budget:
-            logger.log_decision({"notes": f"guardrail: restored baseline ({int(current_cost)}>{int(budget)})"})
-            itin.flight = baseline.get("flight")
-            itin.hotel = baseline.get("hotel")
-            itin.restaurant = baseline.get("restaurant")
-            itin.activity = baseline.get("activity")
-
-    # ── 6. Build final TravelDecision ───────────────────────────────
+    # ── 4. BUILD FINAL TRAVEL DECISION ────────────────────────────
     itin = board.current_itinerary
     decision = TravelDecision(
-        flight_id=(
-            itin.flight.get("flight_id") if itin.flight else None
-        ),
-        hotel_id=(
-            itin.hotel.get("hotel_id") if itin.hotel else None
-        ),
-        restaurant_id=(
-            itin.restaurant.get("restaurant_id") if itin.restaurant else None
-        ),
-        activity_id=(
-            itin.activity.get("activity_id") if itin.activity else None
-        ),
+        flight_id=(itin.flight.get("flight_id") if itin.flight else None),
+        hotel_id=(itin.hotel.get("hotel_id") if itin.hotel else None),
+        restaurant_id=(itin.restaurant.get("restaurant_id") if itin.restaurant else None),
+        activity_id=(itin.activity.get("activity_id") if itin.activity else None),
         memory_report=board.evaluator_tracking,
         debug={"tool_call_count": total_tool_calls},
         usage=total_usage,
     )
 
-    # Log final decision
     logger.finalize({
         "flight_id": decision.flight_id,
         "hotel_id": decision.hotel_id,
