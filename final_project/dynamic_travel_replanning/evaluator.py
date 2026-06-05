@@ -83,6 +83,7 @@ _DOC_ID_TO_KEYS = {
     "city_ops:TPE": ["low_friction_transit", "prefer_airport_access"],
     "city_ops:SIN": ["weather_safe_backup", "low_friction_transit"],
     "stale:budget_cap_archive": ["old_budget_cap"],
+    "stale:local_character_default": ["local_character_if_safe"],
     "stale:avoid_chain_hotels_absolute": ["avoid_chain_hotels_stable"],
     "stale:dry_weather_ops_assumption": ["old_weather_assumption"],
     "stale:partner_social_default": ["old_social_bundle_default"],

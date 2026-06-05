@@ -169,7 +169,15 @@ class TravelToolbox:
         embedding_model: str | None,
         max_results: int,
         role: str,
+        board: Any = None,
+        **session_kwargs: Any,
     ) -> "TravelToolSession":
+        """Create a tool session.
+
+        Extra keyword arguments are accepted and preserved for compatibility
+        with older student solvers that attached custom boards/state to tool
+        sessions.  Official scoring only uses the recorded tool trace.
+        """
         session = TravelToolSession(
             toolbox=self,
             episode=episode,
@@ -177,6 +185,8 @@ class TravelToolbox:
             embedding_model=embedding_model,
             max_results=max_results,
             role=role,
+            board=board,
+            **session_kwargs,
         )
         runtime = get_active_student_runtime()
         if runtime is not None and getattr(runtime, "toolbox", None) is self:
@@ -196,6 +206,8 @@ class TravelToolSession:
         embedding_model: str | None,
         max_results: int,
         role: str,
+        board: Any = None,
+        **session_kwargs: Any,
     ) -> None:
         self.toolbox = toolbox
         self.episode = episode
@@ -203,6 +215,8 @@ class TravelToolSession:
         self.embedding_model = embedding_model
         self.max_results = max_results
         self.role = role
+        self.board = board
+        self.extra_session_kwargs = dict(session_kwargs)
         self.runner = None
         self.tool_trace: List[Dict[str, Any]] = []
         self.docs_seen: List[str] = []
@@ -313,6 +327,11 @@ class TravelToolSession:
                         "memory_type": {"type": ["string", "null"]},
                         "include_stale": {"type": "boolean"},
                         "top_k": {"type": "integer"},
+                        "scope": {
+                            "type": "string",
+                            "enum": ["episode", "city", "traveler", "family", "global"],
+                            "description": "Search scope. episode is default; city/family/traveler/global intentionally broaden retrieval when needed.",
+                        },
                     },
                     "required": ["query"],
                     "additionalProperties": False,
@@ -328,6 +347,11 @@ class TravelToolSession:
                         "query": {"type": ["string", "null"]},
                         "kind": {"type": ["string", "null"]},
                         "max_results": {"type": "integer"},
+                        "scope": {
+                            "type": "string",
+                            "enum": ["episode", "city", "family", "global"],
+                            "description": "Rejected-option search scope. episode is default; city/family/global intentionally broaden retrieval when needed.",
+                        },
                     },
                     "additionalProperties": False,
                 },
@@ -546,13 +570,65 @@ class TravelToolSession:
             return [spec for spec in specs if spec.get("name") in primitive_names]
         return specs
 
+    def _normalize_tool_scope(self, scope: str | None) -> str:
+        cleaned = (scope or "episode").strip().lower().replace("-", "_")
+        aliases = {
+            "trip": "episode",
+            "current": "episode",
+            "episode_only": "episode",
+            "same_city": "city",
+            "city_only": "city",
+            "same_traveler": "traveler",
+            "traveler_only": "traveler",
+            "traveller": "traveler",
+            "traveller_only": "traveler",
+            "same_family": "family",
+            "family_only": "family",
+            "all": "global",
+            "any": "global",
+        }
+        cleaned = aliases.get(cleaned, cleaned)
+        allowed = {"episode", "city", "traveler", "family", "global"}
+        if cleaned not in allowed:
+            raise ValueError(f"Unsupported tool scope {scope!r}; expected one of {sorted(allowed)}")
+        return cleaned
+
+    def _memory_scope_filters(self, scope: str | None) -> Dict[str, str | None]:
+        normalized = self._normalize_tool_scope(scope)
+        if normalized == "episode":
+            return {
+                "city": self.episode.get("city"),
+                "traveler_id": self.episode.get("traveler_id"),
+                "family": self.episode.get("family"),
+            }
+        if normalized == "city":
+            return {"city": self.episode.get("city"), "traveler_id": None, "family": None}
+        if normalized == "traveler":
+            return {"city": None, "traveler_id": self.episode.get("traveler_id"), "family": None}
+        if normalized == "family":
+            return {"city": None, "traveler_id": None, "family": self.episode.get("family")}
+        return {"city": None, "traveler_id": None, "family": None}
+
+    def _rejected_scope_filters(self, scope: str | None) -> Dict[str, str | None]:
+        normalized = self._normalize_tool_scope(scope)
+        if normalized == "episode":
+            return {"city": self.episode.get("city"), "family": self.episode.get("family")}
+        if normalized == "city":
+            return {"city": self.episode.get("city"), "family": None}
+        if normalized == "family":
+            return {"city": None, "family": self.episode.get("family")}
+        # Rejected-option rows are not traveler-scoped, so traveler/global both mean broad search.
+        return {"city": None, "family": None}
+
     def search_memory(
         self,
         query: str,
         memory_type: str | None = None,
         include_stale: bool = True,
         top_k: int = 5,
+        scope: str = "episode",
     ) -> Dict[str, Any]:
+        scope_filters = self._memory_scope_filters(scope)
         payload = self.toolbox.memory_corpus.search(
             runner=self.runner,
             query=query,
@@ -560,21 +636,24 @@ class TravelToolSession:
             embedding_model=self.embedding_model,
             top_k=min(top_k, self.max_results + 1),
             memory_type=memory_type,
-            city=self.episode["city"],
-            traveler_id=self.episode["traveler_id"],
-            family=self.episode["family"],
+            city=scope_filters["city"],
+            traveler_id=scope_filters["traveler_id"],
+            family=scope_filters["family"],
             include_stale=include_stale,
         )
         self.usage = self.runner.combine_usages(self.usage, payload["usage"])
         self._track_docs(payload["results"])
-        return {"strategy": payload["strategy"], "items": payload["results"]}
+        return {"strategy": payload["strategy"], "scope": self._normalize_tool_scope(scope), "items": payload["results"]}
 
     def get_rejected_options(
         self,
         query: str | None = None,
         kind: str | None = None,
         max_results: int = 5,
+        scope: str = "episode",
     ) -> Dict[str, Any]:
+        normalized_scope = self._normalize_tool_scope(scope)
+        scope_filters = self._rejected_scope_filters(normalized_scope)
         query_text = query or f"{self.episode['city']} {self.episode['family']} rejected options"
         query_lower = query_text.lower()
         hinted_kinds = set()
@@ -589,9 +668,9 @@ class TravelToolSession:
             allowed_kinds |= hinted_kinds
         rows = []
         for row in self.toolbox.rejected_options:
-            if row["city"] != self.episode["city"]:
+            if scope_filters["city"] is not None and row["city"] != scope_filters["city"]:
                 continue
-            if row["family"] != self.episode["family"]:
+            if scope_filters["family"] is not None and row["family"] != scope_filters["family"]:
                 continue
             if allowed_kinds and row["kind"] not in allowed_kinds:
                 continue
@@ -601,7 +680,7 @@ class TravelToolSession:
         rows.sort(key=lambda row: row["score"], reverse=True)
         rows = rows[: min(max_results, self.max_results + 1)]
         self._track_rejected(rows)
-        return {"items": rows}
+        return {"scope": normalized_scope, "items": rows}
 
     def get_profile_brief(self, traveler_id: str) -> Dict[str, Any]:
         item = dict(self.toolbox.env.get_profile_brief(traveler_id))
