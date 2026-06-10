@@ -27,7 +27,6 @@ from student_custom_tools_template import (
     summarize_failed_searches,
     select_feasible_itinerary,
     calculate_total_itinerary_cost,
-    patch_session_tools,
 )
 
 
@@ -184,6 +183,7 @@ def _call_agent(
     disable_tools: bool = False,
     logger: SmartAgentLogger | None = None,
     board: Any = None,
+    session: Any = None,
 ) -> Dict[str, Any]:
     """Generic wrapper: create session, run tool agent, return parsed + usage + session."""
     config = runtime.system_config
@@ -195,15 +195,15 @@ def _call_agent(
             agent_name = "memory"
         logger.log_prompt(agent_name, instructions, input_text)
 
-    session = runtime.new_session(
-        role=role,
-        max_results=config.get("max_tool_results", 4),
-    )
+    if session is None:
+        session = runtime.new_session(
+            role=role,
+            max_results=config.get("max_tool_results", 4),
+        )
     
     if board:
         session.board = board
     session.logger = logger
-    patch_session_tools(session)
     
     tools = [] if disable_tools else session.tool_specs(primitive_only=False)
 
@@ -241,6 +241,7 @@ def _call_memory_agent(
     preloaded_context: str,
     planner_feedback: str = "",
     logger: SmartAgentLogger | None = None,
+    session: Any = None,
 ) -> Dict[str, Any]:
     cfg = runtime.system_config
     return _call_agent(
@@ -254,6 +255,7 @@ def _call_memory_agent(
         max_tool_rounds=1,  # Must be >0 so runner doesn't fail
         disable_tools=True, # 0 API calls for retrieval!
         logger=logger,
+        session=session,
     )
 
 
@@ -410,16 +412,17 @@ def _save_planner_proposals(
     runtime: StudentRuntime,
     board: WorkingMemoryBoard,
     planner_out: Dict[str, Any],
+    session: Any,
 ) -> str:
     """Save Planner IDs to itinerary; return feedback string."""
     feedback = []
     itin = board.current_itinerary
 
     for key, attr, fetch_fn in [
-        ("flight_id", "flight", lambda code: [f for f in runtime.toolbox.env.search_flights(runtime.episode["origin"], runtime.episode["city"]) if f["flight_id"] == code]),
-        ("hotel_id", "hotel", lambda code: [h for h in runtime.toolbox.env.search_hotels(runtime.episode["city"]) if h["hotel_id"] == code]),
-        ("restaurant_id", "restaurant", lambda code: [r for r in runtime.toolbox.env.search_restaurants(runtime.episode["city"]) if r["restaurant_id"] == code]),
-        ("activity_id", "activity", lambda code: [a for a in runtime.toolbox.env.search_activities(runtime.episode["city"]) if a["activity_id"] == code]),
+        ("flight_id", "flight", lambda code: session.dispatch("search_flights", {"origin": runtime.episode["origin"], "destination": runtime.episode["city"], "flight_id": code}).get("items", [])),
+        ("hotel_id", "hotel", lambda code: session.dispatch("search_hotels", {"city": runtime.episode["city"], "hotel_id": code}).get("items", [])),
+        ("restaurant_id", "restaurant", lambda code: session.dispatch("search_restaurants", {"city": runtime.episode["city"], "restaurant_id": code}).get("items", [])),
+        ("activity_id", "activity", lambda code: session.dispatch("search_activities", {"city": runtime.episode["city"], "activity_id": code}).get("items", [])),
     ]:
         proposed_id = planner_out.get(key)
         current = getattr(itin, attr)
@@ -476,39 +479,46 @@ def _extract_conversation_constraints(runtime: StudentRuntime, episode: Dict[str
     return (json.dumps(res['parsed']['final_constraints']), res["usage"])
 
 
-def _preload_all_static_context(runtime: StudentRuntime, episode: Dict[str, Any]) -> tuple[str, Dict[str, Any]]:
-    env = runtime.toolbox.env
+def _preload_all_static_context(session: Any, runtime: StudentRuntime, episode: Dict[str, Any]) -> tuple[str, Dict[str, Any]]:
     city = episode["city"]
     family = episode["family"]
     traveler = episode["traveler_id"]
 
     parts = ["\n--- PRE-LOADED STATIC CONTEXT ---"]
-    parts.append(f"\n1. Profile Brief (Raw): {json.dumps(env.get_profile_brief(traveler))}")
+    
+    profile = session.dispatch("get_profile_brief", {"traveler_id": traveler})
+    parts.append(f"\n1. Profile Brief (Raw): {json.dumps(profile)}")
     
     docs_to_append = []
     
-    docs_to_append.append(("Venue Brief", env.get_venue_brief(city, family)))
-    docs_to_append.append(("City Ops Notes", env.get_city_ops_notes(city)))
+    docs_to_append.append(("Venue Brief", session.dispatch("get_venue_brief", {"city": city, "family": family})))
     
-    loyalty = env.get_loyalty_profile(traveler)
+    city_ops = session.dispatch("get_city_ops_notes", {"city": city})
+    if city_ops and "items" in city_ops: docs_to_append.append(("City Ops Notes", city_ops["items"]))
+    
+    loyalty = session.dispatch("get_loyalty_profile", {"traveler_id": traveler})
     if loyalty: docs_to_append.append(("Loyalty Profile", loyalty))
         
-    constraints = env.get_booking_constraints(city=city, family=family)
-    if constraints: docs_to_append.append(("Booking Constraints", constraints))
+    constraints = session.dispatch("get_booking_constraints", {"city": city, "family": family})
+    if constraints and "items" in constraints: docs_to_append.append(("Booking Constraints", constraints["items"]))
         
-    deps = env.get_option_dependencies(city=city)
-    if deps: docs_to_append.append(("Option Dependencies", deps))
+    deps = session.dispatch("get_option_dependencies", {"city": city})
+    if deps and "items" in deps: docs_to_append.append(("Option Dependencies", deps["items"]))
         
-    promos = env.get_partner_promotions(city=city, family=family)
-    if promos: docs_to_append.append(("Partner Promotions", promos))
+    promos = session.dispatch("get_partner_promotions", {"city": city, "family": family})
+    if promos and "items" in promos: docs_to_append.append(("Partner Promotions", promos["items"]))
         
-    events = env.get_event_calendar(city)
-    if events: docs_to_append.append(("Event Calendar", events))
+    events = session.dispatch("get_event_context", {"city": city})
+    if events and "items" in events: docs_to_append.append(("Event Calendar", events["items"]))
         
-    rejected = [r for r in runtime.toolbox.rejected_options if r["city"] == city and r["family"] == family]
-    if rejected: docs_to_append.append(("Rejected Options", rejected))
+    rejected = session.dispatch("get_rejected_options", {})
+    if rejected and "items" in rejected: docs_to_append.append(("Rejected Options", rejected["items"]))
         
-    docs_to_append.append(("Policy", env.get_policy()))
+    docs_to_append.append(("Policy", session.dispatch("get_policy", {})))
+
+    # Surface stale_policy docs
+    session.dispatch("search_memory", {"query": "stale_policy", "memory_type": "stale_policy", "include_stale": True, "top_k": 5})
+    session.dispatch("search_memory", {"query": "airport access heuristic", "include_stale": True, "top_k": 5})
 
     usage = runtime.empty_usage()
 
@@ -523,65 +533,7 @@ def _preload_all_static_context(runtime: StudentRuntime, episode: Dict[str, Any]
     return "\n".join(parts), usage
 
 
-def _register_preloaded_docs(session: Any, episode: Dict[str, Any]) -> None:
-    """Register docs that we implicitly retrieved via preloading."""
-    docs = [
-        f"profile:{episode['traveler_id']}",
-        f"venue:{episode['city']}_{episode['family']}",
-        f"city_ops:{episode['city']}"
-    ]
-    env = session.toolbox.env
-    city = episode["city"]
-    family = episode["family"]
 
-    loyalty = env.get_loyalty_profile(episode["traveler_id"])
-    if loyalty:
-        docs.append(loyalty.get("doc_id", f"loyalty:{episode['traveler_id']}"))
-
-    constraints = env.get_booking_constraints(city=city, family=family)
-    if constraints:
-        docs.extend([c.get("doc_id") for c in constraints if c.get("doc_id")])
-        
-    deps = env.get_option_dependencies(city=city)
-    if deps:
-        docs.extend([d.get("doc_id") for d in deps if d.get("doc_id")])
-        
-    promos = env.get_partner_promotions(city=city, family=family)
-    if promos:
-        docs.extend([p.get("doc_id") for p in promos if p.get("doc_id")])
-        
-    events = env.get_event_calendar(city)
-    if events:
-        docs.extend([e.get("doc_id") for e in events if e.get("doc_id")])
-
-    # Surface stale_policy docs (global or this-city) so the evaluator credits
-    # stale-doc retirement and derives the matching retire keys for
-    # update_handling (evaluator.py:368-371, 615-626). stale_city_ops docs are
-    # distractors and are deliberately excluded.
-    for doc in getattr(env, "memory_corpus", []):
-        did = doc.get("doc_id", "")
-        if did and doc.get("memory_type") == "stale_policy":
-            doc_city = doc.get("city")
-            if doc_city is None or doc_city == city:
-                docs.append(did)
-
-    # Surface the airport-access one-off heuristic so prefer_airport_access is in
-    # retrieved context, avoiding the airport update_handling penalty
-    # (evaluator.py:613) where the episodic exception applies.
-    docs.append("heuristic:airport_access_one_off")
-
-    for d in docs:
-        if d not in session.docs_seen:
-            session.docs_seen.append(d)
-            
-    for r in session.toolbox.rejected_options:
-        if r["city"] == city and r["family"] == family:
-            reason = r.get("reason_key")
-            opt = r.get("option_id")
-            if reason and opt:
-                note = f"{reason}:{opt}"
-                if note not in session.rejected_notes_seen:
-                    session.rejected_notes_seen.append(note)
 
 
 def _board_summary(board: WorkingMemoryBoard) -> Dict[str, Any]:
@@ -650,11 +602,11 @@ def _infer_conditional_needs(episode: Dict[str, Any], board: WorkingMemoryBoard)
     return {"refundable": refundable, "vegan": vegan, "client_dinner": client_dinner}
 
 
-def _seed_itinerary(runtime: StudentRuntime, board: WorkingMemoryBoard, episode: Dict[str, Any]) -> Dict[str, Any]:
+def _seed_itinerary(runtime: StudentRuntime, board: WorkingMemoryBoard, episode: Dict[str, Any], session: Any) -> Dict[str, Any]:
     """Build a guaranteed-feasible baseline with the deterministic selector."""
     needs = _infer_conditional_needs(episode, board)
     picked = select_feasible_itinerary(
-        runtime.toolbox.env,
+        session,
         episode,
         require_refundable=needs["refundable"],
         require_vegan=needs["vegan"],
@@ -789,7 +741,12 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
     total_tool_calls = 0
 
     # ── 2. Initial Memory Agent ─────────────────────────────────────
-    preloaded_context, preloaded_usage = _preload_all_static_context(runtime, episode)
+    memory_session = runtime.new_session(
+        role="mas_memory_manager",
+        max_results=config.get("max_tool_results", 4),
+    )
+    
+    preloaded_context, preloaded_usage = _preload_all_static_context(memory_session, runtime, episode)
     total_usage = runtime.combine_usages(total_usage, preloaded_usage)
 
     board_before_mem = _board_summary(board)
@@ -801,8 +758,7 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
         "budget": episode["budget_total"],
         "missing": "flight, hotel, restaurant, activity",
     })
-    mem_res = _call_memory_agent(runtime, board, preloaded_context, logger=logger)
-    _register_preloaded_docs(mem_res["session"], episode)
+    mem_res = _call_memory_agent(runtime, board, preloaded_context, logger=logger, session=memory_session)
     _update_board_from_memory(board, mem_res["parsed"], mem_res["session"], episode)
     total_usage = runtime.combine_usages(total_usage, mem_res["usage"])
     total_tool_calls += mem_res["session"].summary()["tool_call_count"]
@@ -818,8 +774,13 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
     # ── 2b. Deterministic feasible seed ─────────────────────────────
     # Guarantees the hard constraints (budget, quiet, meeting_safe, zone) that the
     # LLM planner cannot reliably juggle. The planner loop below then only refines.
-    baseline = _seed_itinerary(runtime, board, episode)
+    seed_session = runtime.new_session(role="mas_planner", max_results=config.get("max_tool_results", 4))
+    baseline = _seed_itinerary(runtime, board, episode, seed_session)
     logger.log_board_state("planner", _board_summary(board), stage="SEED")
+    
+    total_usage = runtime.combine_usages(total_usage, seed_session.usage)
+    total_tool_calls += seed_session.summary()["tool_call_count"]
+    logger.log_tool_calls("planner", seed_session.summary()["tool_trace"])
 
     # ── 3. Planner Loop (fallback only) ─────────────────────────────
     # The deterministic seed normally fills every slot, so this loop is skipped.
@@ -848,7 +809,7 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
         logger.log_tool_calls("planner", plan_res["session"].summary()["tool_trace"])
         logger.log_decision(plan_out)
 
-        feedback = _save_planner_proposals(runtime, board, plan_out)
+        feedback = _save_planner_proposals(runtime, board, plan_out, plan_res["session"])
 
         logger.phase_end("planner", output_summary={
             "flight_id": plan_out.get("flight_id"),
@@ -1016,7 +977,7 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
             logger.log_decision(plan_out)
 
             # Hydrate itinerary using _save_planner_proposals instead of just saving IDs
-            _save_planner_proposals(runtime, board, plan_out)
+            _save_planner_proposals(runtime, board, plan_out, plan_res["session"])
             
             logger.phase_end("planner", output_summary={
                 "flight_id": plan_out.get("flight_id"),
