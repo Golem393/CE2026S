@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import concurrent.futures
 from typing import Any, Dict, List
 
 from llm_agents import (
@@ -447,44 +448,79 @@ def _save_planner_proposals(
 #  MAIN ORCHESTRATION
 # ═══════════════════════════════════════════════════════════════════════
 
-def _preload_all_static_context(runtime: StudentRuntime, episode: Dict[str, Any]) -> str:
+def _extract_conversation_constraints(runtime: StudentRuntime, episode: Dict[str, Any]) -> tuple[str, Dict[str, Any]]:
+    turns = episode.get("turns", [])
+    if not turns:
+        return ("None", runtime.empty_usage())
+    
+    schema = {
+        "type": "object",
+        "properties": {
+            "final_constraints": {"type": "array", "items": {"type": "string"}, "description": "The final, active constraints after resolving any contradictions or retractions."}
+        },
+        "required": ["final_constraints"],
+        "additionalProperties": False
+    }
+    input_text = "Chronological conversation history:\n"
+    for i, t in enumerate(turns):
+        input_text += f"Turn {i+1}: {t.get('text', '')}\n"
+        
+    res = runtime.runner.create_json_response(
+        model="gpt-4o-mini",
+        instructions="Analyze the entire conversation. Extract the final, active constraints, explicitly ignoring any that were later retracted or overridden.",
+        input_text=input_text,
+        json_schema=schema,
+        schema_name="final_constraints",
+        max_output_tokens=1500,
+    )
+    return (json.dumps(res['parsed']['final_constraints']), res["usage"])
+
+
+def _preload_all_static_context(runtime: StudentRuntime, episode: Dict[str, Any]) -> tuple[str, Dict[str, Any]]:
     env = runtime.toolbox.env
     city = episode["city"]
     family = episode["family"]
     traveler = episode["traveler_id"]
 
     parts = ["\n--- PRE-LOADED STATIC CONTEXT ---"]
-    parts.append(f"\n1. Profile Brief: {json.dumps(env.get_profile_brief(traveler))}")
-    parts.append(f"\n2. Venue Brief: {json.dumps(env.get_venue_brief(city, family))}")
-    parts.append(f"\n3. City Ops Notes: {json.dumps(env.get_city_ops_notes(city))}")
+    parts.append(f"\n1. Profile Brief (Raw): {json.dumps(env.get_profile_brief(traveler))}")
+    
+    docs_to_append = []
+    
+    docs_to_append.append(("Venue Brief", env.get_venue_brief(city, family)))
+    docs_to_append.append(("City Ops Notes", env.get_city_ops_notes(city)))
     
     loyalty = env.get_loyalty_profile(traveler)
-    if loyalty:
-        parts.append(f"\n4. Loyalty Profile: {json.dumps(loyalty)}")
-    
+    if loyalty: docs_to_append.append(("Loyalty Profile", loyalty))
+        
     constraints = env.get_booking_constraints(city=city, family=family)
-    if constraints:
-        parts.append(f"\n5. Booking Constraints: {json.dumps(constraints)}")
+    if constraints: docs_to_append.append(("Booking Constraints", constraints))
         
     deps = env.get_option_dependencies(city=city)
-    if deps:
-        parts.append(f"\n6. Option Dependencies: {json.dumps(deps)}")
+    if deps: docs_to_append.append(("Option Dependencies", deps))
         
     promos = env.get_partner_promotions(city=city, family=family)
-    if promos:
-        parts.append(f"\n7. Partner Promotions: {json.dumps(promos)}")
+    if promos: docs_to_append.append(("Partner Promotions", promos))
         
     events = env.get_event_calendar(city)
-    if events:
-        parts.append(f"\n8. Event Calendar: {json.dumps(events)}")
+    if events: docs_to_append.append(("Event Calendar", events))
         
     rejected = [r for r in runtime.toolbox.rejected_options if r["city"] == city and r["family"] == family]
-    if rejected:
-        parts.append(f"\n9. Rejected Options: {json.dumps(rejected)}")
+    if rejected: docs_to_append.append(("Rejected Options", rejected))
         
-    parts.append(f"\n10. Policy: {json.dumps(env.get_policy())}")
+    docs_to_append.append(("Policy", env.get_policy()))
 
-    return "\n".join(parts)
+    usage = runtime.empty_usage()
+
+    final_constraints_str, u = _extract_conversation_constraints(runtime, episode)
+    usage = runtime.combine_usages(usage, u)
+    parts.append(f"\n2. Conversation Active Constraints: {final_constraints_str}")
+
+    parts.append("\n3. Raw Static Documents:")
+    for name, doc in docs_to_append:
+        parts.append(f"\n- {name}:\n{json.dumps(doc)}")
+
+    return "\n".join(parts), usage
 
 
 def _register_preloaded_docs(session: Any, episode: Dict[str, Any]) -> None:
@@ -753,7 +789,8 @@ def solve_episode(runtime: StudentRuntime) -> Dict[str, Any]:
     total_tool_calls = 0
 
     # ── 2. Initial Memory Agent ─────────────────────────────────────
-    preloaded_context = _preload_all_static_context(runtime, episode)
+    preloaded_context, preloaded_usage = _preload_all_static_context(runtime, episode)
+    total_usage = runtime.combine_usages(total_usage, preloaded_usage)
 
     board_before_mem = _board_summary(board)
     logger.log_board_state("memory", board_before_mem, stage="BEFORE")
